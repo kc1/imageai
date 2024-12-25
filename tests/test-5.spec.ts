@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
+import sharp from 'sharp';
 
 test("test", async ({ page }) => {
+  test.setTimeout(60000);
+
   // Create context with modified permissions and popup blocking
   const context = await page.context();
   await context.grantPermissions(["geolocation"], {
@@ -61,10 +64,32 @@ test("test", async ({ page }) => {
       y: 250,
     },
   });
-  await page.locator('div').filter({ hasText: /^3D46\.3431, -90\.5944$/ }).getByRole('img').nth(2).click();
+  // await page.locator('div').filter({ hasText: /^3D46\.3431, -90\.5944$/ }).getByRole('img').nth(2).click();
   await page.locator('li').filter({ hasText: 'Water' }).locator('div').first().click();
 
+  await page.waitForTimeout(2000);
   await page.screenshot({ path: "water.png", fullPage: true });
-  await page.locator('li').filter({ hasText: 'Outdoors' }).getByRole('img').locator('path').click();
+
+  // Get the image dimensions
+  const imageInfo = await sharp("water.png").metadata();
+  console.log('Image dimensions:', {
+    width: imageInfo.width,
+    height: imageInfo.height
+  });
+
+  // Now you can use these dimensions to take a cropped screenshot
+  await page.screenshot({ 
+    path: "water-cropped.png", 
+    clip: {
+      x: 0,
+      y: 0,
+      width: imageInfo.width,
+      height: imageInfo.height
+    }
+  });
+
+  await page.locator('li').filter({ hasText: 'Outdoors' }).locator('div').first().click();
+  // await page.locator('li').filter({ hasText: 'Outdoors' }).getByRole('img').locator('path').click();
+  await page.waitForTimeout(2000);
   await page.screenshot({ path: "contours.png", fullPage: true });
 });
