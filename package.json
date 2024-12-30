@@ -11,6 +11,7 @@
     "@ulixee/hero": "^2.0.0-alpha.30",
     "@ulixee/hero-core": "^2.0.0-alpha.30",
     "@ulixee/hero-playground": "^2.0.0-alpha.30",
+    "express": "^4.21.2",
     "playwright": "^1.48.0",
     "playwright-extra": "^4.3.6",
     "playwright-extra-plugin-stealth": "^0.0.1",
@@ -18,7 +19,7 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.49.1",
     "@types/node": "^22.7.5"
   }
 }
