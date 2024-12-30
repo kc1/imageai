@@ -6,8 +6,10 @@ chromium.use(stealth);
 
 async function launchBrowser(headless = false) {
     const browser = await chromium.launch({ headless: headless });
+
     return browser;
 }
+
 
 module.exports = {
     launchBrowser

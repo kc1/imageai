@@ -1,6 +1,8 @@
 const express = require("express");
+// const sharp = require("sharp");
 
 const { launchBrowser } = require("./stealthPlaywright");
+const { performTest } = require('./tests/test-5.spec.ts');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,11 +24,12 @@ app.post("/process", async (req, res) => {
     // });
 
     const page = await context.newPage();
-    await page.goto("https://id.land/users/sign_in");
+    // await page.goto("https://id.land/users/sign_in");
 
+    await performTest(page);
     // Add your test logic here
 
-    await page.screenshot({ path: "water.png", fullPage: true });
+    // await page.screenshot({ path: "water.png", fullPage: true });
     await browser.close();
     res.json({ status: "success" });
   } catch (error) {
