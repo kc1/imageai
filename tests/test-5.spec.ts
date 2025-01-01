@@ -1,7 +1,7 @@
 // const { test, expect } = require("@playwright/test");
 const sharp = require("sharp");
 
-async function performTest(page) {
+async function performTest(page,property) {
   // test.setTimeout(60000);
 
   const context = await page.context();
@@ -29,10 +29,12 @@ async function performTest(page) {
   await page.getByText("ID").click();
 
   await page.keyboard.press("Tab");
-  await page.keyboard.type("Wisconsin");
+  // await page.keyboard.type("Wisconsin");
+  await page.keyboard.type(property.state);
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
-  await page.keyboard.type("Ashland");
+  // await page.keyboard.type("Ashland");
+  await page.keyboard.type(property.county);
   await page.keyboard.press("Tab");
   await page.getByPlaceholder("County").click();
   await page.getByPlaceholder("County").fill("o");
@@ -42,12 +44,22 @@ async function performTest(page) {
     .locator("div")
     .click();
   await page.getByPlaceholder("ID").click();
-  await page.getByPlaceholder("ID").fill("1234");
-  await page
-    .locator("div")
-    .filter({ hasText: /^018-01234-0000 \(18012340000\)$/ })
-    .locator("div")
-    .click();
+  // await page.getByPlaceholder("ID").fill("1234");
+  await page.getByPlaceholder("ID").fill(property.apn);
+  // let slug = "("+property.apn.slice(0, 2); 
+  // slug = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  // console.log(slug);
+  // await page
+  //   .locator("div")
+  //   .filter({ hasText: new RegExp(`${slug}`) })
+  // await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  //   .click();
+  // await page.keyboard.press("Tab");
+  await page.keyboard.press('Tab');
+  // await page.keyboard.press('Tab');
+
+  // await page.getByPlaceholder("County").click();
   await page.getByRole("button", { name: "GO" }).click();
 
   await page.locator(".waypoint-message__close > svg").click();
