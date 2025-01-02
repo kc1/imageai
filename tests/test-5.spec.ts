@@ -1,5 +1,7 @@
 // const { test, expect } = require("@playwright/test");
 const sharp = require("sharp");
+const fetch = require('node-fetch');
+const fileContent = require('fs').readFileSync(filePath);
 
 async function performTest(page,property) {
   // test.setTimeout(60000);
@@ -103,8 +105,12 @@ async function performTest(page,property) {
     .first()
     .click();
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: "contours.png", fullPage: true });
+  await page.screenshot({ path: "/home/ubuntu/external/contours.png", fullPage: true });
 }
+
+
+
+
 // test("test", async ({ page }) => {
 //   test.setTimeout(60000);
 
