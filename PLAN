@@ -13,6 +13,8 @@ https://www.youtube.com/watch?v=-jPLIgms18I
 
 https://www.reddit.com/r/programming/comments/13kt2go/dropbox_api_auth_help/
 
+https://stackoverflow.com/questions/70641660/how-do-you-get-and-use-a-refresh-token-for-the-dropbox-api-python-3-x/71794390#71794390
+
 https://www.codemzy.com/blog/dropbox-long-lived-access-refresh-token
 
 FOR THE ABOVE: curl --location 'https://api.dropboxapi.com/oauth2/token' \
