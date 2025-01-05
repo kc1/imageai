@@ -7,5 +7,36 @@ LearnLM 1.5 Pro Experimental (free)
 
 in the role of a real estate investor can you rewrite the following: Nevin, We talked a while back about https://www.realtor.com/realestateandhomes-detail/On-Laura-Acres-Ln-Unit-37_Rhinelander_WI_54501_M95152-31959?from=srp , but someone else ended up buying it. Have you come across any similar proprties recently? I'm interested in properies with a mild slope , a small amount of ground water/flood plain and legal road access. Thank you - Dan
 
+https://www.dropbox.com/developers/apps/info/4wlwoffttm98qno#settings - to get a new token
 
+https://www.youtube.com/watch?v=-jPLIgms18I
 
+https://www.reddit.com/r/programming/comments/13kt2go/dropbox_api_auth_help/
+
+https://www.codemzy.com/blog/dropbox-long-lived-access-refresh-token
+
+FOR THE ABOVE: curl --location 'https://api.dropboxapi.com/oauth2/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Authorization: Basic NHdsd29mZnR0bTk4cW5vOjZ4ZThjeDE4ZGdxNW9hNQ==' \
+--data-urlencode 'code=NkrxyqzmbBAAAAAAAAABG_ejEPAD9jRLsnj29Tr9PpM' \
+--data-urlencode 'grant_type=authorization_code'
+
+I imported into postman - BUT MOVE QUICKLY, the token expires in  maybe 1-2 minutes
+
+output:
+
+{
+    "access_token": "sl.u.AFecdRyKspBb9EmbG9WHpGIqlp5qmAmwQXUvkmPR8-GaVVrtVOCYIxv5AZJeU0wuOXW4KyZhv32-yVmwM91Y6PMUAERExclgu0K8W4WXC1K8aIsL1MlDaH_sR1ogmRcFj8HizyvnKTdVHiMIldq7GdcGFxjVhzJhivYsRFvS2BYg3Alv6e4KoP7MLHzK-VU3WA6KpATxdiJS1hbSB03MFieXIOdJ-4kUiSbgBBGfcD1_9nlj1teDAEtjiOi3nRVAabLBTpuHR9bJG9fsMJu1EIlg0K509BTIF7kwc-AGxpS8WDqBV3Qk_8qOG35LRQab1C_JlnGBqEzf7zgHx-8Ww6xdCwvgbeRF3d44yM-OnU3aq3xTsl7GIjywONI0-k0eMSfpujYEMGhR-nfhc1-uraMi7snqmgx2dhOtFzDADqsOAsBwlxiWdxsP_zdyAnhIvmXFABrEMahbEJmjDe2RAXR6kqv_AziDTCysxd95NsNKVfJaKaK5OUs-BMXKiCQtYgWAmJUqrMkcK77eFlnmrF1Q2KVZ93eKTJktazxLNF6ZPJ3ZdtGQYHR4IufFeJ_LiK9KGGZhV01Avsr5r_XI53_E5sR6a5vSZ0NoMEcuUCe0CV8qqLGQNazVKgElnuiRy4TVSwmVICNbuu64LIRB6RYmBOuYHgUzniHdWVzLoX-jJilka6fqzV2-q5zjPk4i6sEoqKvXxBTS8Addbb8KmcRbWNZ69Bf0JqoujVu2Iu079jtV0x205cv1NE8eCfZYgHWS0iIs58hRt8C8ENgdrvIIMobTc2xySN6-sky6_awOq7R1jC9MXyb5Ra7tIrhys6YVDr1YI9oPp91rjFeW1QiuDTdr-ROepnNwFSph9pHl15lSmXJtjXuG8JNm0Er3ljfWIBrl6WtWvO1aysdekE7JUe0_RthyCGSa0w6IgotVK_6e67WV78f64MuSYcT6N-mCeAENQ2JF6lL50JGljfB8lDtL_oKkZBH0oYmPKw7kV-ngKZBGaKolts7BJ2JVlnnPxipJrxbWkDZXdxwBY1ZTafD-2nyX-eri7hiNOre-B6Hp7wnNPh176POvqDxQk56qXOShIT3JmjpddptkXAtOXeERPYlrtD5SrhrpZg6r_qILq4fHBbBSyNF9BECAMIEslNqjgLfI0KLSMPMX1hE47q5NGi8TN1Ll2DFGtddXF7mo2yaEum5B-R8CCBxjaeLXpsG8WbYoDoDfeIzTby1uWtPYsEPcktNOrBwLCVcTKv6bbHRzhPpLSvYbDknrEQbaNhbxf7-p1Q0UYQkw5kWmAocTO2rke9kkwy5kSDpUnw",
+    "token_type": "bearer",
+    "expires_in": 14400,
+    "refresh_token": "UOMpkiFcvhYAAAAAAAAAAUewQset5jLmSXhR_WhteKBN7CBO8Yvb4F7_TCCe9Nyr",
+    "scope": "account_info.read files.content.read files.content.write files.metadata.read files.metadata.write",
+    "uid": "2177046336",
+    "account_id": "dbid:AAC1P8KCveHRKsjl96a11LV6RC4MURkoDA0"
+}
+
+if you POST:
+
+https://api.dropbox.com/oauth2/token?grant_type=refresh_token&refresh_token=UOMpkiFcvhYAAAAAAAAAAUewQset5jLmSXhR_WhteKBN7CBO8Yvb4F7_TCCe9Nyr&client_id=4wlwoffttm98qno&client_secret=6xe8cx18dgq5oa5
+
+you should get an access token
