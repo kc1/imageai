@@ -1,6 +1,6 @@
 // const { test, expect } = require("@playwright/test");
 const sharp = require("sharp");
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 const fileContent = require('fs').readFileSync(filePath);
 
 async function performTest(page,property) {
@@ -82,21 +82,21 @@ async function performTest(page,property) {
   await page.waitForTimeout(2000);
   await page.screenshot({ path: "water.png", fullPage: true });
 
-  const imageInfo = await sharp("water.png").metadata();
-  console.log("Image dimensions:", {
-    width: imageInfo.width,
-    height: imageInfo.height,
-  });
+  // const imageInfo = await sharp("water.png").metadata();
+  // console.log("Image dimensions:", {
+  //   width: imageInfo.width,
+  //   height: imageInfo.height,
+  // });
 
-  await page.screenshot({
-    path: "water-cropped.png",
-    clip: {
-      x: 0,
-      y: 0,
-      width: imageInfo.width,
-      height: imageInfo.height,
-    },
-  });
+  // await page.screenshot({
+  //   path: "water-cropped.png",
+  //   clip: {
+  //     x: 0,
+  //     y: 0,
+  //     width: imageInfo.width,
+  //     height: imageInfo.height,
+  //   },
+  // });
 
   await page
     .locator("li")
