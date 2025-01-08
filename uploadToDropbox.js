@@ -1,19 +1,14 @@
 const dropboxV2Api = require("dropbox-v2-api");
 const fs = require("fs");
-const path = require("path");
-const { refreshDropboxToken } = require("./refreshToken");
+// const path = require("path");
+// const { refreshDropboxToken } = require("./refreshToken");
 // console refreshDropboxToken
 // const dropboxToken = "sl.CDstoLOwfEsHmwOx3pUe3DuxajGLKTiVlDK8snrIS5bogNHeJ5KTZTVMIqss3iITXUfTWFW28MVnSW8j3Ww9IZPmWj6-TqfNpgOkBIsbmjGE9l7311Vyv7VQIBU7Ou5cqxyWIIjcAJw4";
 
-(async function uploadToDropbox(filename,filePath,dropboxToken) {
-  // const filePath = "./water.png";
-  // const timestamp = Date.now();
-  // const filename = `${timestamp}_${path.basename(filePath)}`;
+async function uploadToDropbox(filename,filePath,dropboxToken) {
 
-  const data = await refreshDropboxToken();
-  // console.log(dropboxToken);
   const dropbox = dropboxV2Api.authenticate({
-    token: data.access_token,
+    token: dropboxToken,
   });
 
   dropbox(
@@ -32,4 +27,8 @@ const { refreshDropboxToken } = require("./refreshToken");
       console.log("Upload successful:", result);
     }
   );
-})();
+}
+
+module.exports = {
+    uploadToDropbox
+};

@@ -1,10 +1,16 @@
+// import { uploadToDropbox } from "../uploadToDropbox";
+
+const { uploadToDropbox } = require("../uploadToDropbox");
 // const { test, expect } = require("@playwright/test");
 const sharp = require("sharp");
 // const fetch = require('node-fetch');
-const fileContent = require('fs').readFileSync(filePath);
-
+// const fileContent = require('fs').readFileSync(filePath);
+const { refreshDropboxToken } = require("../refreshToken");
 async function performTest(page,property) {
   // test.setTimeout(60000);
+  const data = await refreshDropboxToken();
+  const dropboxToken = data.access_token;
+
 
   const context = await page.context();
   await context.grantPermissions(["geolocation"], {
@@ -105,10 +111,16 @@ async function performTest(page,property) {
     .first()
     .click();
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: "/home/ubuntu/external/contours.png", fullPage: true });
+  await page.screenshot({ path: "contours.png", fullPage: true });
+
+  const date = new Date();
+  const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
+  const waterFilename = `${property.state}-${property.county}-${property.apn}-${formattedDate}-water.png`;
+  const contoursFilename = `${property.state}-${property.county}-${property.apn}-${formattedDate}-contours.png`;
+
+  await uploadToDropbox(waterFilename,"./water.png",dropboxToken);
+  await uploadToDropbox(contoursFilename,"./contours.png",dropboxToken);
 }
-
-
 
 
 // test("test", async ({ page }) => {

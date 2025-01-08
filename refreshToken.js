@@ -26,7 +26,7 @@ async function refreshDropboxToken() {
     }
 }
 
-// refreshDropboxToken();
+refreshDropboxToken();
 
 module.exports = {
     refreshDropboxToken
