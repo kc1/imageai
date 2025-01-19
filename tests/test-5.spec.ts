@@ -1,7 +1,8 @@
 // import { uploadToDropbox } from "../uploadToDropbox";
 const { uploadToDropbox } = require("../uploadToDropbox");
 
-const { writeToDropbox } = require("../writeImageToDropbox");
+// const { writeToDropbox } = require("../writeImageToDropbox");
+
 // const { test, expect } = require("@playwright/test");
 // const sharp = require("sharp");
 // const fetch = require('node-fetch');
@@ -37,7 +38,9 @@ async function login(page) {
 }
 
 async function performTest(page, property, dropboxToken) {
-  await page.waitForTimeout(1000);
+
+  await page.goto("https://id.land/discover");
+  await page.waitForTimeout(2000);
   await page.getByText("Address").click();
   await page.getByText("Parcel").click();
   await page.getByText("ID").click();
@@ -73,7 +76,8 @@ async function performTest(page, property, dropboxToken) {
   // .filter({ hasText: new RegExp(`^$County$`) })
   // await page.getByPlaceholder("ID").fill("1234");
   const apn = property.apn.toString();
-  await page.getByPlaceholder("ID").fill(apn);
+  const cleanApn = apn.replace(/[^a-zA-Z0-9]/g, '');
+  await page.getByPlaceholder("ID").fill(cleanApn);
   // let slug = "("+property.apn.slice(0, 2);
   // slug = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   // console.log(slug);
@@ -175,7 +179,6 @@ async function performTest(page, property, dropboxToken) {
   // await writeToDropbox(waterBuffer, waterFilename, dropboxToken);
   // await writeToDropbox(contourBuffer, contoursFilename, dropboxToken);
 
-  await page.goto("https://id.land/discover");
 }
 
 // test("test", async ({ page }) => {
