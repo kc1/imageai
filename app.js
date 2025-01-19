@@ -2,7 +2,8 @@ const express = require("express");
 // const sharp = require("sharp");
 
 const { launchBrowser } = require("./stealthPlaywright");
-const { performTest } = require("./tests/test-5.spec.ts");
+const { performTest, login } = require("./tests/test-5.spec.ts");
+const { log } = require("console");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,12 +11,17 @@ const port = process.env.PORT || 3000;
 // Add JSON middleware
 app.use(express.json());
 
+const { refreshDropboxToken } = require("./refreshToken");
+
 app.post("/processMany", async (req, res) => {
   try {
     const properties = req.body;
     console.log("Properties:", properties);
 
     if (!properties || !properties.length) return "No properties to process";
+
+    const data = await refreshDropboxToken();
+    const dropboxToken = data.access_token;
 
     // return properties;
 
@@ -29,12 +35,17 @@ app.post("/processMany", async (req, res) => {
       javaScriptEnabled: true,
     });
 
+    const page = await context.newPage();
+    const loggedInPage = await login(page);
+
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
       property.apn = property.APN;
       if (property && property.state && property.county && property.APN) {
-        const page = await context.newPage();
-        await performTest(page, property);
+        // const page = await context.newPage();
+          await performTest(loggedInPage, property, dropboxToken);
+          // await require('fs').promises.unlink('./water.png').catch(err => console.error('Error deleting water.png:', err));
+          // await require('fs').promises.unlink('./contours.png').catch(err => console.error('Error deleting water.png:', err));
       }
     }
 

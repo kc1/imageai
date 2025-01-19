@@ -1,16 +1,18 @@
 // import { uploadToDropbox } from "../uploadToDropbox";
-
 const { uploadToDropbox } = require("../uploadToDropbox");
+
+const { writeToDropbox } = require("../writeImageToDropbox");
 // const { test, expect } = require("@playwright/test");
-const sharp = require("sharp");
+// const sharp = require("sharp");
 // const fetch = require('node-fetch');
 // const fileContent = require('fs').readFileSync(filePath);
-const { refreshDropboxToken } = require("../refreshToken");
-async function performTest(page,property) {
-  // test.setTimeout(60000);
-  const data = await refreshDropboxToken();
-  const dropboxToken = data.access_token;
+// const { uploadToDropbox } = require("../uploadToDropbox");
+// const { refreshDropboxToken } = require("../refreshToken");
+// const data = await refreshDropboxToken();
+// const dropboxToken = data.access_token;
 
+async function login(page) {
+  // test.setTimeout(60000);
 
   const context = await page.context();
   await context.grantPermissions(["geolocation"], {
@@ -30,7 +32,11 @@ async function performTest(page,property) {
   await page.getByPlaceholder("Password").fill("Landid1!");
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await page.keyboard.press("Escape");
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  return page;
+}
 
+async function performTest(page, property, dropboxToken) {
   await page.waitForTimeout(1000);
   await page.getByText("Address").click();
   await page.getByText("Parcel").click();
@@ -43,34 +49,57 @@ async function performTest(page,property) {
   await page.keyboard.press("Tab");
   // await page.keyboard.type("Ashland");
   await page.keyboard.type(property.county);
-  await page.keyboard.press("Tab");
+  // await page.keyboard.press("Tab");
+  // await page.keyboard.press("Tab");
   await page.getByPlaceholder("County").click();
-  await page.getByPlaceholder("County").fill("o");
-  await page
-    .locator("div")
-    .filter({ hasText: /^Ashland County$/ })
-    .locator("div")
-    .click();
+  // await page.getByPlaceholder("County").fill("o");
+  await page.getByPlaceholder("County").fill(property.county);
+  // await page.locator("div.provisional > div.icon").getByText(/.*County.*/).click();
+  // await page.locator("div.provisional > div.icon").getByText(/.*County.*/).click();
+  // await page.getBy.locator("div.provisional").click();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Tab");
+  // await page.getByPlaceholder("County").click();
+  // await page.getByPlaceholder("County").fill("o");
+
+  // await page
+  //   .locator("div")
+  //   .filter({ hasText: new RegExp(/.*County.*/) })
+  //   .locator("div")
+  //   .click();
   await page.getByPlaceholder("ID").click();
+
+  // .filter({ hasText: new RegExp(`^$County$`) })
   // await page.getByPlaceholder("ID").fill("1234");
-  await page.getByPlaceholder("ID").fill(property.apn);
-  // let slug = "("+property.apn.slice(0, 2); 
+  const apn = property.apn.toString();
+  await page.getByPlaceholder("ID").fill(apn);
+  // let slug = "("+property.apn.slice(0, 2);
   // slug = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   // console.log(slug);
   // await page
   //   .locator("div")
   //   .filter({ hasText: new RegExp(`${slug}`) })
   // await page.keyboard.press('Shift+Tab');
-  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press("Shift+Tab");
   //   .click();
   // await page.keyboard.press("Tab");
-  await page.keyboard.press('Tab');
+  await page.keyboard.press("Tab");
   // await page.keyboard.press('Tab');
 
   // await page.getByPlaceholder("County").click();
   await page.getByRole("button", { name: "GO" }).click();
 
-  await page.locator(".waypoint-message__close > svg").click();
+  // Check if waypoint message exists before clicking
+  try {
+    const waypointMessage = page.locator(".waypoint-message__close > svg");
+    if (await waypointMessage.isVisible({ timeout: 2000 })) {
+      await waypointMessage.click();
+    }
+  } catch (error) {
+    console.log("Waypoint message not found, continuing...");
+  }
+
   await page.getByLabel("Map", { exact: true }).click({
     button: "right",
     position: {
@@ -86,8 +115,22 @@ async function performTest(page,property) {
     .click();
 
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: "water.png", fullPage: true });
+  const date = new Date();
+  // const formattedDate = `${(date.getMonth() + 1)
+  //   .toString()
+  //   .padStart(2, "0")}-${date
+  //   .getDate()
+  //   .toString()
+  //   .padStart(2, "0")}-${date.getFullYear()}`;
+    const timestamp = Math.floor(date.getTime() / 1000);
+  const waterFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-water.png`;
+  const contoursFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-contours.png`;
 
+  await page.screenshot({
+    path: "./screenshots/" + waterFilename,
+    fullPage: true,
+  });
+  // const waterBuffer = await page.screenshot();
   // const imageInfo = await sharp("water.png").metadata();
   // console.log("Image dimensions:", {
   //   width: imageInfo.width,
@@ -110,18 +153,30 @@ async function performTest(page,property) {
     .locator("div")
     .first()
     .click();
-  await page.waitForTimeout(2000);
-  await page.screenshot({ path: "contours.png", fullPage: true });
+  await page.waitForTimeout(10000);
+  // const contourBuffer = await page.screenshot();
+  await page.screenshot({
+    path: "./screenshots/" + contoursFilename,
+    fullPage: true,
+  });
 
-  const date = new Date();
-  const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
-  const waterFilename = `${property.state}-${property.county}-${property.apn}-${formattedDate}-water.png`;
-  const contoursFilename = `${property.state}-${property.county}-${property.apn}-${formattedDate}-contours.png`;
+  // await uploadToDropbox(waterFilename, "./water.png", dropboxToken);
+  await uploadToDropbox(
+    waterFilename,
+    "./screenshots/" + waterFilename,
+    dropboxToken
+  );
+  await uploadToDropbox(
+    contoursFilename,
+    "./screenshots/" + contoursFilename,
+    dropboxToken
+  );
 
-  await uploadToDropbox(waterFilename,"./water.png",dropboxToken);
-  await uploadToDropbox(contoursFilename,"./contours.png",dropboxToken);
+  // await writeToDropbox(waterBuffer, waterFilename, dropboxToken);
+  // await writeToDropbox(contourBuffer, contoursFilename, dropboxToken);
+
+  await page.goto("https://id.land/discover");
 }
-
 
 // test("test", async ({ page }) => {
 //   test.setTimeout(60000);
@@ -227,5 +282,6 @@ async function performTest(page,property) {
 // });
 
 module.exports = {
-   performTest 
+  performTest,
+  login,
 };
