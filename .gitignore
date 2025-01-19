@@ -2,6 +2,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
-/screenshots/
 /playwright/.cache/
+package-lock.json
+package.json
 *.png

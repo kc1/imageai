@@ -56,6 +56,11 @@ async function getDropboxSharedLinks() {
 }
 
 // Usage
-getDropboxSharedLinks()
-  .then(links => console.log('Shared Links:', links))
-  .catch(error => console.error('Failed to get links:', error));
+(async () => {
+  try {
+    const links = await getDropboxSharedLinks();
+    console.log('Shared Links:', links);
+  } catch (error) {
+    console.error('Failed to get links:', error);
+  }
+})();
