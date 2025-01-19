@@ -11,6 +11,15 @@ const port = process.env.PORT || 3000;
 // Add JSON middleware
 app.use(express.json());
 
+// Add index route
+app.get('/', (req, res) => {
+  try {
+    res.send('Hello World');
+  } catch (error) {
+    res.status(500).send('Server Error');
+  }
+});
+
 const { refreshDropboxToken } = require("./refreshToken");
 
 app.post("/processMany", async (req, res) => {
