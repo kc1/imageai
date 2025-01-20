@@ -7,7 +7,7 @@ export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
 # npm install                                                               ║
 # npx playwright install    
 # npx playwright install
-yarn playwright install chromium
+# yarn playwright install chromium
 # Install Playwright browsers
 
 # npm install                                                               ║
