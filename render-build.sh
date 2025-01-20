@@ -4,6 +4,7 @@ set -e
 # Set the PLAYWRIGHT_BROWSERS_PATH environment variable
 export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
 
+
 yarn playwright install chromium
 # Install Playwright browsers
 # npx playwright install
