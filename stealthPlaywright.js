@@ -4,7 +4,7 @@ const sharp = require("sharp");
 
 chromium.use(stealth);
 
-async function launchBrowser(headless = false) {
+async function launchBrowser(headless = true) {
     const browser = await chromium.launch({ headless: headless });
 
     return browser;
