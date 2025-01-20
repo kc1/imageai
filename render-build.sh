@@ -5,9 +5,9 @@ set -e
 export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
 
 
+npx playwright install
 yarn playwright install chromium
 # Install Playwright browsers
-# npx playwright install
 
 # Store/pull Playwright cache with build cache
 if [[ ! -d $PLAYWRIGHT_BROWSERS_PATH ]]; then 
