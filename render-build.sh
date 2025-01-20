@@ -4,12 +4,13 @@ set -e
 # Set the PLAYWRIGHT_BROWSERS_PATH environment variable
 export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
 
-npm install                                                               ║
+# npm install                                                               ║
 npx playwright install    
 # npx playwright install
 yarn playwright install chromium
 # Install Playwright browsers
 
+npm install                                                               ║
 # Store/pull Playwright cache with build cache
 if [[ ! -d $PLAYWRIGHT_BROWSERS_PATH ]]; then 
   echo "...Copying Playwright Cache from Build Cache"  
