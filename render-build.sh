@@ -2,7 +2,10 @@
 set -e
 
 # Set the PLAYWRIGHT_BROWSERS_PATH environment variable
-export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
+# export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright"
+export PLAYWRIGHT_BROWSERS_PATH="/opt/render/project/playwright/chromium-1155"
+
+# Chromium Headless Shell 133.0.6943.16 (playwright build v1155) downloaded to /opt/render/project/playwright/chromium_headless_shell-1155
 
 npm install                                   
 # yarn playwright install chromium
