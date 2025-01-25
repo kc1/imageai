@@ -54,9 +54,9 @@ async function performTest(page, property, dropboxToken) {
     "./screenshots/" + testFile,
     dropboxToken
   );
-
+  console.log("Test file uploaded to Dropbox");
   await page.goto("https://id.land/discover");
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(10000);
   await page.getByText("Address").click();
   await page.getByText("Parcel").click();
   await page.getByText("ID").click();
