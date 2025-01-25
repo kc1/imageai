@@ -25,7 +25,7 @@ async function login(page) {
   await context.grantPermissions(["geolocation"], {
     origin: "https://id.land",
   });
-
+  await page.setDefaultTimeout(120000);
   await page.goto("https://id.land/users/sign_in");
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
@@ -55,7 +55,7 @@ async function performTest(page, property, dropboxToken) {
     dropboxToken
   );
   console.log("Test file uploaded to Dropbox");
-  // await page.goto("https://id.land/discover");
+  await page.goto("https://id.land/discover");
   await page.waitForTimeout(10000);
   await page.getByText("Address").click();
   
