@@ -39,6 +39,7 @@ async function login(page) {
 
 async function performTest(page, property, dropboxToken) {
 
+  await page.waitForTimeout(4000);
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
   const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
