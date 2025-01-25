@@ -303,6 +303,6 @@ async function login (page,property, dropboxToken) {;
 // });
 
 module.exports = {
-  performTest,
+  // performTest,
   login,
 };

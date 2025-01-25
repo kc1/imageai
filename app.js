@@ -2,7 +2,8 @@ const express = require("express");
 // const sharp = require("sharp");
 
 const { launchBrowser } = require("./stealthPlaywright");
-const { performTest, login } = require("./tests/test-5.spec.ts");
+// const { performTest, login } = require("./tests/test-5.spec.ts");
+const { login } = require("./tests/test-5.spec.ts");
 const { log } = require("console");
 
 const app = express();
