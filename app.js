@@ -45,7 +45,8 @@ app.post("/processMany", async (req, res) => {
     });
 
     const page = await context.newPage();
-    const loggedInPage = await login(page);
+    // const loggedInPage = await login(page);
+    const loggedInPage = await login(page,properties[0], dropboxToken);
 
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];

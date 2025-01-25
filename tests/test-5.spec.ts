@@ -12,7 +12,8 @@ const { uploadToDropbox } = require("../uploadToDropbox");
 // const data = await refreshDropboxToken();
 // const dropboxToken = data.access_token;
 
-async function login(page) {
+// async function login(page) {
+async function login (page,property, dropboxToken) {;
   // test.setTimeout(60000);
 
   const context = await page.context();
@@ -34,10 +35,10 @@ async function login(page) {
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await page.keyboard.press("Escape");
   await page.setViewportSize({ width: 1920, height: 1080 });
-  return page;
-}
+  // return page;
+// }
 
-async function performTest(page, property, dropboxToken) {
+// async function performTest(page, property, dropboxToken) {
 
   await page.waitForTimeout(4000);
   const dt = new Date();
