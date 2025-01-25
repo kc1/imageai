@@ -39,6 +39,21 @@ async function login(page) {
 
 async function performTest(page, property, dropboxToken) {
 
+  const dt = new Date();
+  let ts = Math.floor(dt.getTime() / 1000);
+  const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
+  // const contoursFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-contours.png`;
+
+  await page.screenshot({
+    path: "./screenshots/" + testFile,
+    fullPage: true,
+  });
+ await uploadToDropbox(
+    testFile,
+    "./screenshots/" + testFile,
+    dropboxToken
+  );
+
   await page.goto("https://id.land/discover");
   await page.waitForTimeout(2000);
   await page.getByText("Address").click();
