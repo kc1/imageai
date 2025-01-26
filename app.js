@@ -2,8 +2,8 @@ const express = require("express");
 // const sharp = require("sharp");
 
 const { launchBrowser } = require("./stealthPlaywright");
-// const { performTest, login } = require("./tests/test-5.spec.ts");
-const { login } = require("./tests/test-5.spec.ts");
+const { performTest, login } = require("./tests/test-5.spec.ts");
+// const { login } = require("./tests/test-5.spec.ts");
 const { log } = require("console");
 
 const app = express();
@@ -46,8 +46,8 @@ app.post("/processMany", async (req, res) => {
     });
 
     const page = await context.newPage();
-    // const loggedInPage = await login(page);
-    const loggedInPage = await login(page,properties[0], dropboxToken);
+    const loggedInPage = await login(page);
+    // const loggedInPage = await login(page,properties[0], dropboxToken);
 
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
