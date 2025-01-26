@@ -7,13 +7,16 @@ const sharp = require("sharp");
 chromium.use(stealth);
 
 async function launchBrowser(headless = true) {
-    const browser = await chromium.launch({ headless: headless });
-    // const browser = await chromium.connect(process.env.BROWSER_PLAYWRIGHT_ENDPOINT);
+  let browser;
+  if (process.env.BROWSER_PLAYWRIGHT_ENDPOINT) {
+    browser = await chromium.connect(process.env.BROWSER_PLAYWRIGHT_ENDPOINT);
+  } else {
+    browser = await chromium.launch({ headless: headless });
+  }
 
-    return browser;
+  return browser;
 }
 
-
 module.exports = {
-    launchBrowser
+  launchBrowser,
 };
