@@ -50,3 +50,5 @@ you should get an access token
 deploy on RENDER.COM:
 
 https://community.render.com/t/error-to-build-node-server-with-playwright/21511
+
+npm install && npx playwright install chromium
