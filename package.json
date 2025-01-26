@@ -15,7 +15,7 @@
     "dropbox-v2-api": "^2.5.11",
     "express": "^4.21.2",
     "node-fetch": "^2.7.0",
-    "playwright": "^1.50.0",
+    "playwright": "1.41.1-beta-1706549589000",
     "playwright-extra": "^4.3.6",
     "playwright-extra-plugin-stealth": "^0.0.1",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
-    "@types/node": "^22.7.5"
+    "@types/node": "^22.7.5",
+    "playwright": "^1.50.0"
   }
 }
