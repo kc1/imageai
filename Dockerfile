@@ -8,7 +8,7 @@ WORKDIR /
 COPY package*.json ./
 
 # Install the dependencies
-RUN npm install && npx playwright install chromium
+RUN npm install && npx playwright install-deps
 
 # Copy the rest of the application code
 COPY . .
