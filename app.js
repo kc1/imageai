@@ -36,6 +36,7 @@ app.post("/processMany", async (req, res) => {
     // return properties;
 
     const browser = await launchBrowser();
+    // const context = await browser.newContext({storageState: "./state.json"});
     const context = await browser.newContext({
       permissions: ["geolocation"],
       geolocation: {
@@ -43,17 +44,18 @@ app.post("/processMany", async (req, res) => {
         longitude: -90.361372973983,
       },
       javaScriptEnabled: true,
+      // storageState: "./state.json", // Load storage state from state.json
     });
 
-    // Load storage state from state.json
-    await context.loadStorageState({ path: './state.json' });
-
-    await context.route('**/*', async (route) => {
+    await context.route("**/*", async (route) => {
       await route.continue();
     });
 
-    const loggedInPage = await context.newPage();
-    // const loggedInPage = await login(page);
+    // const loggedInPage = await context.newPage();
+    // const out = await loggedInPage.context().storageState();
+    // console.log(out);
+
+    const loggedInPage = await login(page);
 
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
@@ -100,10 +102,10 @@ app.post("/process", async (req, res) => {
     });
 
     const page = await context.newPage();
-    await context.route('**/*', async (route) => {
+    await context.route("**/*", async (route) => {
       await route.continue();
     });
-    await context.loadStorageState({ path: './state.json' });
+    await context.loadStorageState({ path: "./state.json" });
     await performTest(page, property);
 
     await browser.close();
@@ -135,7 +137,6 @@ app.get("/createCredentials", async (req, res) => {
     const loggedInPage = await login(page);
     await loggedInPage.context().storageState({ path: "./state.json" });
     browser.close();
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
