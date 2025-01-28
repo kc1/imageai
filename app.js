@@ -51,7 +51,7 @@ app.post("/processMany", async (req, res) => {
       await route.continue();
     });
 
-    // const loggedInPage = await context.newPage();
+    const page = await context.newPage();
     // const out = await loggedInPage.context().storageState();
     // console.log(out);
 
