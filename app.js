@@ -13,11 +13,11 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 // Add index route
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   try {
-    res.send('Hello World');
+    res.send("Hello World");
   } catch (error) {
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 
@@ -54,9 +54,9 @@ app.post("/processMany", async (req, res) => {
       property.apn = property.APN;
       if (property && property.state && property.county && property.APN) {
         // const page = await context.newPage();
-          await performTest(loggedInPage, property, dropboxToken);
-          // await require('fs').promises.unlink('./water.png').catch(err => console.error('Error deleting water.png:', err));
-          // await require('fs').promises.unlink('./contours.png').catch(err => console.error('Error deleting water.png:', err));
+        await performTest(loggedInPage, property, dropboxToken);
+        // await require('fs').promises.unlink('./water.png').catch(err => console.error('Error deleting water.png:', err));
+        // await require('fs').promises.unlink('./contours.png').catch(err => console.error('Error deleting water.png:', err));
       }
     }
 
@@ -105,6 +105,28 @@ app.post("/process", async (req, res) => {
         message: "Processing complete",
       },
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/createCredentials", async (req, res) => {
+  try {
+    const browser = await launchBrowser();
+    const context = await browser.newContext({
+      permissions: ["geolocation"],
+      geolocation: {
+        latitude: 45.680386849221,
+        longitude: -90.361372973983,
+      },
+      javaScriptEnabled: true,
+    });
+
+    const page = await context.newPage();
+    const loggedInPage = await login(page);
+    await loggedInPage.context().storageState({ path: "./state.json" });
+    browser.close();
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
