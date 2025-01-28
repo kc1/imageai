@@ -45,9 +45,15 @@ app.post("/processMany", async (req, res) => {
       javaScriptEnabled: true,
     });
 
-    const page = await context.newPage();
-    const loggedInPage = await login(page);
-    // const loggedInPage = await login(page,properties[0], dropboxToken);
+    // Load storage state from state.json
+    await context.loadStorageState({ path: './state.json' });
+
+    await context.route('**/*', async (route) => {
+      await route.continue();
+    });
+
+    const loggedInPage = await context.newPage();
+    // const loggedInPage = await login(page);
 
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
@@ -94,7 +100,10 @@ app.post("/process", async (req, res) => {
     });
 
     const page = await context.newPage();
-
+    await context.route('**/*', async (route) => {
+      await route.continue();
+    });
+    await context.loadStorageState({ path: './state.json' });
     await performTest(page, property);
 
     await browser.close();
