@@ -6,7 +6,7 @@ chromium.use(stealth);
 
 async function launchBrowser() {
   const browser = await chromium.launch({
-    headless: false,
+    headless: true,
     proxy: {
       server: 'http://198.23.239.134:6540', // Replace with your proxy server
       username: 'asdyycvx', // Optional, if your proxy requires authentication
