@@ -32,9 +32,12 @@ async function login(page) {
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
   await page.getByPlaceholder("Password").fill("Landid1!");
-  await page.getByRole("button", { name: "Sign In", exact: true }).click();
-  await page.keyboard.press("Escape");
-  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+
+  // await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  // await page.keyboard.press("Escape");
+  // await page.setViewportSize({ width: 1920, height: 1080 });
   return page;
 }
 
