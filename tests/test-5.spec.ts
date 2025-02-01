@@ -35,11 +35,28 @@ async function login(page) {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   console.log("logged in");
+
+  // Wait for navigation to complete after login
+  await page.waitForNavigation({ waitUntil: 'networkidle' });
+
+  // Get list of iframes
   const iframes = page.frames();
   console.log("List of iframes:");
   iframes.forEach((frame, index) => {
     console.log(`Iframe ${index + 1}: ${frame.url()}`);
   });
+
+  // Select the iframe with URL "https://id.land/users/sign_in"
+  const targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
+
+  if (targetIframe) {
+    console.log("Target iframe found:", targetIframe.url());
+    // Interact with the iframe
+    // Example: await targetIframe.click('selector');
+  } else {
+    console.log("Target iframe not found");
+  }
+
   // await page.goto("https://id.land/discover");
   console.log("logged in");
 
