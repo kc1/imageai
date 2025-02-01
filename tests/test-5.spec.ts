@@ -13,20 +13,17 @@ const { uploadToDropbox } = require("../uploadToDropbox");
 // const dropboxToken = data.access_token;
 
 async function login(page) {
-  // async function login (page,property, dropboxToken) {;
-  // test.setTimeout(60000);
 
   const context = await page.context();
   await context.grantPermissions(["geolocation"], {
-    origin: "https://id.land",
+    origin: "*", // Apply to all origins
   });
 
-  page = await context.newPage();
+  // page = await context.newPage();
 
-  await context.grantPermissions(["geolocation"], {
-    origin: "https://id.land",
-  });
-  // await page.setDefaultTimeout(120000);
+  // await context.grantPermissions(["geolocation"], {
+  //   origin: "https://id.land",
+  // });
   await page.goto("https://id.land/users/sign_in");
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
