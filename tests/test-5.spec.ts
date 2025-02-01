@@ -34,6 +34,10 @@ async function login(page) {
   await page.getByPlaceholder("Password").fill("Landid1!");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
+  console.log("logged in");
+  await page.goto("https://id.land/discover");
+  console.log("logged in");
+
 
   // Wait for navigation to complete after login
   // await page.waitForNavigation({ waitUntil: 'networkidle' });
@@ -44,7 +48,7 @@ async function login(page) {
   // await page.getByRole("button", { name: "Sign In", exact: true }).click();
   // await page.keyboard.press("Escape");
   // await page.setViewportSize({ width: 1920, height: 1080 });
-  return await page;
+  return page;
 }
 
 async function performTest(page, property, dropboxToken) {
