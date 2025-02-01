@@ -35,10 +35,16 @@ async function login(page) {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
 
+  // Wait for navigation to complete after login
+  // await page.waitForNavigation({ waitUntil: 'networkidle' });
+
+  // Optionally, you can wait for a specific element that indicates successful login
+  // await page.waitForSelector('selector-for-element-after-login');
+
   // await page.getByRole("button", { name: "Sign In", exact: true }).click();
   // await page.keyboard.press("Escape");
   // await page.setViewportSize({ width: 1920, height: 1080 });
-  return page;
+  return await page;
 }
 
 async function performTest(page, property, dropboxToken) {
