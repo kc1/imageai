@@ -46,8 +46,12 @@ async function login(page) {
     console.log(`Iframe ${index + 1}: ${frame.url()}`);
   });
 
-  // Select the iframe with URL "https://id.land/users/sign_in"
-  const targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
+  // Select the iframe with URL "https://id.land/discover" first, then "https://id.land/users/sign_in"
+  let targetIframe = page.frame({ url: "https://id.land/discover" });
+
+  if (!targetIframe) {
+    targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
+  }
 
   if (targetIframe) {
     console.log("Target iframe found:", targetIframe.url());
