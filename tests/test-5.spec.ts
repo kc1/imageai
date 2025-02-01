@@ -13,7 +13,7 @@ const { uploadToDropbox } = require("../uploadToDropbox");
 // const dropboxToken = data.access_token;
 
 async function login(page) {
-// async function login (page,property, dropboxToken) {;
+  // async function login (page,property, dropboxToken) {;
   // test.setTimeout(60000);
 
   const context = await page.context();
@@ -35,9 +35,13 @@ async function login(page) {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   console.log("logged in");
-  await page.goto("https://id.land/discover");
+  const iframes = page.frames();
+  console.log("List of iframes:");
+  iframes.forEach((frame, index) => {
+    console.log(`Iframe ${index + 1}: ${frame.url()}`);
+  });
+  // await page.goto("https://id.land/discover");
   console.log("logged in");
-
 
   // Wait for navigation to complete after login
   // await page.waitForNavigation({ waitUntil: 'networkidle' });
@@ -52,7 +56,6 @@ async function login(page) {
 }
 
 async function performTest(page, property, dropboxToken) {
-
   await page.waitForTimeout(4000);
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
@@ -63,16 +66,12 @@ async function performTest(page, property, dropboxToken) {
     path: "./screenshots/" + testFile,
     fullPage: true,
   });
- await uploadToDropbox(
-    testFile,
-    "./screenshots/" + testFile,
-    dropboxToken
-  );
+  await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
   console.log("Test file uploaded to Dropbox");
   await page.goto("https://id.land/discover");
   await page.waitForTimeout(10000);
   await page.getByText("Address").click();
-  
+
   await page.getByText("Parcel").click();
   await page.getByText("ID").click();
 
@@ -107,7 +106,7 @@ async function performTest(page, property, dropboxToken) {
   // .filter({ hasText: new RegExp(`^$County$`) })
   // await page.getByPlaceholder("ID").fill("1234");
   const apn = property.apn.toString();
-  const cleanApn = apn.replace(/[^a-zA-Z0-9]/g, '');
+  const cleanApn = apn.replace(/[^a-zA-Z0-9]/g, "");
   await page.getByPlaceholder("ID").fill(cleanApn);
   // let slug = "("+property.apn.slice(0, 2);
   // slug = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -157,7 +156,7 @@ async function performTest(page, property, dropboxToken) {
   //   .getDate()
   //   .toString()
   //   .padStart(2, "0")}-${date.getFullYear()}`;
-    const timestamp = Math.floor(date.getTime() / 1000);
+  const timestamp = Math.floor(date.getTime() / 1000);
   const waterFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-water.png`;
   const contoursFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-contours.png`;
 
@@ -209,7 +208,6 @@ async function performTest(page, property, dropboxToken) {
 
   // await writeToDropbox(waterBuffer, waterFilename, dropboxToken);
   // await writeToDropbox(contourBuffer, contoursFilename, dropboxToken);
-
 }
 
 // test("test", async ({ page }) => {
