@@ -14,10 +14,10 @@ const { uploadToDropbox } = require("../uploadToDropbox");
 
 async function login(page) {
 
-  const context = await page.context();
-  await context.grantPermissions(["geolocation"], {
-    origin: "*", // Apply to all origins
-  });
+  // const context = await page.context();
+  // await context.grantPermissions(["geolocation"], {
+  //   origin: "*", // Apply to all origins
+  // });
 
   // page = await context.newPage();
 
