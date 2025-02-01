@@ -38,7 +38,8 @@ app.post("/processMany", async (req, res) => {
     const browser = await launchBrowser();
     // const context = await browser.newContext({storageState: "./state.json"});
     const context = await browser.newContext({
-      permissions: ["geolocation", "persistent-storage"],
+      permissions: ["geolocation"],
+      
       geolocation: {
       latitude: 45.680386849221,
       longitude: -90.361372973983,
