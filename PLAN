@@ -7,3 +7,19 @@ STEP 2:
 
 STEP 3:
 1) upload links to LLM get responses and add to sheet1 row
+
+MODIFIED PLAN (until successful deploy)
+
+1) go to db (collection?) and select last 2? days properties with no:
+
+ContourURL	WaterURL	ContourResponse	WaterResponse
+
+grab this as array of json, and feed it through image ai processmany . this should create contour image and water image in dropbox
+
+2) every 3 hours , run script from apps sceipt to get urls of screen shots and update to collection
+
+3) every 12/24 hours ? , get the records with screenshots urls in collection, but no responses and upload to AI, grab responses and update response fields in coll.
+
+4) consider updating sheet with completed records only.
+
+

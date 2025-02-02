@@ -6,6 +6,7 @@ chromium.use(stealth);
 
 async function launchBrowser() {
   const browser = await chromium.launch({
+    args: ["--headless", "--no-sandbox", "--use-angle=gl"],
     headless: true,
      });
   return browser;
