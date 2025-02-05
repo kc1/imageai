@@ -11,6 +11,7 @@
     "dropbox-v2-api": "^2.5.11",
     "express": "^4.21.2",
     "node-fetch": "^2.7.0",
+    "node-fetch2": "^1.6.3",
     "playwright": "1.41.1-beta-1706549589000",
     "playwright-extra": "^4.3.6",
     "playwright-extra-plugin-stealth": "^0.0.1",

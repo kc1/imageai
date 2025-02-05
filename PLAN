@@ -10,7 +10,7 @@ STEP 3:
 
 MODIFIED PLAN (until successful deploy)
 
-1) go to db (collection?) and select last 2? days properties with no:
+1) go to db (wisconsinOnSale) and select last 2? days properties with no:
 
 ContourURL	WaterURL	ContourResponse	WaterResponse
 
