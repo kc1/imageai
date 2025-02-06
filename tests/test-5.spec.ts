@@ -24,6 +24,7 @@ async function login(page) {
   // await context.grantPermissions(["geolocation"], {
   //   origin: "https://id.land", timeout: 90000,
   // });
+  await page.setDefaultTimeout(60000);
   await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // Set timeout to 90 seconds
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
