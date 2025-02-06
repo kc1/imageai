@@ -24,7 +24,20 @@ async function login(page) {
   // await context.grantPermissions(["geolocation"], {
   //   origin: "https://id.land", timeout: 90000,
   // });
-  await page.setDefaultTimeout(60000);
+  // await page.setDefaultTimeout(60000);
+  await page.setExtraHTTPHeaders({
+    'User-Agent': 'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'platform', { get: () => 'CrOS' });
+  });
+  await page.evaluateOnNewDocument(() => {
+    WebGLRenderingContext.prototype.getParameter = (original => function (param) {
+      if (param === 37445) return "Chromebook"; // Fake renderer
+      return original.call(this, param);
+    })(WebGLRenderingContext.prototype.getParameter);
+  });
   await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // Set timeout to 90 seconds
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
