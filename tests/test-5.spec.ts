@@ -22,9 +22,9 @@ async function login(page) {
   // page = await context.newPage();
 
   // await context.grantPermissions(["geolocation"], {
-  //   origin: "https://id.land",
+  //   origin: "https://id.land", timeout: 90000,
   // });
-  await page.goto("https://id.land/users/sign_in");
+  await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // Set timeout to 90 seconds
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
@@ -34,7 +34,7 @@ async function login(page) {
   console.log("logged in");
 
   // Wait for navigation to complete after login
-  await page.waitForNavigation({ waitUntil: 'networkidle' });
+  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 90000 }); // Set timeout to 90 seconds
 
   // Get list of iframes
   const iframes = page.frames();
