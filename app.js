@@ -1,10 +1,13 @@
 const express = require("express");
 // const sharp = require("sharp");
 
-const { launchBrowser } = require("./stealthPlaywright");
+const { launchBrowser } = require("./patchright");
+// const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
+const { refreshDropboxToken } = require("./refreshToken");
+const { fetchMongoDBData } = require("./getMongoData");
 // const { login } = require("./tests/test-5.spec.ts");
-const { log } = require("console");
+// const { log } = require("console");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,7 +24,6 @@ app.get("/", (req, res) => {
   }
 });
 
-const { refreshDropboxToken } = require("./refreshToken");
 
 app.post("/processMany", async (req, res) => {
   try {
@@ -39,10 +41,10 @@ app.post("/processMany", async (req, res) => {
     // const context = await browser.newContext({storageState: "./state.json"});
     const context = await browser.newContext({
       permissions: ["geolocation"],
-      
+
       geolocation: {
-      latitude: 45.680386849221,
-      longitude: -90.361372973983,
+        latitude: 45.680386849221,
+        longitude: -90.361372973983,
       },
       javaScriptEnabled: true,
       // storageState: "./state.json", // Load storage state from state.json
@@ -78,6 +80,13 @@ app.post("/processMany", async (req, res) => {
         message: "Processing complete",
       },
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/upDateRemoteCollectionWithAPN", async (req, res) => {
+  try {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

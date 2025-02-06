@@ -14,6 +14,8 @@ MODIFIED PLAN (until successful deploy)
 
 ContourURL	WaterURL	ContourResponse	WaterResponse
 
+next, you need to get the APNs with APNS.js and update the list
+
 grab this as array of json, and feed it through image ai processmany . this should create contour image and water image in dropbox
 
 2) every 3 hours , run script from apps sceipt to get urls of screen shots and update to collection

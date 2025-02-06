@@ -71,19 +71,19 @@ function getDaysAgoString(daysBack) {
   return twoDaysAgo.toISOString();
 }
 
-(async () => {
-  const fiveDaysAgo = getDaysAgoString(5);
-  console.log(fiveDaysAgo);
-  const filterObj = {
-    ContourURL: { $exists: false },
-    WaterURL: { $exists: false },
-    list_date: {
-      $gte:fiveDaysAgo,
-    },
-  };
-  const coll = "wisconsinOnSale";
-  const data = await fetchMongoDBData(filterObj, coll);
-  console.log(data);
-})();
+// (async () => {
+//   const fiveDaysAgo = getDaysAgoString(5);
+//   console.log(fiveDaysAgo);
+//   const filterObj = {
+//     ContourURL: { $exists: false },
+//     WaterURL: { $exists: false },
+//     list_date: {
+//       $gte:fiveDaysAgo,
+//     },
+//   };
+//   const coll = "wisconsinOnSale";
+//   const data = await fetchMongoDBData(filterObj, coll);
+//   console.log(data);
+// })();
 
 exports.fetchMongoDBData = fetchMongoDBData;
