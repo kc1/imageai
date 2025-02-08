@@ -13,32 +13,16 @@ const { uploadToDropbox } = require("../uploadToDropbox");
 // const dropboxToken = data.access_token;
 
 async function login(page) {
+  // const context = page.context();
 
-  // const context = await page.context();
-  // await context.grantPermissions(["geolocation"], {
-  //   origin: "*", // Apply to all origins
-  // });
-
-  // page = await context.newPage();
-
-  // await context.grantPermissions(["geolocation"], {
-  //   origin: "https://id.land", timeout: 90000,
-  // });
-  // await page.setDefaultTimeout(60000);
+  // Set headers and viewport
   await page.setExtraHTTPHeaders({
     'User-Agent': 'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
   });
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'platform', { get: () => 'CrOS' });
-  });
-  await page.evaluateOnNewDocument(() => {
-    WebGLRenderingContext.prototype.getParameter = (original => function (param) {
-      if (param === 37445) return "Chromebook"; // Fake renderer
-      return original.call(this, param);
-    })(WebGLRenderingContext.prototype.getParameter);
-  });
-  await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // Set timeout to 90 seconds
+
+    // Navigate to sign in and perform login steps
+  await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // 90 second timeout
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
@@ -48,42 +32,26 @@ async function login(page) {
   console.log("logged in");
 
   // Wait for navigation to complete after login
-  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 90000 }); // Set timeout to 90 seconds
+  // await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 90000 });
 
-  // Get list of iframes
-  const iframes = page.frames();
-  console.log("List of iframes:");
-  iframes.forEach((frame, index) => {
-    console.log(`Iframe ${index + 1}: ${frame.url()}`);
-  });
+  // // List iframes for debugging
+  // const iframes = page.frames();
+  // console.log("List of iframes:");
+  // iframes.forEach((frame, index) => {
+  //   console.log(`Iframe ${index + 1}: ${frame.url()}`);
+  // });
 
-  // Select the iframe with URL "https://id.land/discover" first, then "https://id.land/users/sign_in"
-  let targetIframe = page.frame({ url: "https://id.land/discover" });
+  // // Attempt to select the target iframe(s)
+  // let targetIframe = page.frame({ url: "https://id.land/discover" });
+  // if (!targetIframe) {
+  //   targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
+  // }
+  // if (targetIframe) {
+  //   console.log("Target iframe found:", targetIframe.url());
+  // } else {
+  //   console.log("Target iframe not found");
+  // }
 
-  if (!targetIframe) {
-    targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
-  }
-
-  if (targetIframe) {
-    console.log("Target iframe found:", targetIframe.url());
-    // Interact with the iframe
-    // Example: await targetIframe.click('selector');
-  } else {
-    console.log("Target iframe not found");
-  }
-
-  // await page.goto("https://id.land/discover");
-  console.log("logged in");
-
-  // Wait for navigation to complete after login
-  // await page.waitForNavigation({ waitUntil: 'networkidle' });
-
-  // Optionally, you can wait for a specific element that indicates successful login
-  // await page.waitForSelector('selector-for-element-after-login');
-
-  // await page.getByRole("button", { name: "Sign In", exact: true }).click();
-  // await page.keyboard.press("Escape");
-  // await page.setViewportSize({ width: 1920, height: 1080 });
   return page;
 }
 

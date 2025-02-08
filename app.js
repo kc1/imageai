@@ -24,7 +24,6 @@ app.get("/", (req, res) => {
   }
 });
 
-
 app.post("/processMany", async (req, res) => {
   try {
     const properties = req.body;
@@ -35,39 +34,37 @@ app.post("/processMany", async (req, res) => {
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
 
-    // return properties;
-
     const browser = await launchBrowser();
-    // const context = await browser.newContext({storageState: "./state.json"});
     const context = await browser.newContext({
       permissions: ["geolocation"],
-
       geolocation: {
         latitude: 45.680386849221,
         longitude: -90.361372973983,
       },
       javaScriptEnabled: true,
-      // storageState: "./state.json", // Load storage state from state.json
     });
+    // // Inject scripts to spoof Chrome OS via context.addInitScript
+    // await context.addInitScript(() => {
+    //   Object.defineProperty(navigator, "platform", {
+    //     get: () => "CrOS",
+    //   });
+    // });
 
-    await context.route("**/*", async (route) => {
-      await route.continue();
-    });
+    // await context.addInitScript(() => {
+    //   WebGLRenderingContext.prototype.getParameter = (original => function (param) {
+    //     if (param === 37445) return "Chromebook"; // Fake renderer
+    //     return original.call(this, param);
+    //   })(WebGLRenderingContext.prototype.getParameter);
+    // });
 
     const page = await context.newPage();
-    // const out = await loggedInPage.context().storageState();
-    // console.log(out);
-
     const loggedInPage = await login(page);
 
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
       property.apn = property.APN;
       if (property && property.state && property.county && property.APN) {
-        // const page = await context.newPage();
         await performTest(loggedInPage, property, dropboxToken);
-        // await require('fs').promises.unlink('./water.png').catch(err => console.error('Error deleting water.png:', err));
-        // await require('fs').promises.unlink('./contours.png').catch(err => console.error('Error deleting water.png:', err));
       }
     }
 
