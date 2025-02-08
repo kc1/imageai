@@ -43,12 +43,12 @@ app.post("/processMany", async (req, res) => {
       },
       javaScriptEnabled: true,
     });
-    // // Inject scripts to spoof Chrome OS via context.addInitScript
-    // await context.addInitScript(() => {
-    //   Object.defineProperty(navigator, "platform", {
-    //     get: () => "CrOS",
-    //   });
-    // });
+    // Inject scripts to spoof Chrome OS via context.addInitScript
+    await context.addInitScript(() => {
+      Object.defineProperty(navigator, "platform", {
+        get: () => "CrOS",
+      });
+    });
 
     // await context.addInitScript(() => {
     //   WebGLRenderingContext.prototype.getParameter = (original => function (param) {
