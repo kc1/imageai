@@ -6,6 +6,7 @@ const { launchBrowser } = require("./patchright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
 const { refreshDropboxToken } = require("./refreshToken");
 const { fetchMongoDBData } = require("./getMongoData");
+const { getDaysAgoString } = require("./getMongoData");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -26,8 +27,22 @@ app.get("/", (req, res) => {
 
 app.post("/processMany", async (req, res) => {
   try {
-    const properties = req.body;
-    console.log("Properties:", properties);
+    // const properties = req.body;
+    // console.log("Properties:", properties);
+    const fiveDaysAgo = getDaysAgoString(90);
+    console.log(fiveDaysAgo);
+    const filterObj = {
+      $or: [
+        { ContourURL: { $exists: false } },
+        { WaterURL: { $exists: false } }
+      ],
+      list_date: {
+        $gte: fiveDaysAgo,
+      },
+    };
+    console.log(filterObj);
+
+    let properties = await fetchMongoDBData(filterObj, "bucket1");
 
     if (!properties || !properties.length) return "No properties to process";
 
@@ -44,11 +59,11 @@ app.post("/processMany", async (req, res) => {
       javaScriptEnabled: true,
     });
     // Inject scripts to spoof Chrome OS via context.addInitScript
-    await context.addInitScript(() => {
-      Object.defineProperty(navigator, "platform", {
-        get: () => "CrOS",
-      });
-    });
+    // await context.addInitScript(() => {
+    //   Object.defineProperty(navigator, "platform", {
+    //     get: () => "CrOS",
+    //   });
+    // });
 
     // await context.addInitScript(() => {
     //   WebGLRenderingContext.prototype.getParameter = (original => function (param) {

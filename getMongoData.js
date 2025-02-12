@@ -87,3 +87,4 @@ function getDaysAgoString(daysBack) {
 // })();
 
 exports.fetchMongoDBData = fetchMongoDBData;
+exports.getDaysAgoString = getDaysAgoString;
