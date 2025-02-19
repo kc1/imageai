@@ -3,7 +3,7 @@ const { chromium } = require('patchright');
 async function launchBrowser() {
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
-    headless: true,
+    headless: false,
      });
   return browser;
 }

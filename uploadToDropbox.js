@@ -25,6 +25,7 @@ async function uploadToDropbox(filename,filePath,dropboxToken) {
         return;
       }
       console.log("Upload successful:", result);
+      return result;
     }
   );
 }

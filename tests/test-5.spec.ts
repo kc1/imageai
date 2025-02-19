@@ -66,7 +66,7 @@ async function performTest(page, property, dropboxToken) {
     path: "./screenshots/" + testFile,
     fullPage: true,
   });
-  await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
+  const testResult = await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
   console.log("Test file uploaded to Dropbox");
   await page.goto("https://id.land/discover");
   await page.waitForTimeout(10000);
@@ -195,16 +195,19 @@ async function performTest(page, property, dropboxToken) {
   });
 
   // await uploadToDropbox(waterFilename, "./water.png", dropboxToken);
-  await uploadToDropbox(
+  const resultWaterFile = await uploadToDropbox(
     waterFilename,
     "./screenshots/" + waterFilename,
     dropboxToken
   );
-  await uploadToDropbox(
+  const resultContourFile = await uploadToDropbox(
     contoursFilename,
     "./screenshots/" + contoursFilename,
     dropboxToken
   );
+  console.log(resultWaterFile, resultContourFile);
+
+  return { testResult, resultWaterFile, resultContourFile };
 
   // await writeToDropbox(waterBuffer, waterFilename, dropboxToken);
   // await writeToDropbox(contourBuffer, contoursFilename, dropboxToken);

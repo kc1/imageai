@@ -24,4 +24,12 @@ grab this as array of json, and feed it through image ai processmany . this shou
 
 4) consider updating sheet with completed records only.
 
+Plan 3 -- sheets is the basis
+
+1) Select and send sheets records to bucket1 after adding APN
+
+2) with my computer select those with no contoururl waterurl in last few days - grab and upload urls to dropbox
+ update contoururl and waterurl with upload name
+
+3) 
 

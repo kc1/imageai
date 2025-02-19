@@ -33,18 +33,19 @@ app.post("/processMany", async (req, res) => {
     console.log(fiveDaysAgo);
     const filterObj = {
       $or: [
-        { ContourURL: { $exists: false } },
-        { WaterURL: { $exists: false } }
+        { ContourURL: { $in: [null, "", []], $exists: true } },
+        { WaterURL: { $in: [null, "", []], $exists: true } },
       ],
-      list_date: {
-        $gte: fiveDaysAgo,
-      },
+      list_date: { $gte: fiveDaysAgo },
     };
+
     console.log(filterObj);
 
-    let properties = await fetchMongoDBData(filterObj, "bucket1");
-
+    let response = await fetchMongoDBData(filterObj, "bucket1");
+    let properties = response.documents;
     if (!properties || !properties.length) return "No properties to process";
+    console.log("Properties:", properties);
+    // return;
 
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
