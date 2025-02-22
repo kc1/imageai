@@ -17,7 +17,7 @@ async function getDropboxSharedLinks() {
       path: ''
     });
     console.log('Files:', filesList.result.entries);
-    // return
+    return
     // Create shared links for each file
     const sharedLinks = await Promise.all(
       filesList.result.entries.map(async (file) => {

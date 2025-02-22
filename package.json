@@ -8,8 +8,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "dropbox": "^10.34.0",
     "dropbox-v2-api": "^2.5.11",
     "express": "^4.21.2",
+    "mongodb": "^6.13.1",
     "node-fetch": "^2.7.0",
     "node-fetch2": "^1.6.3",
     "patchright": "^1.50.1",

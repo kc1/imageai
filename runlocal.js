@@ -24,25 +24,20 @@ const {upsertOneToBucket} = require("./updateBucket");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
-// const app = express();
-// const port = process.env.PORT || 3000;
-
-// Add JSON middleware
-// app.use(express.json());
-
-// app.post("/processMany", async (req, res) => {
 (async () => {
   try {
     // const properties = req.body;
     // console.log("Properties:", properties);
-    const fiveDaysAgo = getDaysAgoString(90);
-    console.log(fiveDaysAgo);
+    // const fiveDaysAgo = getDaysAgoString(90);
+    const daysAgo = myArgs[0] ? parseInt(myArgs[0]) : 90;
+    const numberDaysAgo = getDaysAgoString(daysAgo);
+    console.log(numberDaysAgo);
     const filterObj = {
       $or: [
         { ContourURL: { $in: [null, "", []], $exists: true } },
         { WaterURL: { $in: [null, "", []], $exists: true } },
       ],
-      list_date: { $gte: fiveDaysAgo },
+      list_date: { $gte: numberDaysAgo },
     };
 
     console.log(filterObj);
