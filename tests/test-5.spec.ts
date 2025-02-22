@@ -157,8 +157,9 @@ async function performTest(page, property, dropboxToken) {
   //   .toString()
   //   .padStart(2, "0")}-${date.getFullYear()}`;
   const timestamp = Math.floor(date.getTime() / 1000);
-  const waterFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-water.png`;
-  const contoursFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-contours.png`;
+  const waterFilename = `${property.state}_${property.county}_${property.apn}_water.png`;
+  // const contoursFilename = `${property.state}_${property.county}_${property.apn}_${timestamp}-contours.png`;
+  const contoursFilename = `${property.state}_${property.county}_${property.apn}_contours.png`;
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,
