@@ -33,3 +33,7 @@ Plan 3 -- sheets is the basis
 
 3) with "viewDropboxFilesNTL" in netlifyfunction you can get a list of every sshot in the dropbox screentest1 folder/app
 
+4) we use viewDropboxFilesNTL in GAS getScreenshotPaths to match screenshots url with their original rows and update the ContourURL and WaterURL columns
+
+5) next from the sheet get the screenshot path and upload to LLM ,grab response and load into appropriate row 
+
