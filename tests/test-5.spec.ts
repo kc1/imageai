@@ -1,5 +1,6 @@
 // import { uploadToDropbox } from "../uploadToDropbox";
-const { uploadToDropbox } = require("../uploadToDropbox");
+
+// const { uploadToDropbox } = require("../uploadToDropbox");
 
 // const { writeToDropbox } = require("../writeImageToDropbox");
 

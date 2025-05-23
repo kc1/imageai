@@ -17,7 +17,7 @@ console.log(myArgs);
 const { launchBrowser } = require("./patchright");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
-const { performTest2 } = require("./tests/test-1.spec.ts");
+const { performTest2,performTestLatLon } = require("./tests/test-1.spec.ts");
 const { refreshDropboxToken } = require("./refreshToken");
 const { fetchMongoDBData } = require("./getMongoData");
 const { getDaysAgoString } = require("./getMongoData");
@@ -81,15 +81,18 @@ const {upsertOneToBucket} = require("./updateBucket");
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
       property.apn = property.APN;
-      if (property && property.state && property.county && property.APN) {
+      // if (property && property.state && property.county && property.APN) {
+      if (property && property.state && property.county) {
         console.log("Property:", property);
         // const uploadData = await performTest(loggedInPage, property, dropboxToken);
-        const uploadData = await performTest2(loggedInPage, property, dropboxToken);
+        // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
+
+        const uploadData = await performTestLatLon(loggedInPage, property, dropboxToken);
 
         property.ContourURL = uploadData.contourURL;
         property.WaterURL = uploadData.waterURL;
         // console.log("Property:", property);
-        await upsertOneToBucket('bucket1', property);
+        await upsertOneToBucket(collection, property);
       }
     }
 

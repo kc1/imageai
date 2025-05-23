@@ -22,7 +22,7 @@ async function uploadToDropbox(filename,filePath,dropboxToken) {
     (err, result) => {
       if (err) {
         console.error("Upload failed:", err);
-        return;
+        // return;
       }
       console.log("Upload successful:", result);
       return result;

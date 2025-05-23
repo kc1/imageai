@@ -1,6 +1,31 @@
 // import { test, expect } from '@playwright/test';
 const { uploadToDropbox } = require("../uploadToDropbox");
 
+// test('test', async ({ page }) => {
+//   await page.goto('https://id.land/');
+//   await page.getByRole('banner').getByRole('link', { name: 'Sign in' }).click();
+//   await page.getByPlaceholder('Email address').fill('optionhomes11@gmail.com');
+//   await page.getByPlaceholder('Email address').press('Tab');
+//   await page.getByPlaceholder('Password').fill('Landid1!');
+//   await page.getByRole('button', { name: 'Sign In', exact: true }).click();
+//   await page.locator('div').filter({ hasText: /^Location Access Needed$/ }).getByRole('button').click();
+//   await page.getByLabel('Map', { exact: true }).click({
+//     position: {
+//       x: 782,
+//       y: 211
+//     }
+//   });
+//   await page.goto('https://id.land/discover');
+//   await page.getByRole('textbox').click();
+//   await page.getByRole('textbox').fill('34,-88');
+//   await page.getByRole('heading', { name: '-88.000000' }).click();
+//   await page.locator('li').filter({ hasText: 'Water' }).getByRole('img').click();
+//   await page.locator('li').filter({ hasText: 'Outdoors' }).getByRole('img').locator('path').click();
+//   await page.getByText('Account', { exact: true }).click();
+//   await page.getByRole('button', { name: 'Sign Out' }).click();
+// });
+
+
 async function performTest2(page, property, dropboxToken) {
 
   await page.goto('https://id.land/discover');
@@ -20,11 +45,20 @@ async function performTest2(page, property, dropboxToken) {
 
 
 
-async function performTestLatLon(page, property, dropboxToken) {
-
+async function performTest3(page, property, dropboxToken) {
   await page.waitForTimeout(4000);
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
+
+  // const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
+  // // const contoursFilename = `${property.state}-${property.county}-${property.apn}-${timestamp}-contours.png`;
+
+  // await page.screenshot({
+  //   path: "./screenshots/" + testFile,
+  //   fullPage: true,
+  // });
+  // const testResult = await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
+  // console.log("Test file uploaded to Dropbox");
 
   await page.goto('https://id.land/discover');
   await page.waitForTimeout(10000);
@@ -64,6 +98,12 @@ async function performTestLatLon(page, property, dropboxToken) {
 
   await page.waitForTimeout(2000);
   const date = new Date();
+  // const formattedDate = `${(date.getMonth() + 1)
+  //   .toString()
+  //   .padStart(2, "0")}-${date
+  //   .getDate()
+  //   .toString()
+  //   .padStart(2, "0")}-${date.getFullYear()}`;
   const timestamp = Math.floor(date.getTime() / 1000);
 
   // const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
@@ -128,5 +168,5 @@ async function performTestLatLon(page, property, dropboxToken) {
 // #mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___sm5Wt
 module.exports = {
   performTest2,
-  performTestLatLon
+  performTest3
 };
