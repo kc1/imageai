@@ -38,6 +38,10 @@ async function upsertToBucket(coll, objArr) {
 }
 
 async function upsertOneToBucket(coll, obj) {
+  // Remove _id if present so that it doesn't try to update it
+  if (obj.hasOwnProperty("_id")) {
+    delete obj._id;
+  }
   // Use listing_id as the unique identifier in the filter.
   const filter = { listing_id: obj.listing_id };
   try {
@@ -52,8 +56,10 @@ async function upsertOneToBucket(coll, obj) {
       );
     } else if (result.modifiedCount > 0) {
       console.log(`Updated listing with listing_id: ${obj.listing_id}`);
+      console.log(obj);
     } else {
       console.log(`No changes made for listing_id: ${obj.listing_id}`);
+      console.log(obj);
     }
   } catch (error) {
     console.log(error);

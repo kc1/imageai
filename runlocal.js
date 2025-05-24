@@ -13,15 +13,14 @@ let lastNum = 3;
 let myArgs = process.argv.slice(2);
 console.log(myArgs);
 
-
 const { launchBrowser } = require("./patchright");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
-const { performTest2,performTestLatLon } = require("./tests/test-1.spec.ts");
+const { performTestAPN, performTestLatLon } = require("./tests/test-1.spec.ts");
 const { refreshDropboxToken } = require("./refreshToken");
 const { fetchMongoDBData } = require("./getMongoData");
 const { getDaysAgoString } = require("./getMongoData");
-const {upsertOneToBucket} = require("./updateBucket");
+const { upsertOneToBucket } = require("./updateBucket");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -81,19 +80,42 @@ const {upsertOneToBucket} = require("./updateBucket");
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
       property.apn = property.APN;
-      // if (property && property.state && property.county && property.APN) {
-      if (property && property.state && property.county) {
-        console.log("Property:", property);
+      console.log("Property:", property);
+      let uploadData;
+      if (
+        property &&
+        property.state &&
+        property.county &&
+        property.APN !== ""
+      ) {
+        uploadData = await performTestAPN(loggedInPage, property, dropboxToken);
         // const uploadData = await performTest(loggedInPage, property, dropboxToken);
         // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
-
-        const uploadData = await performTestLatLon(loggedInPage, property, dropboxToken);
-
-        property.ContourURL = uploadData.contourURL;
-        property.WaterURL = uploadData.waterURL;
-        // console.log("Property:", property);
-        await upsertOneToBucket(collection, property);
+      } else if (
+        property &&
+        property.state &&
+        property.county &&
+        property.apn === ""
+      ) {
+        uploadData = await performTestLatLon(
+          loggedInPage,
+          property,
+          dropboxToken
+        );
       }
+      // console.log("Property:", property);
+      // console.log("Upload Data:", uploadData);
+
+      // if (property && property.state && property.county) {
+      // const uploadData = await performTest(loggedInPage, property, dropboxToken);
+      // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
+
+      // const uploadData = await performTestLatLon(loggedInPage, property, dropboxToken);
+
+      property.ContourURL = uploadData.resultContourFile.path_lower;
+      property.WaterURL = uploadData.resultWaterFile.path_lower;
+      // console.log("Property:", property);
+      await upsertOneToBucket(collection, property);
     }
 
     await browser.close();
