@@ -1,5 +1,3 @@
-// const express = require("express");
-// const sharp = require("sharp");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 var murl = process.env.MONGODB_URI;
@@ -7,7 +5,6 @@ const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
 let collection = database.collection("bucket1");
-// let ignorethiszz;
 let firstNum = 0;
 let lastNum = 3;
 let myArgs = process.argv.slice(2);
@@ -103,16 +100,7 @@ const { upsertOneToBucket } = require("./updateBucket");
           dropboxToken
         );
       }
-      // console.log("Property:", property);
-      // console.log("Upload Data:", uploadData);
-
-      // if (property && property.state && property.county) {
-      // const uploadData = await performTest(loggedInPage, property, dropboxToken);
-      // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
-
-      // const uploadData = await performTestLatLon(loggedInPage, property, dropboxToken);
-
-      property.ContourURL = uploadData.resultContourFile.path_lower;
+           property.ContourURL = uploadData.resultContourFile.path_lower;
       property.WaterURL = uploadData.resultWaterFile.path_lower;
       // console.log("Property:", property);
       await upsertOneToBucket(collection, property);
@@ -123,74 +111,3 @@ const { upsertOneToBucket } = require("./updateBucket");
     console.log("Error:", error);
   }
 })();
-
-// app.get("/upDateRemoteCollectionWithAPN", async (req, res) => {
-//   try {
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// app.post("/process", async (req, res) => {
-//   try {
-//     const { property } = req.body;
-
-//     if (!property || !property.state || !property.county || !property.apn) {
-//       return res.status(400).json({ error: "Missing property details" });
-//     }
-//     console.log("Property:", property);
-
-//     const browser = await launchBrowser();
-//     const context = await browser.newContext({
-//       permissions: ["geolocation"],
-//       geolocation: {
-//         latitude: 45.680386849221,
-//         longitude: -90.361372973983,
-//       },
-//       javaScriptEnabled: true,
-//     });
-
-//     const page = await context.newPage();
-//     await context.route("**/*", async (route) => {
-//       await route.continue();
-//     });
-//     await context.loadStorageState({ path: "./state.json" });
-//     await performTest(page, property);
-
-//     await browser.close();
-//     res.json({
-//       success: true,
-//       data: {
-//         property,
-//         message: "Processing complete",
-//       },
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// app.get("/createCredentials", async (req, res) => {
-//   try {
-//     const browser = await launchBrowser();
-//     const context = await browser.newContext({
-//       permissions: ["geolocation"],
-//       geolocation: {
-//         latitude: 45.680386849221,
-//         longitude: -90.361372973983,
-//       },
-//       javaScriptEnabled: true,
-//     });
-
-//     const page = await context.newPage();
-//     const loggedInPage = await login(page);
-//     await loggedInPage.context().storageState({ path: "./state.json" });
-//     browser.close();
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// app.listen(port, () => {
-//   console.log(`Server running on port ${port}`);
-// });
