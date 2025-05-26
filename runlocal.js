@@ -1,3 +1,5 @@
+const dropboxV2Api = require("dropbox-v2-api");
+const { Dropbox } = require("dropbox");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 var murl = process.env.MONGODB_URI;
@@ -15,11 +17,39 @@ const { launchBrowser } = require("./patchright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
 const { performTestAPN, performTestLatLon } = require("./tests/test-1.spec.ts");
 const { refreshDropboxToken } = require("./refreshToken");
-const { fetchMongoDBData } = require("./getMongoData");
-const { getDaysAgoString } = require("./getMongoData");
+const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData");
+// const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
+
+const fs = require("fs").promises;
+const path = require("path");
+const { getSharedLink } = require("./getSharedLink");
+
+async function deletePngFiles(folderPath) {
+  try {
+    // Read the contents of the folder
+    const files = await fs.readdir(folderPath);
+    // Filter out files that have a .png extension
+    const pngFiles = files.filter(
+      (file) => path.extname(file).toLowerCase() === ".png"
+    );
+
+    // Loop through the filtered files and delete each one
+    for (const file of pngFiles) {
+      await fs.unlink(path.join(folderPath, file));
+      console.log(`Deleted ${file}`);
+    }
+
+    console.log("All .png files deleted from", folderPath);
+  } catch (error) {
+    console.error("Error deleting .png files:", error);
+  }
+}
+
+// Call the function for the "screenshots" folder
+deletePngFiles("./screenshots");
 
 (async () => {
   try {
@@ -47,6 +77,7 @@ const { upsertOneToBucket } = require("./updateBucket");
 
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
+    const dbx = new Dropbox({ accessToken: dropboxToken });
 
     const browser = await launchBrowser();
     const context = await browser.newContext({
@@ -100,13 +131,21 @@ const { upsertOneToBucket } = require("./updateBucket");
           dropboxToken
         );
       }
-           property.ContourURL = uploadData.resultContourFile.path_lower;
-      property.WaterURL = uploadData.resultWaterFile.path_lower;
+
+      const sharedWaterLink = await getSharedLink(dbx, uploadData.resultWaterFile.path_lower);
+      const sharedContourLink = await getSharedLink(dbx, uploadData.resultContourFile.path_lower);
+
+      property.WaterURL = sharedWaterLink;
+      property.ContourURL = sharedContourLink;
+
+      // property.ContourURL = uploadData.resultContourFile.path_lower;
+      // property.WaterURL = uploadData.resultWaterFile.path_lower;
       // console.log("Property:", property);
       await upsertOneToBucket(collection, property);
     }
 
     await browser.close();
+    console.log("Processing complete");
   } catch (error) {
     console.log("Error:", error);
   }

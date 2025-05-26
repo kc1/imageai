@@ -1,11 +1,12 @@
-1) Select and send sheets records to bucket1 after adding APN, using apps script "pushToBucket"
+1) Select and send sheets records to bucket1 after adding APN, using apps script "pushToBucket"/or just send without with included
+lat/lon
 
 NOTE: with the new smartsearch you can also get things using built in lat, lng (eg 46.25,-88)
 
 2) with my computer select those with no contoururl waterurl in last few days - grab and upload sshots to dropbox.
  This will also update bucket1 contoururl and waterurl with upload name. this uses RUNLOCAL.js
 
-3) with "viewDropboxFilesNTL" in netlifyfunction you can get a list of every sshot in the dropbox screentest1 folder/app
+3) with "viewDropboxFilesNTL" in netlifyfunction you can get a list of every sshot in the dropbox "screentest1" folder/app
 
 4) we use viewDropboxFilesNTL in GAS getScreenshotPaths to match screenshots url with their original rows and update the ContourURL and WaterURL columns
 

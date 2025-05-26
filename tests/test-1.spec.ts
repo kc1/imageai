@@ -208,7 +208,7 @@ async function performTestLatLon(page, property, dropboxToken) {
     .locator("div")
     .first()
     .click();
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(8000);
   // const contourBuffer = await page.screenshot();
   await page.screenshot({
     path: "./screenshots/" + contoursFilename,
