@@ -53,3 +53,7 @@ https://community.render.com/t/error-to-build-node-server-with-playwright/21511
 
 npm install && npx playwright install chromium
 
+
+npm install patchright@latest
+(base) ubuntu@penguin:~/node/imageai$ npx patchright install
+

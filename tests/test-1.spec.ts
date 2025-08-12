@@ -73,8 +73,9 @@ async function performTestAPN(page, property, dropboxToken) {
     .locator("#react-autowhatever-countyAutosuggest--item-0")
     .filter({ hasText: property.county.substring(0, 10) })
     .click(); // Match the first part of the county
-  await page.getByPlaceholder("ID").click();
-  await page.getByPlaceholder("ID").fill(property.apn.toString());
+  // await page.getByPlaceholder("ID").click();
+  await page.getByPlaceholder('ID').first().click();
+  await page.getByPlaceholder("ID").first().fill(property.apn.toString());
 
   // Select the APN from the dropdown
   await page
