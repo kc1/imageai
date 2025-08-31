@@ -232,11 +232,13 @@ async function performTestLatLon(page, property, dropboxToken) {
     await page.getByRole("textbox").press("Enter");
   await page
     .locator(
-      "#mapright-map-container > div.search-bar > div.search-bar__search-control"
-    )
-    .click();
-    await page.locator("#mapright-map-container > div.home-map-panels > div > div > div > div > div.styles-module__resultsContainer___fV9m0 > div > div:nth-child(1) > ul > li > span > div > h3").click();
-    
+      "#mapright-map-container > div.search-bar > div.search-bar__search-control h3"
+    ).click();
+    // #mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___fV9m0.styles-module__relativeToInput___kBcGo > div > div:nth-child(1) > ul > li > span > div > h3
+    // await page.locator("#mapright-map-container > div.home-map-panels > div > div > div > div > div.styles-module__resultsContainer___fV9m0 > div > div:nth-child(1) > ul > li > span > div > h3").click();
+    await page.locator("#mapright-map-container > div.home-map-panels > div > div > div > div > div.lid-sidebar__tabs > div > div:nth-child(1) > ul > li.lid-sidebar__tabs__element.lid-sidebar__tabs__element--selected > div > span.lid-sidebar__tabs__element__selected-icon > svg > path").click();
+  // await page.locator("#mapright-map-container > div.home-map-panels > div h3").first().click();
+   console.log("Clicked on the first search result"); 
 /*   await page
     .locator(
       "#mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___fV9m0.styles-module__relativeToInput___kBcGo > ul > li > span > div > h3"
