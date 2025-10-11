@@ -132,8 +132,53 @@ deletePngFiles("./screenshots");
         );
       }
 
-      const sharedWaterLink = await getSharedLink(dbx, uploadData.resultWaterFile.path_lower);
-      const sharedContourLink = await getSharedLink(dbx, uploadData.resultContourFile.path_lower);
+      // Ensure uploadData and the returned result files exist before accessing path_lower
+      if (!uploadData) {
+        console.error("uploadData is null or undefined for property:", property);
+        // skip this property and continue with the next one
+        continue;
+      }
+
+      let sharedWaterLink = "";
+      let sharedContourLink = "";
+
+      try {
+        if (
+          uploadData.resultWaterFile &&
+          uploadData.resultWaterFile.path_lower
+        ) {
+          sharedWaterLink =
+            (await getSharedLink(dbx, uploadData.resultWaterFile.path_lower)) ||
+            "";
+        } else {
+          console.warn(
+            "No resultWaterFile.path_lower for property, skipping water link:",
+            property
+          );
+        }
+      } catch (err) {
+        console.error("Failed to create shared water link:", err);
+      }
+
+      try {
+        if (
+          uploadData.resultContourFile &&
+          uploadData.resultContourFile.path_lower
+        ) {
+          sharedContourLink =
+            (await getSharedLink(
+              dbx,
+              uploadData.resultContourFile.path_lower
+            )) || "";
+        } else {
+          console.warn(
+            "No resultContourFile.path_lower for property, skipping contour link:",
+            property
+          );
+        }
+      } catch (err) {
+        console.error("Failed to create shared contour link:", err);
+      }
 
       property.WaterURL = sharedWaterLink;
       property.ContourURL = sharedContourLink;

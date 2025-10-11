@@ -1,0 +1,3 @@
+[root@realoption ~]# google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1280,1024 --screenshot=screenshot1.png https://yahoo.com
+
+you get screenshot1.png in your root directory

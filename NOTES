@@ -57,3 +57,4 @@ npm install && npx playwright install chromium
 npm install patchright@latest
 (base) ubuntu@penguin:~/node/imageai$ npx patchright install
 
+ second mongo db - vercel : mongodb+srv://Vercel-Admin-atlas-fuchsia-house:9BK2xTAXzHSVzV0y@atlas-fuchsia-house.geojeze.mongodb.net/?retryWrites=true&w=majority
