@@ -3,7 +3,8 @@ const { chromium } = require('patchright');
 async function launchBrowser() {
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
-    headless: false,
+    args: ["--enable-unsafe-swiftshader"],
+    headless: true,
      });
   return browser;
 }
