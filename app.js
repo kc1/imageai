@@ -4,6 +4,7 @@ const express = require("express");
 const { launchBrowser } = require("./patchright");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
+const { performTestAPN, performTestLatLon } = require("./tests/test-1.spec.ts");
 const { refreshDropboxToken } = require("./refreshToken");
 const { fetchMongoDBData } = require("./getMongoData");
 const { getDaysAgoString } = require("./getMongoData");
@@ -80,7 +81,8 @@ app.post("/processMany", async (req, res) => {
       let property = properties[i];
       property.apn = property.APN;
       if (property && property.state && property.county && property.APN) {
-        await performTest(loggedInPage, property, dropboxToken);
+        // await performTest(loggedInPage, property, dropboxToken);
+        await performTestAPN(loggedInPage, property, dropboxToken);
       }
     }
 
@@ -124,12 +126,18 @@ app.post("/process", async (req, res) => {
       javaScriptEnabled: true,
     });
 
+    const data = await refreshDropboxToken();
+    const dropboxToken = data.access_token;
+
+
     const page = await context.newPage();
-    await context.route("**/*", async (route) => {
-      await route.continue();
-    });
-    await context.loadStorageState({ path: "./state.json" });
-    await performTest(page, property);
+    // /*     await context.route("**/*", async (route) => {
+    // await route.continue();
+    // */   });
+    // await context.loadStorageState({ path: "./state.json" });
+    const loggedInPage = await login(page);
+    // await performTest(loggedInPage, property);
+    await performTestLatLon(loggedInPage, property, dropboxToken);
 
     await browser.close();
     res.json({

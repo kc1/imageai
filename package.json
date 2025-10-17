@@ -15,10 +15,7 @@
     "mongodb": "^6.13.1",
     "node-fetch": "^2.7.0",
     "node-fetch2": "^1.6.3",
-    "patchright": "^1.52.5",
-    "playwright": "1.41.1-beta-1706549589000",
-    "playwright-extra": "^4.3.6",
-    "playwright-extra-plugin-stealth": "^0.0.1",
+    "patchright": "^1.56.1",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sharp": "^0.33.5"
   },

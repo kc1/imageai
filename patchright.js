@@ -4,7 +4,7 @@ async function launchBrowser() {
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
     args: ["--enable-unsafe-swiftshader"],
-    headless: true,
+    headless: false,
      });
   return browser;
 }

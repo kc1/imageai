@@ -32,27 +32,6 @@ async function login(page) {
   await page.keyboard.press("Enter");
   console.log("logged in");
 
-  // Wait for navigation to complete after login
-  // await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 90000 });
-
-  // // List iframes for debugging
-  // const iframes = page.frames();
-  // console.log("List of iframes:");
-  // iframes.forEach((frame, index) => {
-  //   console.log(`Iframe ${index + 1}: ${frame.url()}`);
-  // });
-
-  // // Attempt to select the target iframe(s)
-  // let targetIframe = page.frame({ url: "https://id.land/discover" });
-  // if (!targetIframe) {
-  //   targetIframe = page.frame({ url: "https://id.land/users/sign_in" });
-  // }
-  // if (targetIframe) {
-  //   console.log("Target iframe found:", targetIframe.url());
-  // } else {
-  //   console.log("Target iframe not found");
-  // }
-
   return page;
 }
 
@@ -67,10 +46,11 @@ async function performTest(page, property, dropboxToken) {
     path: "./screenshots/" + testFile,
     fullPage: true,
   });
-  const testResult = await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
-  console.log("Test file uploaded to Dropbox");
+  // const testResult = await uploadToDropbox(testFile, "./screenshots/" + testFile, dropboxToken);
+  // console.log("Test file uploaded to Dropbox");
   await page.goto("https://id.land/discover");
   await page.waitForTimeout(10000);
+  // ERROR here 
   await page.getByText("Address").click();
 
   await page.getByText("Parcel").click();
