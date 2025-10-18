@@ -38,9 +38,11 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        // Use specific Chromium installation
+        // Use system Chromium on Render, fallback to Playwright's Chromium locally
         channel: undefined, // Disable default channel
-        executablePath: '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome'
+        executablePath: process.env.NODE_ENV === 'production' 
+          ? '/usr/bin/chromium' 
+          : '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome'
       },
     },
 

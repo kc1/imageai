@@ -1,11 +1,16 @@
 const { chromium } = require('patchright');
 
 async function launchBrowser() {
+  // Use system Chromium on Render, fallback to Playwright's Chromium locally
+  const executablePath = process.env.NODE_ENV === 'production' 
+    ? '/usr/bin/chromium' 
+    : '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome';
+    
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
     args: ["--enable-unsafe-swiftshader"],
     headless: true,
-    executablePath: '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome'
+    executablePath: executablePath
      });
   return browser;
 }

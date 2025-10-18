@@ -143,7 +143,8 @@ app.post("/process", async (req, res) => {
     const timestamp = Date.now();
     const screenshotFilename = `property-${property.state}-${property.county}-${timestamp}.png`;
     const screenshotPath = `./screenshots/${screenshotFilename}`;
-    
+    // Add a 10 second delay before taking the screenshot
+    await new Promise(resolve => setTimeout(resolve, 20000));
     await loggedInPage.screenshot({
       path: screenshotPath,
       fullPage: true
