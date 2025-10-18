@@ -5,6 +5,7 @@ async function launchBrowser() {
     // args: ["--use-angle=gl"],
     args: ["--enable-unsafe-swiftshader"],
     headless: true,
+    executablePath: '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome'
      });
   return browser;
 }

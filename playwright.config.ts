@@ -36,7 +36,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Use specific Chromium installation
+        channel: undefined, // Disable default channel
+        executablePath: '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome'
+      },
     },
 
     {
