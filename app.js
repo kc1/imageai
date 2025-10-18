@@ -137,7 +137,7 @@ app.post("/process", async (req, res) => {
     // await context.loadStorageState({ path: "./state.json" });
     const loggedInPage = await login(page);
     // await performTest(loggedInPage, property);
-    await performTestLatLon(loggedInPage, property, dropboxToken);
+    // await performTestLatLon(loggedInPage, property, dropboxToken);
 
     // Take a screenshot before closing the browser
     const timestamp = Date.now();
