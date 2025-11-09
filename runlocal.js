@@ -8,9 +8,10 @@ client.connect();
 const database = client.db("mydata");
 let collection = database.collection("bucket1");
 let firstNum = 0;
-let lastNum = 3;
 let myArgs = process.argv.slice(2);
 console.log(myArgs);
+let lastNum = myArgs.pop();
+console.log("Last number:", lastNum);
 
 const { launchBrowser } = require("./patchright");
 // const { launchBrowser } = require("./stealthPlaywright");
@@ -72,6 +73,7 @@ deletePngFiles("./screenshots");
     let response = await fetchMongoDBData(filterObj, "bucket1");
     let properties = response.documents;
     if (!properties || !properties.length) return "No properties to process";
+    properties = properties.slice(0, lastNum-1);
     console.log("Properties:", properties);
     // return;
 
@@ -104,7 +106,13 @@ deletePngFiles("./screenshots");
 
     const page = await context.newPage();
     const loggedInPage = await login(page);
-
+    // Primary: locate by id
+/*     const helpButton = loggedInPage.locator("#guide-help-hub-button");
+    await helpButton.waitFor({ state: "visible", timeout: 3000 });
+    await helpButton.click({ timeout: 5000 });
+    await loggedInPage.keyboard.press("Escape");
+    await loggedInPage.waitForTimeout(100); */
+    await loggedInPage.keyboard.press("Escape");
     for (let i = 0; i < properties.length; i++) {
       let property = properties[i];
       property.apn = property.APN;
@@ -134,7 +142,10 @@ deletePngFiles("./screenshots");
 
       // Ensure uploadData and the returned result files exist before accessing path_lower
       if (!uploadData) {
-        console.error("uploadData is null or undefined for property:", property);
+        console.error(
+          "uploadData is null or undefined for property:",
+          property
+        );
         // skip this property and continue with the next one
         continue;
       }
