@@ -11,3 +11,18 @@
 you get screenshot1.png in your root directory
 
 [root@realoption ~]# google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --force-device-scale-factor=1 --hide-scrollbars --disable-extensions --disable-background-networking --disable-sync --disable-translate --disable-plugins --window-size=1280,1024 --screenshot=screenshot1.png https://yahoo.com
+
+to see screenshot- run locally:
+
+(base) ubuntu@penguin:~/node/imageai$ scp root@199.246.88.29:/root/screenshot1.png 
+
+Linux VPS - Standard - 1 GB (10/07/2025 - 10/06/2026) $84.00 USD
+Operating System: AlmaLinux 8.10
+Region: Buffalo, NY, USA (High Performance)
+Number of IPs: 1 IPv4 IP Address
+Monthly Bandwidth: Unmetered Bandwidth
+CPU Cores: 1
+Space: 15 GB NvME Space
+RAM: 1 GB
+
+look it up on realoption gmail
