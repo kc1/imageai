@@ -194,6 +194,7 @@ app.post("/main", async (req, res) => {
 
     await browser.close();
     console.log("Processing complete");
+    return res.send("Processing complete");
   } catch (error) {
     console.log("Error:", error);
   }
