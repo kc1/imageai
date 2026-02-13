@@ -9,7 +9,8 @@ async function launchBrowser() {
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
     args: ["--enable-unsafe-swiftshader"],
-    headless: process.env.HEADLESS === undefined ? false : process.env.HEADLESS
+    // headless: process.env.HEADLESS === undefined ? false : process.env.HEADLESS
+    headless: process.env.HEADLESS === 'true'
 
     // headless:false ,
     // executablePath: executablePath
