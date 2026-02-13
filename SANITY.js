@@ -1,11 +1,13 @@
+/* The purpose of this code is to set up a simple Express server that listens for POST requests on the "/main" endpoint. When a request is received, it logs a message and responds with "Hello World".
+Run this on a VPS to make sure NGINX can proxy requests to it.
+ */
+
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Add JSON middleware
 app.use(express.json());
-
-
 
 const dropboxV2Api = require("dropbox-v2-api");
 const { Dropbox } = require("dropbox");
