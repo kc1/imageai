@@ -48,3 +48,177 @@ server {
 }
 
 5) symlink to nginx/sites-enabled
+
+6) some commsnds i used:
+
+1  restart
+    2  reboot
+    3  # 1. Add Google’s key and repo (example layout)
+    4  sudo install -m 0755 -d /etc/apt/keyrings
+    5  wget -O- https://dl.google.com/linux/linux_signing_key.pub   | sudo gpg --dearmor -o /etc/apt/keyrings/google-linux.gpg
+    6  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-linux.gpg] \
+    7  https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+    8  # 2. Update and install the stable channel
+    9  sudo apt update
+   10  sudo apt install google-chrome-stable
+   11  google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --force-device-scale-factor=1 --hide-scrollbars --disable-extensions --disable-background-networking --disable-sync --disable-translate --disable-plugins --window-size=1280,1024 --screenshot=screenshot1.png https://yahoo.com
+   12  ls
+   13  xdg-open screenshot1.png 
+   14  which xdg-open
+   15  xdg-open --version  # or: xdg-open --help
+   16  [root@realoption ~]# google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1280,1024 --screenshot=screenshot1.png https://id.land
+   17  google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1280,1024 --screenshot=screenshot1.png https://id.land
+   18  which git
+   19  which node
+   20  # From your VPS shell, as a normal user or root:
+   21  curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+   22  sudo apt-get install -y nodejs
+   23  # Optional: verify
+   24  node -v
+   25  npm -v
+   26  mkdir chrome-shot && cd chrome-shot
+   27  npm init -y
+   28  npm install playwright
+   29  npx playwright install chromium
+   30  ls
+   31  cd ..
+   32  history
+   33  mkdir imageai & cd imageai
+   34  mkdir imageai && cd imageai
+   35  ls
+   36  cd imageai/
+   37  git clone https://github.com/kc1/imageai.git
+   38  ls
+   39  cd imageai/
+   40  ls
+   41  cd ..
+   42  rm -rf ./imageai/
+   43  ls
+   44  git clone https://github.com/kc1/imageai.git
+   45  ls
+   46  cd imageai/
+   47  ls
+   48  npm install
+   49  ls
+   50  ls -la
+   51  sudo apt update && sudo apt upgrade -y
+   52  [200~sudo ufw allow OpenSSH
+   53  sudo ufw allow OpenSSH
+   54  sudo ufw enable
+   55  sudo apt install apache2 -y
+   56  sudo systemctl status apache2
+   57  history
+   58  sudo systemctl status apache2
+   59  sudo ufw app list
+   60  sudo ufw allow 'Apache Full'
+   61  sudo ufw status
+   62  sudo ufw status
+   63  sudo ss -tlpn | grep ':443'
+   64  sudo ss -tlpn | grep ':443'
+   65  sudo a2enmod ssl
+   66  sudo apache2ctl configtest
+   67  sudo systemctl reload apache2
+   68  sudo ss -tlpn | grep ':443'
+   69  sudo systemctl status apache2
+   70  sudo apt update
+   71  sudo apt install nginx
+   72  sudo ufw allow 'Nginx Full'
+   73  sudo ufw enable    # if not already enabled
+   74  vim /etc/nginx/sites-available/myProject:
+   75  sudo ln -s /etc/nginx/sites-available/myProject /etc/nginx/sites-enabled/
+   76  sudo nginx -t      # check config
+   77  sudo systemctl reload nginx
+   78  systemctl status nginx.service
+   79  sudo nginx -t      # check config
+   80  ls /etc/nginx/
+   81  ls /etc/nginx/sites-available/
+   82  vim /etc/nginx/sites-available/default 
+   83  vim /etc/nginx/sites-available/myProject\: 
+   84  vim /etc/nginx/sites-available/default 
+   85  ls /etc/nginx/sites-enabled/
+   86  ls /etc/nginx/sites-enabled/
+   87  sudo systemctl reload nginx
+   88  ls /etc/nginx/sites-available/default 
+   89  ls /etc/nginx/sites-available/
+   90  ls -la /etc/nginx/sites-enabled/
+   91  ls /etc/nginx/sites-available/
+   92  rm /etc/nginx/sites-available/myProject\: 
+   93  touch /etc/nginx/sites-available/test
+   94  ls /etc/nginx/sites-available/
+   95  vim /etc/nginx/sites-available/
+   96  ls -la /etc/nginx/sites-enabled/
+   97  sudo unlink /etc/nginx/sites-enabled/default 
+   98  ls -la /etc/nginx/sites-enabled/
+   99  sudo link /etc/nginx/sites-available/test /etc/nginx/sites-enabled/
+  100  ls -la /etc/nginx/sites-enabled/
+  101  sudo link -s /etc/nginx/sites-available/test /etc/nginx/sites-enabled/test
+  102  sudo ln -s /etc/nginx/sites-available/test /etc/nginx/sites-enabled/test
+  103  ls -la /etc/nginx/sites-enabled/
+  104  sudo systemctl reload nginx
+  105  sudo nginx -t      # check config
+  106  vim /etc/nginx/sites-available/test 
+  107  sudo systemctl reload nginx
+  108  vim /etc/nginx/sites-available/test 
+  109  sudo systemctl reload nginx
+  110  sudo nginx -t      # check config
+  111  ls
+  112  rm -rf imageai/
+  113  git clone https://github.com/kc1/imageai
+  114  ls imageai/
+  115  cd imageai/
+  116  node runLocalApp.js 
+  117  node install
+  118  ls
+  119  npm install
+  120  node runLocalApp.js 
+  121  cd imageai/
+  122  vim .env
+  123  node runLocalApp.js 
+  124  sudo apt install certbot python3-certbot-nginx   # Debian/Ubuntu
+  125  sudo certbot --nginx -d image1.space -d www.image1.space
+  126  vim /etc/nginx/sites-available/test 
+  127  sudo systemctl reload nginx
+  128  sudo nginx -t      # check config
+  129  cd imageai/
+  130  node runLocalApp.js 
+  131  netstat
+  132  im /etc
+  133  vim /etc
+  134  netstat -ltnp | grep :3000
+  135  apt install net-tools
+  136  netstat -ltnp | grep :3000
+  137  kill -15 60670
+  138  netstat -ltnp | grep :3000
+  139  cd imageai/
+  140  node runLocalApp.js 
+  141  netstat -ltnp | grep :3000
+  142  ║     npx patchright install                                              ║
+  143  npx patchright install  
+  144  npx patchright install-deps
+  145  netstat -ltnp | grep :3000
+  146  node runLocalApp.js 
+  147  git remote
+  148  git remote -v
+  149  git pull origin main
+  150  node SA
+  151  node runLocalApp.js 
+  152  vim .env
+  153  node runLocalApp.js 
+  154  vim .env
+  155  git pull origin main
+  156  node runLocalApp.js 
+  157  git pull origin main
+  158  node runLocalApp.js 
+  159  git pull origin main
+  160  node runLocalApp.js 
+  161  vd imageai/
+  162  cd imageai/
+  163  node runLocalApp.js 2
+  164  node runLocalApp.js 10
+  165  vim /etc/nginx/sites-available/test 
+  166  less /etc/nginx/sites-available/test 
+  167  less history
+  168  less|history
+  169  vim history
+  170  vim|history
+
