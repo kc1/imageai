@@ -8,21 +8,24 @@ async function launchBrowser() {
     
   const browser = await chromium.launch({
     // args: ["--use-angle=gl"],
-    args: ["--enable-unsafe-swiftshader"],
-    // headless: process.env.HEADLESS === undefined ? false : process.env.HEADLESS
+    args: [
+      "--no-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--force-device-scale-factor=1",
+      "--hide-scrollbars",
+      "--disable-extensions",
+      "--disable-background-networking",
+      "--disable-sync",
+      "--disable-translate",
+      "--disable-plugins",
+      "--window-size=1280,1024",
+      "--enable-unsafe-swiftshader",
+    ],
     headless: process.env.HEADLESS === 'true'
 
-    // headless:false ,
-    // executablePath: executablePath
      });
   return browser;
 }
-
-//  proxy: {
-//       server: 'http://198.23.239.134:6540', // Replace with your proxy server
-//       username: 'asdyycvx', // Optional, if your proxy requires authentication
-//       password: 'qk597lgwe2ni'  // Optional, if your proxy requires authentication
-//     }
-
 
 module.exports = { launchBrowser };
