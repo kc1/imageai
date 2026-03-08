@@ -14,3 +14,7 @@ using ssh kc@tailscale-ip
    look for gateway token, copy it:
 
 7) http://127.0.0.1:18789/?token=TOKEN
+
+https://www.reddit.com/r/openclaw/comments/1r4ldnh/i_built_a_tavily_search_plugin_for_openclaw/
+
+https://app.tavily.com/home - gives you web search api key TAVILY_API_KEY
