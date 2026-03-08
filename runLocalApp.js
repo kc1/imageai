@@ -5,8 +5,6 @@ const port = process.env.PORT || 3000;
 // Add JSON middleware
 app.use(express.json());
 
-
-
 const dropboxV2Api = require("dropbox-v2-api");
 const { Dropbox } = require("dropbox");
 require("dotenv").config();
@@ -63,7 +61,6 @@ deletePngFiles("./screenshots");
 
 // (async () => {
 app.post("/main", async (req, res) => {
-
   try {
     // const properties = req.body;
     // console.log("Properties:", properties);
@@ -106,46 +103,50 @@ app.post("/main", async (req, res) => {
     const loggedInPage = await login(page);
     await loggedInPage.keyboard.press("Escape");
     for (let i = 0; i < properties.length; i++) {
-      let property = properties[i];
-      property.apn = property.APN;
-      console.log("Property:", property);
-      let uploadData;
-      if (
-        property &&
-        property.state &&
-        property.county &&
-        property.APN !== ""
-      ) {
-        uploadData = await performTestAPN(loggedInPage, property, dropboxToken);
-        // const uploadData = await performTest(loggedInPage, property, dropboxToken);
-        // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
-      } else if (
-        property &&
-        property.state &&
-        property.county &&
-        property.apn === ""
-      ) {
-        uploadData = await performTestLatLon(
-          loggedInPage,
-          property,
-          dropboxToken,
-        );
-      }
-
-      // Ensure uploadData and the returned result files exist before accessing path_lower
-      if (!uploadData) {
-        console.error(
-          "uploadData is null or undefined for property:",
-          property,
-        );
-        // skip this property and continue with the next one
-        continue;
-      }
-
-      let sharedWaterLink = "";
-      let sharedContourLink = "";
-
       try {
+        let property = properties[i];
+        property.apn = property.APN;
+        console.log("Property:", property);
+        let uploadData;
+        if (
+          property &&
+          property.state &&
+          property.county &&
+          property.APN !== ""
+        ) {
+          uploadData = await performTestAPN(
+            loggedInPage,
+            property,
+            dropboxToken,
+          );
+          // const uploadData = await performTest(loggedInPage, property, dropboxToken);
+          // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
+        } else if (
+          property &&
+          property.state &&
+          property.county &&
+          property.apn === ""
+        ) {
+          uploadData = await performTestLatLon(
+            loggedInPage,
+            property,
+            dropboxToken,
+          );
+        }
+
+        // Ensure uploadData and the returned result files exist before accessing path_lower
+        if (!uploadData) {
+          console.error(
+            "uploadData is null or undefined for property:",
+            property,
+          );
+          // skip this property and continue with the next one
+          continue;
+        }
+
+        let sharedWaterLink = "";
+        let sharedContourLink = "";
+
         if (
           uploadData.resultWaterFile &&
           uploadData.resultWaterFile.path_lower
@@ -159,11 +160,7 @@ app.post("/main", async (req, res) => {
             property,
           );
         }
-      } catch (err) {
-        console.error("Failed to create shared water link:", err);
-      }
 
-      try {
         if (
           uploadData.resultContourFile &&
           uploadData.resultContourFile.path_lower
@@ -179,29 +176,29 @@ app.post("/main", async (req, res) => {
             property,
           );
         }
+
+        property.WaterURL = sharedWaterLink;
+        property.ContourURL = sharedContourLink;
+
+        // property.ContourURL = uploadData.resultContourFile.path_lower;
+        // property.WaterURL = uploadData.resultWaterFile.path_lower;
+        // console.log("Property:", property);
+        await upsertOneToBucket(collection, property);
       } catch (err) {
-        console.error("Failed to create shared contour link:", err);
+        console.error("Error processing property:", err);
       }
-
-      property.WaterURL = sharedWaterLink;
-      property.ContourURL = sharedContourLink;
-
-      // property.ContourURL = uploadData.resultContourFile.path_lower;
-      // property.WaterURL = uploadData.resultWaterFile.path_lower;
-      // console.log("Property:", property);
-      await upsertOneToBucket(collection, property);
     }
-
     await browser.close();
     console.log("Processing complete");
     return res.send("Processing complete");
-  } catch (error) {
-    console.log("Error:", error);
+  } catch (err) {
+    console.error("Error in /main route:", err);
+    return res
+      .status(500)
+      .send("An error occurred while processing properties.");
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-

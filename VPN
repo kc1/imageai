@@ -1,0 +1,34 @@
+I've set up a tailscale vpn following https://www.youtube.com/watch?v=tnsrnsy_Lus&t=1724s : all commands are in show notes and here:
+
+Command List
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up --ssh
+tailscale status
+
+sudo nano /etc/ssh/sshd_config
+   ListenAddress 100.x.x.x 
+  PasswordAuthenticationssh -N -L 18789:127.0.0.1:18789 kc@100.x.x.x
+ no
+  PermitRootLogin no
+
+sudo systemctl restart ssh
+
+adduser kc
+usermod -aG sudo kc
+su - kc
+sudo whoami
+logout
+ssh kc@tailscale-ip
+
+
+the vpn is working - it is set up in linux (but not android, which appears separate) you can login to the VPN through it- eg:
+
+(base) ubuntu@penguin:~/node/imageai$ ssh root@image1
+
+you can get a web dashboard by signing into login.tailscale.com
+
+It appears that when enabled the VPN creates its own internal IP addresses/MagicDNS. Since MagicDNS is enabled, access a device signed in to your network by using its machine name. IP addresses are also available.
+
+kc : sunshineband
+
+

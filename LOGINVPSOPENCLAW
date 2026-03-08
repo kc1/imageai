@@ -1,0 +1,16 @@
+1) login to https://login.tailscale.com/admin/machines?refreshed=true
+
+2) In can get into server from my local machine (with VPM on) 
+using ssh kc@tailscale-ip
+
+3) to get access to the OPENCLAW ADMIN PAGE link the 2 sshs with:
+
+(base) ubuntu@penguin:~$ ssh -N -L 18789:127.0.0.1:18789 kc@image1
+(IT DOES NOT RETURN)zz
+
+4) open browser to 127.0.0.1:18789
+
+5) kc@image1:~$ less .openclaw/openclaw.json
+   look for gateway token, copy it:
+
+7) http://127.0.0.1:18789/?token=TOKEN
