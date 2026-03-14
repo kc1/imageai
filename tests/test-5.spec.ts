@@ -28,8 +28,9 @@ async function login(page) {
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
   await page.getByPlaceholder("Password").fill("Landid1!");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Enter");
+  // await page.keyboard.press("Tab");
+  // await page.getByRole("button", { name: /Sign\s*In/i }).click();
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
   console.log("logged in");
 
   return page;

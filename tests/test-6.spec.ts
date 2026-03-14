@@ -23,7 +23,9 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
   await page.getByPlaceholder("Password").fill("Landid1!");
-  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  const signInBtn = page.getByRole("button", { name: /Sign\s*In/i });
+  await signInBtn.waitFor({ state: "visible", timeout: 20000 });
+  await signInBtn.click();
   await page.keyboard.press("Escape");
 
   await page.waitForTimeout(1000);

@@ -1,0 +1,148 @@
+When dealing with county tax and assessor data (which your `alcornms` and `alcorn1` collections represent), formatting inconsistencies are your biggest enemy. 
+
+Because MongoDB's `$lookup` function relies on **exact string matching**, even a single invisible difference will cause records to fail to merge. `"010417        00100"` (8 spaces) does not equal `"010417       00100"` (7 spaces).
+
+Here is a discussion on why pre-cleaning is the best approach, followed by the exact code to do it.
+
+### Why PRE-cleaning is better than ON-THE-FLY cleaning
+
+You *can* write a MongoDB aggregation that strips spaces and formats strings exactly at the moment it tries to merge them. However, doing it beforehand is heavily preferred for two reasons:
+
+1. **Performance (Indexes):** When you run a `$lookup`, MongoDB compares every record in `Collection A` against every record in `Collection B`. If you match on standard fields, MongoDB can use an Index, taking milliseconds. If you force MongoDB to calculate and strip spaces *during* the match, it cannot use indexes. It has to calculate the spacing for all ~43,000 records in memory, which is heavy and slow.
+2. **Auditing:** If you clean the data first and save it as a new field, you can visually query the database to ensure your formatting worked before you commit to merging thousands of documents.
+
+### The Strategy: The "Clean ID" Approach
+
+The most bulletproof way to fix these parcel numbers isn't to try and guess how many spaces there should be. **The best method is to remove all spaces entirely.** 
+
+If you convert `"010417        00100"` into `"01041700100"`, it never matters how the original system exported it. 
+
+Instead of overwriting your original data, we will add a new field to both collections called `cleanParcelID`. 
+
+#### Step 1: Add `cleanParcelID` to `alcornms`
+Run this in mongosh, Compass, or your Node script. It uses an update pipeline `[...]` and `$replaceAll` to strip out all white space.
+
+```javascript
+db.alcornms.updateMany(
+  {}, // match all documents
+  [
+    {
+      // Create a new field that removes all spaces from properties.PARNO
+      $set: {
+        "properties.cleanParcelID": {
+          $replaceAll: { input: "$properties.PARNO", find: " ", replacement: "" }
+        }
+      }
+    }
+  ]
+)
+```
+
+#### Step 2: Add `cleanParcelID` to `alcorn1`
+Do the exact same thing for the second collection.
+
+```javascript
+db.alcorn1.updateMany(
+  {}, 
+  [
+    {
+      $set: {
+        "cleanParcelID": {
+          $replaceAll: { input: "$parcelNumber", find: " ", replacement: "" }
+        }
+      }
+    }
+  ]
+)
+```
+
+#### Step 3: Run the Merge on the Clean Indexes
+Now that both collections have flawlessly matching ID strings, you can run the `$lookup` logic we discussed earlier, targeting your brand new clean fields:
+
+```javascript
+db.alcornms.aggregate([
+  {
+    $lookup: {
+      from: "alcorn1",                   
+      localField: "properties.cleanParcelID",  // Match using the clean string
+      foreignField: "cleanParcelID",           // Match using the clean string
+      as: "taxData"                      
+    }
+  },
+  {
+    $unwind: {                           
+      path: "$taxData",
+      preserveNullAndEmptyArrays: true   
+    }
+  },
+  {
+    $out: "alcorn_merged"                
+  }
+])
+```
+
+<details>
+<summary><strong>Advanced Checking: Finding Unmatched Records</strong></summary>
+
+After you run the merge into `alcorn_merged`, you will likely want to know if there were any orphans (records from `alcornms` that had no matching tax data in `alcorn1`).
+
+You can easily query your new merged collection to see which ones failed to find a pair:
+
+```javascript
+// Find records where the taxData field is missing or null
+db.alcorn_merged.find({ "taxData": { $exists: false } }).count()
+```
+
+If this returns a high number, check those specific records. You might find that some parcel numbers have hyphens instead of spaces (e.g., `010417-00100`), which means your cleaning step might need to strip hyphens in addition to spaces using an extra `$replaceAll`.
+</details>
+
+
+NOTE - in /gis/notebooks , and using the GEO2 conda env, I have a jupyter lab
+notebook which compares alcorn1 parcelNumber to alcornMS PARNO. I found its a match 99% of time
+
+const { MongoClient } = require('mongodb');
+
+async function mergeCollections() {
+  const uri = "mongodb://localhost:27017"; // Change to your MongoDB connection string
+  const client = new MongoClient(uri);
+
+  try {
+    await client.connect();
+    const db = client.db('your_database_name'); // Change to your database name
+
+    console.log("Starting aggregation process...");
+    
+    // Define the aggregation pipeline
+    const pipeline = [
+      {
+        $lookup: {
+          from: "alcorn1",
+          localField: "properties.PARNO",
+          foreignField: "parcelNumber",
+          as: "taxData"
+        }
+      },
+      {
+        $unwind: {
+          path: "$taxData",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $out: "alcorn_merged" 
+      }
+    ];
+
+    // Run the pipeline
+    await db.collection('alcornms').aggregate(pipeline).toArray();
+    
+    console.log("Merge complete! Check the 'alcorn_merged' collection.");
+
+  } catch (err) {
+    console.error("Error merging records:", err);
+  } finally {
+    await client.close();
+  }
+}
+
+mergeCollections();

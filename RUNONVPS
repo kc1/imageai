@@ -4,6 +4,12 @@
 
 3) using remmina app to connect to vps - pw = Keyring1!
 
+3a) please note that following the directions in VPN, I have 
+installed a vpn from this machine to the Linveo vps. so to login go to:
+
+https://login.tailscale.com/admin/machines then ssh kc@image1. I've added a quicklink 
+in remmina to ssh into the machine using the tailscale ip address.
+
 4)nginx "sites-available/mysite" block:
 
 server {

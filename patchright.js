@@ -1,30 +1,44 @@
-const { chromium } = require('patchright');
+const { chromium } = require("patchright");
+
+// Use system Chromium on Render, fallback to Playwright's Chromium locally
+// const executablePath = process.env.NODE_ENV === 'production'
+// ? '/usr/bin/chromium'
+// : '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome';
+/* 
+(async () => {
+  const browser = await chromium.launch({
+    headless: false,
+    args: [
+      "--ignore-gpu-blocklist",
+      "--use-gl=angle", // Force ANGLE rendering framework
+      "--use-angle=swiftshader", // Force SwiftShader (Software WebGL)
+      "--enable-webgl",
+    ],
+  });
+
+  const page = await browser.newPage();
+  await page.goto("https://get.webgl.org/");
+  // The spinning cube should now appear!
+  // await page.screenshot({ path: 'webgl-test.png' });
+
+  await browser.close();
+})();
+ */
+
+// there is a bug likely in the latest chromeos that 
+// causes issues with WebGL rendering 
 
 async function launchBrowser() {
-  // Use system Chromium on Render, fallback to Playwright's Chromium locally
-  // const executablePath = process.env.NODE_ENV === 'production' 
-    // ? '/usr/bin/chromium' 
-    // : '/opt/render/project/.cache/playwright/chromium-1194/chrome-linux/chrome';
-    
   const browser = await chromium.launch({
-    // args: ["--use-angle=gl"],
     args: [
-      "--no-sandbox",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-      "--force-device-scale-factor=1",
-      // "--hide-scrollbars",
-      "--disable-extensions",
-      "--disable-background-networking",
-      "--disable-sync",
-      "--disable-translate",
-      "--disable-plugins",
-      // "--window-size=1280,1024",
-      "--enable-unsafe-swiftshader",
+      "--ignore-gpu-blocklist",
+      "--use-gl=angle", // Force ANGLE rendering framework
+      "--use-angle=swiftshader", // Force SwiftShader (Software WebGL)
+      "--enable-webgl",
     ],
-    headless: process.env.HEADLESS === 'true'
 
-     });
+    headless: process.env.HEADLESS === "true",
+  });
   return browser;
 }
 
