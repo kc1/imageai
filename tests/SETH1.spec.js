@@ -113,54 +113,17 @@ async function performTestAPN(page, property, dropboxToken) {
     .first()
     .click();
 
-  // await page.goto('https://id.land/discover');
-  // await page.waitForTimeout(10000);
-  // await page.getByRole('textbox').click();
-  // console.log('property', property);
-  // // await page.getByRole('textbox').fill('34,-88');
-  // await page.getByRole('textbox').fill(property.lat.toString() + ',' + property.lon.toString());
-  // // await page.getByRole('heading', { name: '-88.000000' }).click();
-  // // #mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___sm5Wt > ul > li > span > div > p
-  // await page.locator('#mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___sm5Wt > ul > li > span > div > p').click();
-  // // await page.getByRole('heading', { name: property.lat.toString() }).click();
-  // await page.locator('li').filter({ hasText: 'Water' }).getByRole('img').click();
-
-  //  // Check if waypoint message exists before clicking
-  // try {
-  //   const waypointMessage = page.locator(".waypoint-message__close > svg");
-  //   if (await waypointMessage.isVisible({ timeout: 2000 })) {
-  //     await waypointMessage.click();
-  //   }
-  // } catch (error) {
-  //   console.log("Waypoint message not found, continuing...");
-  // }
-
-  // await page.getByLabel("Map", { exact: true }).click({
-  //   button: "right",
-  //   position: {
-  //     x: 809,
-  //     y: 250,
-  //   },
-  // });
-  // await page
-  //   .locator("li")
-  //   .filter({ hasText: "Water" })
-  //   .locator("div")
-  //   .first()
-  //   .click();
-
   await page.waitForTimeout(2000);
   const date = new Date();
   const timestamp = Math.floor(date.getTime() / 1000);
 
-  // const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
+  const fileState = (property.state || property.SSTATE || property.STNAME || "UNKNOWN").toString().trim();
+  const fileCounty = (property.county || property.CNTYNAME || property.STNAME || "UNKNOWN").toString().trim();
+  const apnRaw = property.apn || property.APN || property.PARNO || property.parcelNumber || "UNKNOWN";
+  const fileApn = apnRaw.toString().replace(/\s+/g, "");
 
-  // await page.getByRole('textbox').fill(property.lat.toString() + ',' + property.lon.toString());
-
-  const waterFilename = `${property.state}-${property.county}-${property.apn}-${ts}-water.png`;
-  // const contoursFilename = `${property.state}_${property.county}_${property.apn}_${timestamp}-contours.png`;
-  // const contoursFilename = `${property.state}_${property.county}_${property.apn}_contours.png`;
-  const contoursFilename = `${property.state}-${property.county}-${property.apn}-${ts}-contours.png`;
+  const waterFilename = `${fileState}-${fileCounty}-${fileApn}-${timestamp}-water.png`;
+  const contoursFilename = `${fileState}-${fileCounty}-${fileApn}-${timestamp}-contours.png`;
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,
@@ -227,7 +190,7 @@ async function performTestLatLon(page, property, dropboxToken) {
   // await page.getByRole('textbox').fill('34,-88');
   await page
     .getByRole("textbox")
-    .fill(property.lat.toString() + "," + property.lon.toString());
+    .fill(property.LAT.toString() + "," + property.LON.toString());
   // await page.getByRole('heading', { name: '-88.000000' }).click();
   // #mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___sm5Wt > ul > li > span > div > p
   // await page.locator('#mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___sm5Wt > ul > li > span > div ').click();
@@ -236,7 +199,7 @@ async function performTestLatLon(page, property, dropboxToken) {
   await page.locator('div[class*="resultsContainer"]').click();
   // await page.locator("#mapright-map-container >
   // .home-map-panels > div > div > div > div > div.l    const numbers = property.lat.toString() + "," + property.lon.toString();
-  const numbers = property.lat.toString() + "," + property.lon.toString();
+  const numbers = property.LAT.toString() + "," + property.LON.toString();
   // */ // #mapright-map-container > div.search-bar > div.search-bar__search-control > div > div.styles-module__resultsContainer___fV9m0.styles-module__relativeToInput___kBcGo > div > div:nth-child(1) > ul > li > span > div > h3
   // await page.getByRole('heading', { name: property.lat.toString() }).click();
 // 
@@ -274,21 +237,14 @@ async function performTestLatLon(page, property, dropboxToken) {
     .click();
 
   await page.waitForTimeout(2000);
-  const date = new Date();
-  const timestamp = Math.floor(date.getTime() / 1000);
 
-  // const testFile = `${property.state}-${property.county}-${property.apn}-${ts}-test.png`;
+  const fileState2 = (property.state || property.SSTATE || property.STNAME || "UNKNOWN").toString().trim();
+  const fileCounty2 = (property.county || property.CNTYNAME || property.STNAME || "UNKNOWN").toString().trim();
+  const apnRaw2 = property.apn || property.APN || property.PARNO || property.parcelNumber || "UNKNOWN";
+  const fileApn2 = apnRaw2.toString().replace(/\s+/g, "");
 
-  // await page.getByRole('textbox').fill(property.lat.toString() + ',' + property.lon.toString());
-
-  const waterFilename = `${property.state}=${property.county}=${
-    property.lat.toString() + "," + property.lon.toString()
-  }=${ts}=water.png`;
-  // const contoursFilename = `${property.state}_${property.county}_${property.apn}_${timestamp}-contours.png`;
-  // const contoursFilename = `${property.state}_${property.county}_${property.apn}_contours.png`;
-  const contoursFilename = `${property.state}=${property.county}=${
-    property.lat.toString() + "," + property.lon.toString()
-  }=${ts}=contours.png`;
+  const waterFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-water.png`;
+  const contoursFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-contours.png`;
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,

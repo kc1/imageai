@@ -13,7 +13,7 @@ var murl = process.env.MONGODB_URI;
 const client = new MongoClient(murl);
 client.connect();
 const database = client.db("mydata");
-let collection = database.collection("alcornms");
+// let collection = database.collection("alcornms");
 let firstNum = 0;
 let myArgs = process.argv.slice(2);
 console.log(myArgs);
@@ -65,11 +65,14 @@ app.post("/sethProp", async (req, res) => {
   try {
     const body = req.body;
     console.log("body:", body);
-    const filterObj = body.filterObj || {};
+    // const filterObj = body.filterObj || {};
+    const filterObj = { $or: [{ WaterURL: "" }, { ContourURL: "" }] };
     const num = body.num || 2;
     console.log(filterObj);
 
-    let response = await fetchMongoDBData(filterObj, "alcornms");
+    let collection = database.collection("alcornBucket");
+
+    let response = await fetchMongoDBData(filterObj, "alcornBucket");
     let properties = response.documents;
     if (!properties || !properties.length) return "No properties to process";
 
@@ -90,42 +93,17 @@ app.post("/sethProp", async (req, res) => {
 
     const page = await context.newPage();
     const loggedInPage = await login(page);
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     await loggedInPage.screenshot({ path: "screenshot-debug.png" });
     // await loggedInPage.keyboard.press("Escape");
     for (let i = 0; i < properties.length; i++) {
       try {
         let property = properties[i];
-        property.apn = property.APN;
-
-        await loggedInPage.screenshot({ path: "screenshot-debug2.png" });
-        console.log("Property:", property);
-        let uploadData;
-        if (
-          property &&
-          property.state &&
-          property.county &&
-          property.APN !== ""
-        ) {
-          uploadData = await performTestAPN(
-            loggedInPage,
-            property,
-            dropboxToken,
-          );
-          // const uploadData = await performTest(loggedInPage, property, dropboxToken);
-          // const uploadData = await performTest2(loggedInPage, property, dropboxToken);
-        } else if (
-          property &&
-          property.state &&
-          property.county &&
-          property.apn === ""
-        ) {
-          uploadData = await performTestLatLon(
-            loggedInPage,
-            property,
-            dropboxToken,
-          );
-        }
+        uploadData = await performTestLatLon(
+          loggedInPage,
+          property,
+          dropboxToken,
+        );
 
         // Ensure uploadData and the returned result files exist before accessing path_lower
         if (!uploadData) {

@@ -6,7 +6,7 @@ async function launchBrowser() {
     // It's highly recommended to use the new headless mode when faking WebGL
     // If process.env.HEADLESS isn't set, default to false for debugging
     // headless: process.env.HEADLESS === "true", 
-    headless: true, 
+    headless: false, 
     
     args: [
       // 1. Force Software WebGL (Bypass broken Crostini GPU)

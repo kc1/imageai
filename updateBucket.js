@@ -42,8 +42,8 @@ async function upsertOneToBucket(coll, obj) {
   if (obj.hasOwnProperty("_id")) {
     delete obj._id;
   }
-  // Use listing_id as the unique identifier in the filter.
-  const filter = { listing_id: obj.listing_id };
+  // Use ID as the unique identifier in the filter.
+  const filter = { ID: obj.ID };
   try {
     const result = await coll.updateOne(
       filter,
