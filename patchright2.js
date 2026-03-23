@@ -5,8 +5,8 @@ async function launchBrowser() {
   const browser = await chromium.launch({
     // It's highly recommended to use the new headless mode when faking WebGL
     // If process.env.HEADLESS isn't set, default to false for debugging
-    // headless: process.env.HEADLESS === "true", 
-    headless: false, 
+    headless: process.env.HEADLESS === "true", 
+    // headless: false, 
     
     args: [
       // 1. Force Software WebGL (Bypass broken Crostini GPU)
