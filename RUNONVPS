@@ -55,7 +55,9 @@ server {
 
 5) symlink to nginx/sites-enabled
 
-6) some commsnds i used:
+sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
+
+6) some commands I used:
 
 1  restart
     2  reboot
@@ -111,31 +113,21 @@ server {
    52  [200~sudo ufw allow OpenSSH
    53  sudo ufw allow OpenSSH
    54  sudo ufw enable
-   55  sudo apt install apache2 -y
-   56  sudo systemctl status apache2
-   57  history
-   58  sudo systemctl status apache2
-   59  sudo ufw app list
-   60  sudo ufw allow 'Apache Full'
-   61  sudo ufw status
-   62  sudo ufw status
-   63  sudo ss -tlpn | grep ':443'
-   64  sudo ss -tlpn | grep ':443'
-   65  sudo a2enmod ssl
-   66  sudo apache2ctl configtest
-   67  sudo systemctl reload apache2
-   68  sudo ss -tlpn | grep ':443'
-   69  sudo systemctl status apache2
    70  sudo apt update
    71  sudo apt install nginx
-   72  sudo ufw allow 'Nginx Full'
-   73  sudo ufw enable    # if not already enabled
-   74  vim /etc/nginx/sites-available/myProject:
-   75  sudo ln -s /etc/nginx/sites-available/myProject /etc/nginx/sites-enabled/
-   76  sudo nginx -t      # check config
-   77  sudo systemctl reload nginx
-   78  systemctl status nginx.service
-   79  sudo nginx -t      # check config
+   sudo ufw allow 'Nginx Full'
+   sudo ufw enable    # if not already enabled
+   vim /etc/nginx/sites-available/myProject:
+
+
+
+
+   
+   sudo ln -s /etc/nginx/sites-available/myProject /etc/nginx/sites-enabled/
+   sudo nginx -t      # check config
+   sudo systemctl reload nginx
+   systemctl status nginx.service
+   sudo nginx -t      # check config
    80  ls /etc/nginx/
    81  ls /etc/nginx/sites-available/
    82  vim /etc/nginx/sites-available/default 
