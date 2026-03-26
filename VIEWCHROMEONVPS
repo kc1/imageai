@@ -1,0 +1,43 @@
+You can use x windows to forward display over ssh:
+
+X11 Forwarding (For Linux/macOS users) 
+If you are on Linux or macOS, you can forward the graphical display over SSH directly to your display.
+Connect: Use the command: ssh -X username@vps_ip.
+Launch: Type chromium-browser in the terminal. The window will open on your local computer.
+
+kc@image1:~$ history 30
+  328  sudo systemctl status sethapp
+  329  sudo journalctl -u sethapp -f
+  330  ls
+  331  [200~sudo apt install feh
+  332  sudo apt install feh
+  333  ls
+  334  feh screenshot-debug.png 
+  335  sudo journalctl -u sethapp -f
+  336  touch ~/.Xauthority
+  337  chown kc:kc ~/.Xauthority
+  338  chmod 600 ~/.Xauthority
+  339  logout
+  340  xeyes
+  341  sudo apt install x11-apps
+  342  xeyes
+  343  chromium-browser
+  344  which chromium
+  345  clear
+  346  ls -la
+  347  ls .cache/
+  348  ls .cache/ms-playwright/
+  349  ls .cache/ms-playwright/chromium-1208/
+  350  ls .cache/ms-playwright/chromium-1208/chrome-linux64/
+  351  .cache/ms-playwright/chromium-1208/chrome-linux64/chrome
+  352  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1208/chrome-linux/chrome"
+  353  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  354  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
+  355  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  
+  running 355, I was able to see vps browser in my laptop , I logged in to land.id , but needed to turn swiftshader on for login to work
+
+
+
+
+kc@image1:~$ 

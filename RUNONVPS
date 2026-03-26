@@ -69,7 +69,7 @@ sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
     8  # 2. Update and install the stable channel
     9  sudo apt update
    10  sudo apt install google-chrome-stable
-   11  google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --force-device-scale-factor=1 --hide-scrollbars --disable-extensions --disable-background-networking --disable-sync --disable-translate --disable-plugins --window-size=1280,1024 --screenshot=screenshot1.png https://yahoo.com
+   google-chrome-stable --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --force-device-scale-factor=1 --hide-scrollbars --disable-extensions --disable-background-networking --disable-sync --disable-translate --disable-plugins --window-size=1280,1024 --screenshot=screenshot1.png https://yahoo.com
    12  ls
    13  xdg-open screenshot1.png 
    14  which xdg-open

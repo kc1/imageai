@@ -29,6 +29,7 @@ const { refreshDropboxToken } = require("./refreshToken.js");
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
+const { closeOverlays } = require("./overlay.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -94,8 +95,9 @@ app.post("/sethProp", async (req, res) => {
     const page = await context.newPage();
     const loggedInPage = await login(page);
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    await closeOverlays(loggedInPage);
     await loggedInPage.screenshot({ path: "screenshot-debug.png" });
-    // await loggedInPage.keyboard.press("Escape");
+    await loggedInPage.keyboard.press("Escape");
     for (let i = 0; i < properties.length; i++) {
       try {
         let property = properties[i];
