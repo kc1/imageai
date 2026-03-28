@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-
 // Add JSON middleware
 app.use(express.json());
 
+const turf = require("@turf/turf");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 var murl = process.env.MONGODB_URI;
@@ -74,7 +74,9 @@ async function upsertOneToBucket(coll, obj) {
   }
 }
 
-// exports.handler = async function (event, context) {
+async function calculatePerimeterLength(poly1) {
+  return turf.length(poly1, { units: "feet" });
+}
 
 app.post("/length", async (req, res) => {
   // send in number to process and collection
@@ -98,18 +100,25 @@ app.post("/length", async (req, res) => {
     const num = body.num || 2;
     console.log(filterObj);
 
-    // let collection = database.collection("alcornGEO");
-
+    let collection = database.collection("alcornGEO");
     let response = await fetchMongoDBData(filterObj, "alcornGEOtest");
     let properties = response.documents;
     if (!properties || !properties.length) return "No properties to process";
 
     properties = properties.slice(0, num || properties.length);
+    for (let i = 0; i < properties.length; i++) {
+      try {
+        let property = properties[i];
+        const length1 = await calculatePerimeterLength(property.geometry);
+        console.log(`Polygon 1 perimeter: ${length1.toFixed(2)} ft`);
+        await upsertOneToBucket(collection, { ...property, calculatedPerimeter: length1 });
+      } catch (err) {
+        console.error(`Error processing property with ID ${property.ID}:`, err);
+      }
+    }
 
-    const myObjArray = JSON.parse(event.body);
-    console.log(myObjArray);
 
-    await upsertToBucket(collection, myObjArray);
+    // await upsertToBucket(collection, myObjArray);
     return res.send("Processing complete");
   } catch (err) {
     console.error("Error in /main route:", err);
