@@ -1,12 +1,23 @@
 1) Is it posible to calculate perimeter of polygon with turf in feet.
 
 2) Following this , we may need to calculate area of polygon with turf and check with actual area 
-measuremenr to make sure polygon is the correct property.
+measurement to make sure polygon is the correct property.
 
 3)perimeter.js looks for all properties that have either polygons or multipolygons with single coordinate arrays:
 
+{
+      $or: [
+        {
+          "geometry.type": "Polygon",
+        },
+        {
+          "geometry.type": "MultiPolygon",
+          "geometry.coordinates": {
+            $size: 1,
+          },
+        },
+      ],
+    }
 
-
-
-
-then adds perimeterFeet property using turf
+then adds perimeterFeet property using turf,
+I'm also adding calculatedAreaAcres which tracks closely with GISACRES - use this as a sanity check for 2)
