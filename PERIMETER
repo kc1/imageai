@@ -20,4 +20,15 @@ measurement to make sure polygon is the correct property.
     }
 
 then adds perimeterFeet property using turf,
-I'm also adding calculatedAreaAcres which tracks closely with GISACRES - use this as a sanity check for 2)
+I'm also adding calculatedAreaAcres which tracks closely with GISACRES - use this as a sanity check for 2) above
+
+the request:
+
+curl --location 'http://localhost:3000/length' \
+--header 'Content-Type: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+  "num": 1000,
+  "filterObj": {}
+}
+'
