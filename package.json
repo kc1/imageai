@@ -8,6 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@turf/turf": "^7.3.4",
     "dotenv": "^16.4.7",
     "dropbox": "^10.34.0",
     "dropbox-v2-api": "^2.5.11",
