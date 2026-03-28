@@ -44,29 +44,35 @@ async function upsertToBucket(coll, objArr) {
   }
 }
 
-async function upsertOneToBucket(coll, obj) {
-  // Remove _id if present so that it doesn't try to update it
-  if (obj.hasOwnProperty("_id")) {
-    delete obj._id;
+async function updateOneToBucket(coll, obj) {
+  const originalId = obj._id;
+  const filter = originalId
+    ? { _id: originalId }
+    : obj.myId
+    ? { myId: obj.myId }
+    : null;
+
+  if (!filter) {
+    console.log("Cannot updateOneToBucket: missing _id and myId");
+    return;
   }
-  // Use ID as the unique identifier in the filter.
-  const filter = { ID: obj.ID };
+  console.log("Filter for update:", filter);
+
+  const update = { $set: { calculatedPerimeterFeet: obj.calculatedPerimeterFeet } };
+  if (originalId !== undefined) {
+    update.$setOnInsert = { _id: originalId };
+  }
+
   try {
-    const result = await coll.updateOne(
-      filter,
-      { $set: obj },
-      { upsert: true },
-    );
+    const result = await coll.updateOne(filter, update, { upsert: true });
     if (result.upsertedCount > 0) {
-      console.log(
-        `Upsert created a new listing with id: ${result.upsertedId._id}`,
-      );
+      console.log(`Upsert created a new listing with id: ${result.upsertedId._id}`);
     } else if (result.modifiedCount > 0) {
-      console.log(`Updated listing with listing_id: ${obj.listing_id}`);
-      console.log(obj);
+      console.log(`Updated document with filter: ${JSON.stringify(filter)}`);
+      console.log(update.$set);
     } else {
-      console.log(`No changes made for listing_id: ${obj.listing_id}`);
-      console.log(obj);
+      console.log(`No changes made for filter: ${JSON.stringify(filter)}`);
+      console.log(update.$set);
     }
   } catch (error) {
     console.log(error);
@@ -83,7 +89,7 @@ app.post("/length", async (req, res) => {
     const body = req.body;
     console.log("body:", body);
     // const filterObj = body.filterObj || {};
-    const filterObj = {
+    const geometryFilter = {
       $or: [
         {
           "geometry.type": "Polygon",
@@ -94,6 +100,13 @@ app.post("/length", async (req, res) => {
             $size: 1,
           },
         },
+      ],
+    };
+
+    const filterObj = {
+      $and: [
+        geometryFilter,
+        { calculatedPerimeterFeet: { $exists: false } },
       ],
     };
     const num = body.num || 2;
@@ -115,7 +128,7 @@ app.post("/length", async (req, res) => {
         const length1 = await calculatePerimeterLength(polyFeature);
         property.calculatedPerimeterFeet = length1;
         console.log(`Polygon 1 perimeter: ${length1.toFixed(2)} ft`);
-        await upsertOneToBucket(collection, property);
+        await updateOneToBucket(collection, property);
       } catch (err) {
         console.error(`Error processing property with ID ${property.ID}:`, err);
       }
