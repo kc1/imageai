@@ -17,7 +17,9 @@ let myArgs = process.argv.slice(2);
 console.log(myArgs);
 
 const length = require("@turf/length").default;
+const area = require("@turf/area").default; // ← Add this line
 const { polygon } = require("@turf/helpers");
+
 async function upsertToBucket(coll, objArr) {
   for (let i = 0; i < objArr.length; i++) {
     const obj = objArr[i];
@@ -49,8 +51,8 @@ async function updateOneToBucket(coll, obj) {
   const filter = originalId
     ? { _id: originalId }
     : obj.myId
-    ? { myId: obj.myId }
-    : null;
+      ? { myId: obj.myId }
+      : null;
 
   if (!filter) {
     console.log("Cannot updateOneToBucket: missing _id and myId");
@@ -58,7 +60,12 @@ async function updateOneToBucket(coll, obj) {
   }
   console.log("Filter for update:", filter);
 
-  const update = { $set: { calculatedPerimeterFeet: obj.calculatedPerimeterFeet } };
+  const update = {
+    $set: {
+      calculatedPerimeterFeet: obj.calculatedPerimeterFeet,
+      calculatedAreaAcres: obj.calculatedAreaAcres,
+    },
+  };
   if (originalId !== undefined) {
     update.$setOnInsert = { _id: originalId };
   }
@@ -66,7 +73,9 @@ async function updateOneToBucket(coll, obj) {
   try {
     const result = await coll.updateOne(filter, update, { upsert: true });
     if (result.upsertedCount > 0) {
-      console.log(`Upsert created a new listing with id: ${result.upsertedId._id}`);
+      console.log(
+        `Upsert created a new listing with id: ${result.upsertedId._id}`,
+      );
     } else if (result.modifiedCount > 0) {
       console.log(`Updated document with filter: ${JSON.stringify(filter)}`);
       console.log(update.$set);
@@ -81,6 +90,12 @@ async function updateOneToBucket(coll, obj) {
 
 async function calculatePerimeterLength(polyFeature) {
   return length(polyFeature, { units: "feet" });
+}
+
+async function calculatePerimeterArea(polyFeature) {
+  const calculatedArea = area(polyFeature); // ← Returns square meters (geodesic)
+  const areaAcres = calculatedArea / 4046.86; // 1 acre ≈ 4046.86 m²
+  return areaAcres;
 }
 
 app.post("/length", async (req, res) => {
@@ -104,10 +119,7 @@ app.post("/length", async (req, res) => {
     };
 
     const filterObj = {
-      $and: [
-        geometryFilter,
-        { calculatedPerimeterFeet: { $exists: false } },
-      ],
+      $and: [geometryFilter, { calculatedPerimeterFeet: { $exists: false } }],
     };
     const num = body.num || 2;
     console.log(filterObj);
@@ -128,6 +140,9 @@ app.post("/length", async (req, res) => {
         const length1 = await calculatePerimeterLength(polyFeature);
         property.calculatedPerimeterFeet = length1;
         console.log(`Polygon 1 perimeter: ${length1.toFixed(2)} ft`);
+        const areaAcres = await calculatePerimeterArea(polyFeature);
+        console.log(`Polygon 1 area: ${areaAcres.toFixed(2)} acres`);
+        property.calculatedAreaAcres = areaAcres;
         await updateOneToBucket(collection, property);
       } catch (err) {
         console.error(`Error processing property with ID ${property.ID}:`, err);
