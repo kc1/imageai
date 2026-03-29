@@ -62,9 +62,19 @@ async function deletePngFiles(folderPath) {
 deletePngFiles("./screenshots");
 
 // (async () => {
-app.post("/sethProp", async (req, res) => {
+app.post("/sethProp", (req, res) => {
+  const body = req.body;
+  res.send("Processing started");
+  processSethProp(body).catch((err) =>
+    console.error("Unhandled error in /sethProp async processing:", err),
+  );
+});
+
+async function processSethProp(body) {
+  console.time("sethPropProcessing");
+  const sethPropStart = Date.now();
+
   try {
-    const body = req.body;
     console.log("body:", body);
     // const filterObj = body.filterObj || {};
     const filterObj = { $or: [{ WaterURL: "" }, { ContourURL: "" }] };
@@ -75,7 +85,10 @@ app.post("/sethProp", async (req, res) => {
 
     let response = await fetchMongoDBData(filterObj, "alcornBucket");
     let properties = response.documents;
-    if (!properties || !properties.length) return "No properties to process";
+    if (!properties || !properties.length) {
+      console.log("No properties to process");
+      return;
+    }
 
     properties = properties.slice(0, num || properties.length);
     const data = await refreshDropboxToken();
@@ -98,7 +111,9 @@ app.post("/sethProp", async (req, res) => {
     await closeOverlays(loggedInPage);
     await loggedInPage.screenshot({ path: "screenshot-debug.png" });
     await loggedInPage.keyboard.press("Escape");
+
     for (let i = 0; i < properties.length; i++) {
+      console.log(`Processing property #${i + 1} of ${properties.length}`);
       try {
         let property = properties[i];
         uploadData = await performTestLatLon(
@@ -162,16 +177,15 @@ app.post("/sethProp", async (req, res) => {
       }
     }
     await browser.close();
+    console.timeEnd("sethPropProcessing");
+    const sethPropDuration = Date.now() - sethPropStart;
+    console.log(`sethProp processing duration: ${sethPropDuration}ms`);
     console.log("Processing complete");
-    return res.send("Processing complete");
   } catch (err) {
-    console.error("Error in /main route:", err);
-    return res
-      .status(500)
-      .send("An error occurred while processing properties.");
+    console.error("Error in processSethProp:", err);
   }
-});
+}
 
-app.listen(port,'0.0.0.0', () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });

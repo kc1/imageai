@@ -1,5 +1,8 @@
-const { MongoClient } = require("mongodb");
+const sourceCollectionName = "alcornGEOtest"; // ← your source collection name
+const foreignCollectionName = "alcornTAX"; // ← your foreign collection name
+const outputCollectionName = "alcornMERGED2"; // ← your desired output collection name
 
+const { MongoClient } = require("mongodb");
 const uri = "mongodb://localhost:27017"; // ← your URI
 
 async function mergeCollections(sourceCollection) {
@@ -8,7 +11,7 @@ async function mergeCollections(sourceCollection) {
   const pipeline = [
     {
       $lookup: {
-        from: "alcornTAX",
+        from: foreignCollectionName,
         localField: "PARNO",
         foreignField: "parcelNumber",
         as: "taxData",
@@ -39,7 +42,7 @@ async function mergeCollections(sourceCollection) {
       $unset: "taxData", // optional but recommended cleanup
     },
     {
-      $out: "alcornMERGED",
+      $out: outputCollectionName,
     },
   ];
 
@@ -53,7 +56,7 @@ async function mergeCollections(sourceCollection) {
 
   const db = client.db("mydata");
   // set up source collection reference
-  const sourceCollection = db.collection("alcornGEO");
+  const sourceCollection = db.collection(sourceCollectionName);
 
   try {
     console.log("Connected. Starting merge , this will take a moment...");
@@ -73,7 +76,7 @@ async function mergeCollections(sourceCollection) {
     await mergeCollections(sourceCollection);
 
     // Optional: verify output count
-    const outCount = await db.collection("alcornMERGED").countDocuments({});
+    const outCount = await db.collection(outputCollectionName).countDocuments({});
     console.log(`Output collection now has ${outCount} documents`);
   } catch (err) {
     console.error("Error during aggregation:", err);
