@@ -40,3 +40,5 @@ app.listen(port,'0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
 });
 
+// you can run this server with `node SANITY.js` and it will listen for incoming POST requests on the specified port. You can test it by sending a POST request to `http://localhost:3000/main` using a tool like Postman or curl.
+
