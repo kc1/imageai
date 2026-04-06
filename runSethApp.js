@@ -109,7 +109,7 @@ async function processSethProp(body) {
     const loggedInPage = await login(page);
     await new Promise((resolve) => setTimeout(resolve, 5000));
     await closeOverlays(loggedInPage);
-    await loggedInPage.screenshot({ path: "screenshot-debug.png" });
+    await loggedInPage.screenshot({ path: "./screenshots/screenshot-debug.png" });
     await loggedInPage.keyboard.press("Escape");
 
     for (let i = 0; i < properties.length; i++) {
