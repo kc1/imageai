@@ -1,0 +1,12 @@
+add .env:
+
+MONGODB_URI="mongodb+srv://realoption11:RZR5KLeX7s6BFWte@cluster0.cqtemdq.mongodb.net/?retryWrites=true&w=majority"
+realoption11=RZR5KLeX7s6BFWte
+HEADLESS=true
+~                     
+
+npx patchright install
+
+alsp make sure to restart: kc@image1:~/imageai$ sudo systemctl restart sethapp
+
+after each git pull to update the codebase.
