@@ -119,7 +119,7 @@ async function processSethProp(body) {
     } else {
       console.log("Popup close button not found");
     }
-    await closeOverlays(loggedInPage);
+    // await closeOverlays(loggedInPage);
     await loggedInPage.screenshot({
       path: "./screenshots/screenshot-debug.png",
     });
