@@ -108,8 +108,21 @@ async function processSethProp(body) {
     const page = await context.newPage();
     const loggedInPage = await login(page);
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    // At the beginning of your script, right after page load
+
+    // Best and most reliable way:
+    const closeButton = loggedInPage.getByTestId("nudge-step-close-button");
+
+    if (await closeButton.isVisible()) {
+      await closeButton.click();
+      console.log("✅ Engagement nudge popup closed");
+    } else {
+      console.log("Popup close button not found");
+    }
     await closeOverlays(loggedInPage);
-    await loggedInPage.screenshot({ path: "./screenshots/screenshot-debug.png" });
+    await loggedInPage.screenshot({
+      path: "./screenshots/screenshot-debug.png",
+    });
     await loggedInPage.keyboard.press("Escape");
 
     for (let i = 0; i < properties.length; i++) {
