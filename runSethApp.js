@@ -29,7 +29,7 @@ const { refreshDropboxToken } = require("./refreshToken.js");
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
-const { closeOverlays } = require("./overlay.js");
+const { closeOverlays, closeOverlays2 } = require("./overlay.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -110,16 +110,7 @@ async function processSethProp(body) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     // At the beginning of your script, right after page load
 
-    // Best and most reliable way:
-    const closeButton = loggedInPage.getByTestId("nudge-step-close-button");
-
-    if (await closeButton.isVisible()) {
-      await closeButton.click();
-      console.log("✅ Engagement nudge popup closed");
-    } else {
-      console.log("Popup close button not found");
-    }
-    // await closeOverlays(loggedInPage);
+    await closeOverlays2(loggedInPage);
     await loggedInPage.screenshot({
       path: "./screenshots/screenshot-debug.png",
     });
@@ -128,11 +119,13 @@ async function processSethProp(body) {
     for (let i = 0; i < properties.length; i++) {
       console.log(`Processing property #${i + 1} of ${properties.length}`);
       try {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         let property = properties[i];
         uploadData = await performTestLatLon(
           loggedInPage,
           property,
           dropboxToken,
+          closeOverlays2
         );
 
         // Ensure uploadData and the returned result files exist before accessing path_lower

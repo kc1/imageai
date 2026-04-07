@@ -178,13 +178,14 @@ async function performTestAPN(page, property, dropboxToken) {
   // await writeToDropbox(contourBuffer, contoursFilename, dropboxToken);
 }
 
-async function performTestLatLon(page, property, dropboxToken) {
+async function performTestLatLon(page, property, dropboxToken,closeOverlays2) {
   await page.waitForTimeout(4000);
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
 
   await page.goto("https://id.land/discover");
   await page.waitForTimeout(5000);
+  await closeOverlays2(page);
   await page.getByRole("textbox").click();
   console.log("property", property);
   // await page.getByRole('textbox').fill('34,-88');
