@@ -65,7 +65,7 @@ async function closeOverlays(page) {
 
 async function closeOverlays2(page) {
   // Best and most reliable way:
-  const closeButton = loggedInPage.getByTestId("nudge-step-close-button");
+  const closeButton = page.getByTestId("nudge-step-close-button");
 
   if (await closeButton.isVisible()) {
     await closeButton.click();
