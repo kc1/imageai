@@ -99,8 +99,8 @@ async function processSethProp(body) {
     const context = await browser.newContext({
       permissions: ["geolocation"],
       geolocation: {
-        latitude: 45.680386849221,
-        longitude: -90.361372973983,
+        latitude: 34.8985,
+        longitude: -88.5952,
       },
       javaScriptEnabled: true,
     });
@@ -111,9 +111,9 @@ async function processSethProp(body) {
     // At the beginning of your script, right after page load
 
     await closeOverlays2(loggedInPage);
-    await loggedInPage.screenshot({
+/*     await loggedInPage.screenshot({
       path: "./screenshots/screenshot-debug.png",
-    });
+    }); */
     await loggedInPage.keyboard.press("Escape");
 
     for (let i = 0; i < properties.length; i++) {

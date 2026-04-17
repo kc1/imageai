@@ -179,7 +179,7 @@ async function performTestAPN(page, property, dropboxToken) {
 }
 
 async function performTestLatLon(page, property, dropboxToken,closeOverlays2) {
-  await page.waitForTimeout(4000);
+  // await page.waitForTimeout(4000);
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
 
@@ -237,7 +237,8 @@ async function performTestLatLon(page, property, dropboxToken,closeOverlays2) {
     .first()
     .click();
 
-  await page.waitForTimeout(2000);
+  // await page.waitForTimeout(2000);
+  await page.waitForLoadState("networkidle", { timeout: 30_000 });
 
   const fileState2 = (property.state || property.SSTATE || property.STNAME || "UNKNOWN").toString().trim();
   const fileCounty2 = (property.county || property.CNTYNAME || property.STNAME || "UNKNOWN").toString().trim();
