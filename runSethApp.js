@@ -29,7 +29,7 @@ const { refreshDropboxToken } = require("./refreshToken.js");
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
-const { closeOverlays, closeOverlays2 } = require("./overlay.js");
+const { closeEngagementPopups } = require("./overlay.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -110,7 +110,7 @@ async function processSethProp(body) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     // At the beginning of your script, right after page load
 
-    await closeOverlays2(loggedInPage);
+    await closeEngagementPopups(loggedInPage);
 /*     await loggedInPage.screenshot({
       path: "./screenshots/screenshot-debug.png",
     }); */
@@ -125,7 +125,7 @@ async function processSethProp(body) {
           loggedInPage,
           property,
           dropboxToken,
-          closeOverlays2
+          closeEngagementPopups,
         );
 
         // Ensure uploadData and the returned result files exist before accessing path_lower

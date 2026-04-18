@@ -51,10 +51,22 @@ async function closeOverlays(page) {
     return;
   }
 
-  // 4) Fallback: nuke the modal
+  // 4) Escape (rc-dialog / Amplitude sometimes honor this)
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  if (
+    !(await modal
+      .first()
+      .isVisible()
+      .catch(() => false))
+  )
+    return;
+
+  // 5) Fallback: remove modal nodes from the DOM so clicks reach the page
   await page.evaluate(() => {
     const sel = [
       ".engagement-nudge-modal",
+      ".amplitude-engagement-modal-container",
       ".rc-dialog-wrap",
       "#engagement-wrapper",
     ];
@@ -63,16 +75,22 @@ async function closeOverlays(page) {
   });
 }
 
-async function closeOverlays2(page) {
-  // Best and most reliable way:
-  const closeButton = page.getByTestId("nudge-step-close-button");
-
-  if (await closeButton.isVisible()) {
-    await closeButton.click();
-    console.log("✅ Engagement nudge popup closed");
-  } else {
-    console.log("Popup close button not found");
+/**
+ * Closes Amplitude engagement / rc-dialog overlays that intercept pointer events
+ * (e.g. `.engagement-nudge-modal`, `.rc-dialog-wrap`).
+ * Tries the documented test id first, then the broader strategies in closeOverlays.
+ */
+async function closeEngagementPopups(page) {
+  const closeByTestId = page.getByTestId("nudge-step-close-button");
+  if (await closeByTestId.isVisible().catch(() => false)) {
+    await closeByTestId.click({ timeout: 3000 }).catch(() => {});
+    console.log("✅ Engagement nudge popup closed (test id)");
   }
+  await closeOverlays(page);
 }
 
-module.exports = { closeOverlays, closeOverlays2 };
+async function closeOverlays2(page) {
+  await closeEngagementPopups(page);
+}
+
+module.exports = { closeOverlays, closeOverlays2, closeEngagementPopups };

@@ -9,7 +9,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/perimeter.js"
+      "program": "${workspaceFolder}/runSethApp.js"
     }
   ]
 }
