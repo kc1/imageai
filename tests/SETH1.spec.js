@@ -237,9 +237,6 @@ async function performTestLatLon(page, property, dropboxToken,closeOverlays2) {
     .first()
     .click();
 
-  // await page.waitForTimeout(2000);
-  await page.waitForLoadState("networkidle", { timeout: 30_000 });
-
   const fileState2 = (property.state || property.SSTATE || property.STNAME || "UNKNOWN").toString().trim();
   const fileCounty2 = (property.county || property.CNTYNAME || property.STNAME || "UNKNOWN").toString().trim();
   const apnRaw2 = property.apn || property.APN || property.PARNO || property.parcelNumber || "UNKNOWN";
@@ -247,6 +244,9 @@ async function performTestLatLon(page, property, dropboxToken,closeOverlays2) {
 
   const waterFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-water.png`;
   const contoursFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-contours.png`;
+
+  await page.waitForTimeout(5000);
+  await page.waitForLoadState("networkidle", { timeout: 30_000 });
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,
