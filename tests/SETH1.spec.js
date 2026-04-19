@@ -245,13 +245,14 @@ async function performTestLatLon(page, property, dropboxToken, closeEngagementPo
   const waterFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-water.png`;
   const contoursFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-contours.png`;
 
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(6000);
   await page.waitForLoadState("networkidle", { timeout: 30_000 });
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,
     fullPage: true,
   });
+
   // const waterBuffer = await page.screenshot();
   // const imageInfo = await sharp("water.png").metadata();
   // console.log("Image dimensions:", {

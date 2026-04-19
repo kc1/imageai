@@ -63,6 +63,14 @@ deletePngFiles("./screenshots");
 
 // (async () => {
 app.post("/sethProp", (req, res) => {
+  
+/*   curl --location 'http://localhost:3000/sethProp' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "num": 30,
+    "filterObj": {}
+  }' */
+
   const body = req.body;
   res.send("Processing started");
   processSethProp(body).catch((err) =>
@@ -78,7 +86,7 @@ async function processSethProp(body) {
     console.log("body:", body);
     // const filterObj = body.filterObj || {};
     const filterObj = { $or: [{ WaterURL: "" }, { ContourURL: "" }] };
-    const num = body.num || 2;
+    const num = body.num || 30;
     console.log(filterObj);
 
     let collection = database.collection("alcornBucket");
