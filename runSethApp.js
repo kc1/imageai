@@ -81,6 +81,7 @@ app.post("/sethProp", (req, res) => {
 async function processSethProp(body) {
   console.time("sethPropProcessing");
   const sethPropStart = Date.now();
+  let timerEnded = false;
 
   try {
     console.log("body:", body);
@@ -192,11 +193,19 @@ async function processSethProp(body) {
     }
     await browser.close();
     console.timeEnd("sethPropProcessing");
+    timerEnded = true;
     const sethPropDuration = Date.now() - sethPropStart;
     console.log(`sethProp processing duration: ${sethPropDuration}ms`);
     console.log("Processing complete");
   } catch (err) {
     console.error("Error in processSethProp:", err);
+  } finally {
+    if (!timerEnded) {
+      console.timeEnd("sethPropProcessing");
+      const sethPropDuration = Date.now() - sethPropStart;
+      console.log(`sethProp processing duration: ${sethPropDuration}ms`);
+      console.log("Processing complete");
+    }
   }
 }
 

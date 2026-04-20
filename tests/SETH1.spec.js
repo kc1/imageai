@@ -183,7 +183,29 @@ async function performTestLatLon(page, property, dropboxToken, closeEngagementPo
   const dt = new Date();
   let ts = Math.floor(dt.getTime() / 1000);
 
-  await page.goto("https://id.land/discover");
+  let navigated = false;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      await page.goto("https://id.land/discover", {
+        waitUntil: "domcontentloaded",
+        timeout: 60_000,
+      });
+      navigated = true;
+      break;
+    } catch (error) {
+      const isLastAttempt = attempt === 2;
+      console.warn(
+        `Discover navigation attempt ${attempt} failed: ${error?.message || error}`,
+      );
+      if (isLastAttempt) {
+        throw error;
+      }
+      await page.waitForTimeout(3000);
+    }
+  }
+  if (!navigated) {
+    throw new Error("Failed to navigate to id.land/discover after retries");
+  }
   await page.waitForTimeout(5000);
   await closeEngagementPopups(page);
   await page.getByRole("textbox").click();
@@ -245,7 +267,7 @@ async function performTestLatLon(page, property, dropboxToken, closeEngagementPo
   const waterFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-water.png`;
   const contoursFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-contours.png`;
 
-  await page.waitForTimeout(6000);
+  await page.waitForTimeout(8000);
   // Map pages often keep websocket/polling traffic open forever, so
   // "networkidle" can timeout even when the UI is ready for capture.
   await page.waitForLoadState("domcontentloaded", { timeout: 15_000 });
@@ -292,6 +314,9 @@ async function performTestLatLon(page, property, dropboxToken, closeEngagementPo
     "./screenshots/" + waterFilename,
     dropboxToken
   );
+  
+  console.log("Uploaded water file:", resultWaterFile);
+
   let resultContourFile = await uploadToDropbox(
     contoursFilename,
     "./screenshots/" + contoursFilename,
