@@ -246,7 +246,10 @@ async function performTestLatLon(page, property, dropboxToken, closeEngagementPo
   const contoursFilename = `${fileState2}-${fileCounty2}-${fileApn2}-${ts}-contours.png`;
 
   await page.waitForTimeout(6000);
-  await page.waitForLoadState("networkidle", { timeout: 30_000 });
+  // Map pages often keep websocket/polling traffic open forever, so
+  // "networkidle" can timeout even when the UI is ready for capture.
+  await page.waitForLoadState("domcontentloaded", { timeout: 15_000 });
+  await page.getByLabel("Map", { exact: true }).waitFor({ timeout: 15_000 });
 
   await page.screenshot({
     path: "./screenshots/" + waterFilename,
