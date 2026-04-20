@@ -22,8 +22,26 @@ async function login(page) {
   });
   await page.setViewportSize({ width: 1920, height: 1080 });
 
-    // Navigate to sign in and perform login steps
-  await page.goto("https://id.land/users/sign_in", { timeout: 90000 }); // 90 second timeout
+  // Navigate to sign in; avoid waiting for full "load" because third-party
+  // resources can keep loading and trigger timeouts on otherwise usable pages.
+  const signInUrl = "https://id.land/users/sign_in";
+  try {
+    await page.goto(signInUrl, {
+      timeout: 120000,
+      waitUntil: "domcontentloaded",
+    });
+  } catch (error) {
+    console.warn(
+      "Initial sign-in navigation timed out, retrying with commit wait:",
+      error?.name || error
+    );
+    await page.goto(signInUrl, {
+      timeout: 120000,
+      waitUntil: "commit",
+    });
+  }
+
+  await page.getByPlaceholder("Email address").waitFor({ timeout: 30000 });
   await page.getByPlaceholder("Email address").click();
   await page.getByPlaceholder("Email address").fill("optionhomes11@gmail.com");
   await page.getByPlaceholder("Password").click();
@@ -31,6 +49,23 @@ async function login(page) {
   // await page.keyboard.press("Tab");
   // await page.getByRole("button", { name: /Sign\s*In/i }).click();
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
+
+  // Validate login completed so downstream discover actions fail less opaquely.
+  try {
+    await page.waitForURL((url) => !url.pathname.includes("/users/sign_in"), {
+      timeout: 45000,
+    });
+  } catch (error) {
+    const currentUrl = page.url();
+    throw new Error(
+      `Login did not complete (still on or returned to sign-in page). Current URL: ${currentUrl}. Original error: ${
+        error?.message || error
+      }`
+    );
+  }
+
+  // Ensure app shell is interactive after redirect.
+  await page.waitForLoadState("domcontentloaded", { timeout: 30000 });
   console.log("logged in");
 
   return page;
