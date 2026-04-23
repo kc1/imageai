@@ -24,12 +24,12 @@ console.log("Last number:", lastNum);
 const { launchBrowser } = require("./patchright2.js");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
-const { performTestAPN, performTestLatLon } = require("./tests/SETH1.spec.js");
+const { performTestAPN, performTestLatLon } = require("./tests/SETH2.spec.js");
 const { refreshDropboxToken } = require("./refreshToken.js");
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
-const { closeEngagementPopups } = require("./overlay.js");
+const { closeEngagementPopups,setBasemap } = require("./overlay.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -124,6 +124,7 @@ async function processSethProp(body) {
       path: "./screenshots/screenshot-debug.png",
     }); */
     await loggedInPage.keyboard.press("Escape");
+    await setBasemap(loggedInPage);
 
     for (let i = 0; i < properties.length; i++) {
       console.log(`Processing property #${i + 1} of ${properties.length}`);

@@ -10,3 +10,6 @@ screenshot*.*
 
 # Local Netlify folder
 .netlify
+
+# Playwright
+/playwright/.auth/

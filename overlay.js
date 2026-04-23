@@ -1,3 +1,11 @@
+async function setBasemap(page) {
+
+  await page.getByRole('button', { name: 'Layers & Basemaps' }).click();
+  // await page.getByRole('button', { name: 'Vintage USGS' }).click();
+  await page.getByRole('button', { name: 'Street' }).click();
+  await page.locator('div').filter({ hasText: /^Layers$/ }).getByRole('button').click();
+}
+
 async function closeOverlays(page) {
   const modal = page.locator(".engagement-nudge-modal, .rc-dialog-wrap");
 
@@ -93,4 +101,9 @@ async function closeOverlays2(page) {
   await closeEngagementPopups(page);
 }
 
-module.exports = { closeOverlays, closeOverlays2, closeEngagementPopups };
+module.exports = {
+  closeOverlays,
+  closeOverlays2,
+  closeEngagementPopups,
+  setBasemap,
+};
