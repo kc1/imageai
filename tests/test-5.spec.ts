@@ -48,13 +48,18 @@ async function login(page) {
   await page.getByPlaceholder("Password").fill("Landid1!");
   // await page.keyboard.press("Tab");
   // await page.getByRole("button", { name: /Sign\s*In/i }).click();
+  // Attach URL waiter before click so fast redirects are not missed; use
+  // domcontentloaded — id.land/discover often never reaches "load" within
+  // timeout when trackers or map tiles keep the document "loading".
+  const loginNav = page.waitForURL(
+    (url) => !url.pathname.includes("/users/sign_in"),
+    { timeout: 45000, waitUntil: "domcontentloaded" },
+  );
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
 
   // Validate login completed so downstream discover actions fail less opaquely.
   try {
-    await page.waitForURL((url) => !url.pathname.includes("/users/sign_in"), {
-      timeout: 45000,
-    });
+    await loginNav;
   } catch (error) {
     const currentUrl = page.url();
     throw new Error(
