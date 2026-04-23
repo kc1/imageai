@@ -84,16 +84,108 @@ async function closeOverlays(page) {
 }
 
 /**
+ * Amplitude follow-up popover ("Select all that apply"): choose Other and Submit.
+ * Runs before global `nudge-step-close-button` handling so we do not dismiss first.
+ * @param {{ waitForSurveyMs?: number }} [options] — after Personal Use, pass ~8000 so the second popover can mount.
+ */
+async function fillEngagementSurveyOtherIfPresent(page, options = {}) {
+  const waitMs = options.waitForSurveyMs ?? 0;
+  const surveyPopover = page.locator(
+    [
+      ".amplitude-engagement-popover-container",
+      '[data-testid^="engagement-popover"]',
+    ].join(", "),
+  );
+  const other = surveyPopover.getByRole("checkbox", { name: /^other$/i }).first();
+  if (waitMs > 0) {
+    await other.waitFor({ state: "visible", timeout: waitMs }).catch(() => {});
+  }
+  if (!(await other.isVisible().catch(() => false))) return;
+
+  await other.click({ timeout: 3000 }).catch(() => {});
+  const submit = surveyPopover.getByRole("button", { name: /^submit$/i });
+  if (await submit.isVisible().catch(() => false)) {
+    await submit.click({ timeout: 3000 }).catch(() => {});
+  }
+  console.log("✅ Engagement survey step: selected Other (and Submit if present)");
+  await page.waitForTimeout(300).catch(() => {});
+}
+
+/**
  * Closes Amplitude engagement / rc-dialog overlays that intercept pointer events
  * (e.g. `.engagement-nudge-modal`, `.rc-dialog-wrap`).
  * Tries the documented test id first, then the broader strategies in closeOverlays.
  */
 async function closeEngagementPopups(page) {
+  await fillEngagementSurveyOtherIfPresent(page);
+
   const closeByTestId = page.getByTestId("nudge-step-close-button");
   if (await closeByTestId.isVisible().catch(() => false)) {
     await closeByTestId.click({ timeout: 3000 }).catch(() => {});
     console.log("✅ Engagement nudge popup closed (test id)");
   }
+
+  const engagementActionsBar = page.locator(
+    [
+      "#engagement-wrapper .amplitude-engagement-actions-bar-container",
+      ".rc-dialog-wrap .amplitude-engagement-actions-bar-container",
+      ".amplitude-engagement-modal-container .amplitude-engagement-actions-bar-container",
+    ].join(", "),
+  );
+
+  const personalUseCta = engagementActionsBar.getByRole("button", {
+    name: /personal use/i,
+  });
+  const personalUseByClass = engagementActionsBar.locator(
+    "button.amplitude-engagement-cta-button__secondary",
+  );
+
+  const closeByEngagementWrapperSelector = page.locator(
+    [
+      '#engagement-wrapper .amplitude-engagement-actions-bar-container button[aria-label*="close" i]',
+      '#engagement-wrapper .amplitude-engagement-actions-bar-container button:has-text("Close")',
+      '#engagement-wrapper .amplitude-engagement-actions-bar-container > div > div:nth-child(2) > button',
+      "#engagement-wrapper .rc-dialog-root .rc-dialog-wrap .amplitude-engagement-actions-bar-container > div > div:nth-child(2) > button",
+    ].join(", "),
+  );
+
+  if (
+    await personalUseCta
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await personalUseCta
+      .first()
+      .click({ timeout: 3000 })
+      .catch(() => {});
+    console.log("✅ Engagement nudge popup closed (Personal Use CTA)");
+    await fillEngagementSurveyOtherIfPresent(page, { waitForSurveyMs: 8000 });
+  } else if (
+    await personalUseByClass
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await personalUseByClass
+      .first()
+      .click({ timeout: 3000 })
+      .catch(() => {});
+    console.log("✅ Engagement nudge popup closed (secondary engagement CTA)");
+    await fillEngagementSurveyOtherIfPresent(page, { waitForSurveyMs: 8000 });
+  } else if (
+    await closeByEngagementWrapperSelector
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await closeByEngagementWrapperSelector
+      .first()
+      .click({ timeout: 3000 })
+      .catch(() => {});
+    console.log("✅ Engagement nudge popup closed (#engagement-wrapper selector)");
+  }
+
   await closeOverlays(page);
 }
 
