@@ -1,20 +1,58 @@
+async function neutralizeEngagementOverlay(page) {
+  await page.evaluate(() => {
+    const selectors = [
+      ".engagement-nudge-modal",
+      ".amplitude-engagement-modal-container",
+      ".rc-dialog-wrap",
+      "#engagement-wrapper",
+    ];
+    for (const selector of selectors) {
+      document.querySelectorAll(selector).forEach((el) => {
+        el.remove();
+      });
+    }
+  }).catch(() => {});
+}
+
 async function setBasemap(page) {
   const layersButton = page.getByRole("button", { name: "Layers & Basemaps" });
   const engagementModal = page.locator(
     ".engagement-nudge-modal, .rc-dialog-wrap, #engagement-wrapper",
   );
+  const debugTs = Date.now();
+  const debugScreenshotPath = `./screenshots/setBasemap-click-failure-${debugTs}.png`;
 
   await closeEngagementPopups(page).catch(() => {});
   await page.keyboard.press("Escape").catch(() => {});
+  await neutralizeEngagementOverlay(page);
 
-  try {
-    await layersButton.click({ timeout: 10000 });
-  } catch (error) {
-    // A late engagement modal can still mount and intercept pointer events.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await layersButton.click({ timeout: 10000 });
+      break;
+    } catch (error) {
+      // A late engagement modal can still mount and intercept pointer events.
+      if (attempt === 2) {
+        await page.screenshot({
+          path: debugScreenshotPath,
+          fullPage: true,
+        }).catch(() => {});
+        console.error(
+          `setBasemap debug screenshot saved: ${debugScreenshotPath}`,
+        );
+        throw error;
+      }
+      await closeEngagementPopups(page).catch(() => {});
+      await page.keyboard.press("Escape").catch(() => {});
+      await neutralizeEngagementOverlay(page);
+      await page.waitForTimeout(400);
+    }
+  }
+
+  if (await engagementModal.first().isVisible().catch(() => false)) {
     await closeEngagementPopups(page).catch(() => {});
     await page.keyboard.press("Escape").catch(() => {});
-    await engagementModal.first().waitFor({ state: "hidden", timeout: 3000 }).catch(() => {});
-    await layersButton.click({ timeout: 10000, force: true });
+    await neutralizeEngagementOverlay(page);
   }
 
   // await page.getByRole('button', { name: 'Vintage USGS' }).click();
@@ -91,16 +129,7 @@ async function closeOverlays(page) {
     return;
 
   // 5) Fallback: remove modal nodes from the DOM so clicks reach the page
-  await page.evaluate(() => {
-    const sel = [
-      ".engagement-nudge-modal",
-      ".amplitude-engagement-modal-container",
-      ".rc-dialog-wrap",
-      "#engagement-wrapper",
-    ];
-    for (const s of sel)
-      document.querySelectorAll(s).forEach((el) => el.remove());
-  });
+  await neutralizeEngagementOverlay(page);
 }
 
 /**
