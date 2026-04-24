@@ -1,9 +1,29 @@
 async function setBasemap(page) {
+  const layersButton = page.getByRole("button", { name: "Layers & Basemaps" });
+  const engagementModal = page.locator(
+    ".engagement-nudge-modal, .rc-dialog-wrap, #engagement-wrapper",
+  );
 
-  await page.getByRole('button', { name: 'Layers & Basemaps' }).click();
+  await closeEngagementPopups(page).catch(() => {});
+  await page.keyboard.press("Escape").catch(() => {});
+
+  try {
+    await layersButton.click({ timeout: 10000 });
+  } catch (error) {
+    // A late engagement modal can still mount and intercept pointer events.
+    await closeEngagementPopups(page).catch(() => {});
+    await page.keyboard.press("Escape").catch(() => {});
+    await engagementModal.first().waitFor({ state: "hidden", timeout: 3000 }).catch(() => {});
+    await layersButton.click({ timeout: 10000, force: true });
+  }
+
   // await page.getByRole('button', { name: 'Vintage USGS' }).click();
-  await page.getByRole('button', { name: 'Street' }).click();
-  await page.locator('div').filter({ hasText: /^Layers$/ }).getByRole('button').click();
+  await page.getByRole("button", { name: "Street" }).click({ timeout: 10000 });
+  await page
+    .locator("div")
+    .filter({ hasText: /^Layers$/ })
+    .getByRole("button")
+    .click({ timeout: 10000 });
 }
 
 async function closeOverlays(page) {
