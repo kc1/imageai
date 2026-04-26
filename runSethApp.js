@@ -116,7 +116,7 @@ async function processSethProp(body) {
 
     const page = await context.newPage();
     const loggedInPage = await login(page);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
     // At the beginning of your script, right after page load
 
     await closeEngagementPopups(loggedInPage);

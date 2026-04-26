@@ -14,7 +14,7 @@ you get screenshot1.png in your root directory
 
 to see screenshot- run locally:
 
-(base) ubuntu@penguin:~/node/imageai$ scp root@199.246.88.29:/root/screenshot1.png 
+(base) ubuntu@penguin:~/node/imageai$ scp kc@image1:/home/kc/imageai/screenshots/* .
 
 Linux VPS - Standard - 1 GB (10/07/2025 - 10/06/2026) $84.00 USD
 Operating System: AlmaLinux 8.10

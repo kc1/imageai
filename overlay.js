@@ -24,7 +24,16 @@ async function closeLocationAccessModalIfPresent(page) {
 }
 
 async function setBasemap(page) {
-  const layersButton = page.getByRole("button", { name: "Layers & Basemaps" });
+  const layersButtonCandidates = [
+    // Most stable: accessible name.
+    page.getByRole("button", { name: /layers\s*&\s*basemaps/i }),
+    // Fallback for non-accessible render where text still exists.
+    page.locator("button:has-text('Layers & Basemaps')"),
+    // Fallback to the known panel button style/class from the map UI.
+    page.locator("button._68b3e39946b7f923-layersPanelButton"),
+    // Last resort: panel container that owns the layers/basemaps button label.
+    page.locator("div._0e7b8dbffd309e9e-container button"),
+  ];
   const engagementModal = page.locator(
     ".engagement-nudge-modal, .rc-dialog-wrap, #engagement-wrapper",
   );
@@ -38,7 +47,17 @@ async function setBasemap(page) {
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      await layersButton.click({ timeout: 10000 });
+      let clicked = false;
+      for (const buttonLocator of layersButtonCandidates) {
+        if (await buttonLocator.first().isVisible().catch(() => false)) {
+          await buttonLocator.first().click({ timeout: 10000 });
+          clicked = true;
+          break;
+        }
+      }
+      if (!clicked) {
+        throw new Error("Layers & Basemaps trigger button not visible");
+      }
       break;
     } catch (error) {
       // A late engagement modal can still mount and intercept pointer events.
@@ -69,12 +88,14 @@ async function setBasemap(page) {
 
   // await page.getByRole('button', { name: 'Vintage USGS' }).click();
   await page.getByRole("button", { name: "Street" }).click({ timeout: 10000 });
-  await neutralizeEngagementOverlay(page);
+  await page.locator('button[class*="closeButton"]').click({ timeout: 10000 });
+
+  /* await neutralizeEngagementOverlay(page);
   await page
     .locator("div")
     .filter({ hasText: /Layers\s*&\s*Basemaps/ })
     .getByRole("button")
-    .click({ timeout: 10000 });
+    .click({ timeout: 10000 }); */
 }
 
 async function closeOverlays(page) {
