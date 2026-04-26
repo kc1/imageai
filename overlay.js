@@ -69,9 +69,10 @@ async function setBasemap(page) {
 
   // await page.getByRole('button', { name: 'Vintage USGS' }).click();
   await page.getByRole("button", { name: "Street" }).click({ timeout: 10000 });
+  await neutralizeEngagementOverlay(page);
   await page
     .locator("div")
-    .filter({ hasText: /^Layers$/ })
+    .filter({ hasText: /Layers\s*&\s*Basemaps/ })
     .getByRole("button")
     .click({ timeout: 10000 });
 }

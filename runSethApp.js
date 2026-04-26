@@ -189,6 +189,15 @@ async function processSethProp(body) {
         // console.log("Property:", property);
         await upsertOneToBucket(collection, property);
       } catch (err) {
+        const errorTs = new Date().toISOString().replace(/[:.]/g, "-");
+        const errorScreenshotPath = `./screenshots/ERROR-${errorTs}.png`;
+        await loggedInPage
+          .screenshot({
+            path: errorScreenshotPath,
+            fullPage: true,
+          })
+          .catch(() => {});
+        console.error(`Saved error screenshot: ${errorScreenshotPath}`);
         console.error("Error processing property:", err);
       }
     }
