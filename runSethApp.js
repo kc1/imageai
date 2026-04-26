@@ -120,9 +120,9 @@ async function processSethProp(body) {
     // At the beginning of your script, right after page load
 
     await closeEngagementPopups(loggedInPage);
-/*     await loggedInPage.screenshot({
+    await loggedInPage.screenshot({
       path: "./screenshots/screenshot-debug.png",
-    }); */
+    });
     await loggedInPage.keyboard.press("Escape");
     await setBasemap(loggedInPage);
 
