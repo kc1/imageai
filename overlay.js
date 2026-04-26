@@ -14,6 +14,15 @@ async function neutralizeEngagementOverlay(page) {
   }).catch(() => {});
 }
 
+async function closeLocationAccessModalIfPresent(page) {
+  const locationAccessText = page.getByText("Location Access NeededIn").first();
+  if (!(await locationAccessText.isVisible().catch(() => false))) return;
+
+  await locationAccessText.click({ button: "right" }).catch(() => {});
+  await page.getByLabel("Modal").click().catch(() => {});
+  await locationAccessText.click({ button: "right" }).catch(() => {});
+}
+
 async function setBasemap(page) {
   const layersButton = page.getByRole("button", { name: "Layers & Basemaps" });
   const engagementModal = page.locator(
@@ -23,6 +32,7 @@ async function setBasemap(page) {
   const debugScreenshotPath = `./screenshots/setBasemap-click-failure-${debugTs}.png`;
 
   await closeEngagementPopups(page).catch(() => {});
+  await closeLocationAccessModalIfPresent(page).catch(() => {});
   await page.keyboard.press("Escape").catch(() => {});
   await neutralizeEngagementOverlay(page);
 
@@ -43,6 +53,7 @@ async function setBasemap(page) {
         throw error;
       }
       await closeEngagementPopups(page).catch(() => {});
+      await closeLocationAccessModalIfPresent(page).catch(() => {});
       await page.keyboard.press("Escape").catch(() => {});
       await neutralizeEngagementOverlay(page);
       await page.waitForTimeout(400);
@@ -51,6 +62,7 @@ async function setBasemap(page) {
 
   if (await engagementModal.first().isVisible().catch(() => false)) {
     await closeEngagementPopups(page).catch(() => {});
+    await closeLocationAccessModalIfPresent(page).catch(() => {});
     await page.keyboard.press("Escape").catch(() => {});
     await neutralizeEngagementOverlay(page);
   }
@@ -166,6 +178,7 @@ async function fillEngagementSurveyOtherIfPresent(page, options = {}) {
  * Tries the documented test id first, then the broader strategies in closeOverlays.
  */
 async function closeEngagementPopups(page) {
+  await closeLocationAccessModalIfPresent(page);
   await fillEngagementSurveyOtherIfPresent(page);
 
   const closeByTestId = page.getByTestId("nudge-step-close-button");

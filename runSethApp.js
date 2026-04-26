@@ -192,6 +192,9 @@ async function processSethProp(body) {
         console.error("Error processing property:", err);
       }
     }
+    await loggedInPage.getByRole("button").first().click();
+    await loggedInPage.locator("header").getByRole("button").nth(2).click();
+    await loggedInPage.getByRole("button", { name: "Sign Out" }).click();
     await browser.close();
     console.timeEnd("sethPropProcessing");
     timerEnded = true;
