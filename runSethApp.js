@@ -86,7 +86,7 @@ async function takeScreenShots(body) {
   // const geoJsonIOurl = body.geoJsonIOurl;
   console.log("body:", body);
   // const filterObj = body.filterObj || {};
-  const filterObj = { geoJSONioUrl: { $regex: "geojson" } };
+  const filterObj = { RoadURL: { $regex: "geojson" } };
   const num = body.num || 30;
   console.log(filterObj);
 
@@ -129,7 +129,7 @@ async function takeScreenShots(body) {
       const modifiedPARNO = property.PARNO.replace(/ /g, "-");
       const roadFile = `${modifiedPARNO}-${ts}-road.png`;
 
-      await page.goto(property.geoJSONioUrl);
+      await page.goto(property.RoadURL);
 
       await page.waitForTimeout(8000);
 
@@ -154,7 +154,7 @@ async function takeScreenShots(body) {
       } else {
         let sharedRoadLink =
           (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
-        property.GeoJSONioURL = sharedRoadLink;
+        property.RoadURL = sharedRoadLink;
         await upsertOneToBucket(collection, property);
       }
     } catch (err) {
