@@ -29,7 +29,7 @@ const { refreshDropboxToken } = require("./refreshToken.js");
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
-const { closeEngagementPopups,setBasemap } = require("./overlay.js");
+const { closeEngagementPopups, setBasemap } = require("./overlay.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -62,9 +62,111 @@ async function deletePngFiles(folderPath) {
 deletePngFiles("./screenshots");
 
 // (async () => {
+
+app.post("/buildScreenshotsFromLink", (req, res) => {
+  /*   curl --location 'http://localhost:3000/sethProp' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "num": 30,
+    "filterObj": {}
+  }' */
+
+  const body = req.body;
+  res.send("Processing started");
+  // return;
+  takeScreenShots(body).catch((err) =>
+    console.error("Unhandled error in /sethProp async processing:", err),
+  );
+});
+
+async function takeScreenShots(body) {
+  // const body = req.body;
+
+  const { uploadToDropbox } = require("./uploadToDropbox.js");
+  // const geoJsonIOurl = body.geoJsonIOurl;
+  console.log("body:", body);
+  // const filterObj = body.filterObj || {};
+  const filterObj = { geoJSONioUrl: { $regex: "geojson" } };
+  const num = body.num || 30;
+  console.log(filterObj);
+
+  let collection = database.collection("alcornGeoJsonBucket");
+
+  let response = await fetchMongoDBData(filterObj, "alcornGeoJsonBucket");
+  let properties = response.documents;
+  if (!properties || !properties.length) {
+    console.log("No properties to process");
+    return;
+  }
+
+  properties = properties.slice(0, num || properties.length);
+  const data = await refreshDropboxToken();
+  const dropboxToken = data.access_token;
+  const dbx = new Dropbox({
+    accessToken: dropboxToken,
+  });
+
+  const browser = await launchBrowser();
+  const context = await browser.newContext({
+    permissions: ["geolocation"],
+    geolocation: {
+      latitude: 34.8985,
+      longitude: -88.5952,
+    },
+    javaScriptEnabled: true,
+  });
+
+  const page = await context.newPage();
+
+  for (let i = 0; i < properties.length; i++) {
+    console.log(`Processing property #${i + 1} of ${properties.length}`);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      let property = properties[i];
+
+      const dt = new Date();
+      let ts = Math.floor(dt.getTime() / 1000);
+      const modifiedPARNO = property.PARNO.replace(/ /g, "-");
+      const roadFile = `${modifiedPARNO}-${ts}-road.png`;
+
+      await page.goto(property.geoJSONioUrl);
+
+      await page.waitForTimeout(8000);
+
+      await page.screenshot({
+        path: "./screenshots/" + roadFile,
+        fullPage: true,
+      });
+
+      let resultRoadFile = await uploadToDropbox(
+        roadFile,
+        "./screenshots/" + roadFile,
+        dropboxToken,
+      );
+      console.log(resultRoadFile);
+
+      // Ensure uploadData and the returned result files exist before accessing path_lower
+      if (!resultRoadFile) {
+        console.error(
+          "resultRoadFile is null or undefined for property:",
+          property,
+        );
+      } else {
+        let sharedRoadLink =
+          (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
+        property.GeoJSONioURL = sharedRoadLink;
+        await upsertOneToBucket(collection, property);
+      }
+    } catch (err) {
+      console.error("Error processing property:", err);
+    }
+  }
+  await browser.close();
+  console.log("Processing complete");
+}
+
 app.post("/sethProp", (req, res) => {
-  
-/*   curl --location 'http://localhost:3000/sethProp' \
+  /*   curl --location 'http://localhost:3000/sethProp' \
   --header 'Content-Type: application/json' \
   --data '{
     "num": 30,
