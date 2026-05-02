@@ -9,6 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "@turf/area": "^7.3.4",
+    "@turf/buffer": "^7.3.5",
     "@turf/helpers": "^7.3.4",
     "@turf/length": "^7.3.4",
     "dotenv": "^16.4.7",

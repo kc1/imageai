@@ -1,5 +1,0 @@
- log into vps : ssh kc@image1
-
-kc@image1:~$ sudo sytemctl status sethapp
-
-kc@image1:~$ sudo journalctl -u sethapp -f // (tail -follow)
