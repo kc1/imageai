@@ -1,10 +1,16 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 var murl = process.env.MONGODB_URI;
-const client = new MongoClient(murl);
-client.connect();
-const database = client.db("mydata");
-let collection = database.collection("bucket1");
+const MONGO_MAX_POOL_SIZE = Number(process.env.MONGO_MAX_POOL_SIZE || 5);
+
+function createMongoClient() {
+  return new MongoClient(murl, {
+    maxPoolSize: MONGO_MAX_POOL_SIZE,
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 10000,
+    waitQueueTimeoutMS: 10000,
+  });
+}
 // let ignorethiszz;
 let firstNum = 0;
 let lastNum = 3;
@@ -69,8 +75,16 @@ async function upsertOneToBucket(coll, obj) {
 exports.handler = async function (event, context) {
   const myObjArray = JSON.parse(event.body);
   console.log(myObjArray);
+  const client = createMongoClient();
+  await client.connect();
+  const database = client.db("mydata");
+  const collection = database.collection("bucket1");
 
-  await upsertToBucket(collection, myObjArray);
+  try {
+    await upsertToBucket(collection, myObjArray);
+  } finally {
+    await client.close();
+  }
 
   return {
     statusCode: 200,

@@ -2,6 +2,7 @@ require("dotenv").config();
 const { MongoClient } = require("mongodb");
 
 const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_MAX_POOL_SIZE = Number(process.env.MONGO_MAX_POOL_SIZE || 5);
 
 /**
  * Fetches data from MongoDB using the native driver
@@ -10,7 +11,12 @@ const MONGO_URI = process.env.MONGODB_URI;
  * @returns {Promise<Object>} MongoDB response with documents array
  */
 async function fetchMongoDBData(filterObj, coll) {
-  const client = new MongoClient(MONGO_URI);
+  const client = new MongoClient(MONGO_URI, {
+    maxPoolSize: MONGO_MAX_POOL_SIZE,
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 10000,
+    waitQueueTimeoutMS: 10000,
+  });
   
   try {
     await client.connect();

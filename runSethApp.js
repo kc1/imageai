@@ -15,24 +15,27 @@ var murl = process.env.MONGODB_URI;
 if (typeof murl === "string" && murl.startsWith("mongodb+srv://")) {
   dns.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8"]);
 }
-const client = new MongoClient(murl);
-client.connect();
-// let collection = database.collection("bucket1");
-// Async connection
-/* async function connectToMongo() {
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
-  }
+const MONGO_DB_NAME = "mydata";
+const MONGO_MAX_POOL_SIZE = Number(process.env.MONGO_MAX_POOL_SIZE || 5);
+
+function createMongoClient(runLabel) {
+  const options = {
+    maxPoolSize: MONGO_MAX_POOL_SIZE,
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 10000,
+    waitQueueTimeoutMS: 10000,
+  };
+  console.log(
+    `[MongoDB] Creating fresh client for ${runLabel} with maxPoolSize=${options.maxPoolSize}`,
+  );
+  return new MongoClient(murl, options);
 }
 
-connectToMongo();
- */
-const database = client.db("mydata");
-// let collection = database.collection("alcornms");
+function logMongoClientState(client, label) {
+  const serverCount = client.topology?.description?.servers?.size ?? 0;
+  console.log(`[MongoDB] ${label} | knownServers=${serverCount}`);
+}
+
 let firstNum = 0;
 let myArgs = process.argv.slice(2);
 console.log(myArgs);
@@ -100,111 +103,127 @@ app.post("/buildScreenshotsFromLink", (req, res) => {
 });
 
 async function takeScreenShots(body) {
-  // const body = req.body;
+  let mongoClient;
+  let browser;
 
-  const { uploadToDropbox } = require("./uploadToDropbox.js");
-  // const geoJsonIOurl = body.geoJsonIOurl;
-  console.log("body:", body);
-  // const filterObj = body.filterObj || {};
-  const filterObj = { RoadURL: "" };
-  const num = body.num || 30;
-  console.log(filterObj);
+  try {
+    const { uploadToDropbox } = require("./uploadToDropbox.js");
+    console.log("body:", body);
+    const filterObj = { RoadURL: "" };
+    const num = body.num || 30;
+    console.log(filterObj);
 
-  let collection = database.collection("alcornGeoJsonBucket");
+    mongoClient = createMongoClient("buildScreenshotsFromLink");
+    await mongoClient.connect();
+    logMongoClientState(mongoClient, "Connected in takeScreenShots");
+    const database = mongoClient.db(MONGO_DB_NAME);
+    let collection = database.collection("alcornGeoJsonBucket");
 
-  let response = await fetchMongoDBData(filterObj, "alcornGeoJsonBucket");
-  let properties = response.documents;
-  if (!properties || !properties.length) {
-    console.log("No properties to process");
-    return;
-  }
+    let response = await fetchMongoDBData(filterObj, "alcornGeoJsonBucket");
+    let properties = response.documents;
+    if (!properties || !properties.length) {
+      console.log("No properties to process");
+      return;
+    }
 
-  properties = properties.slice(0, num || properties.length);
-  const data = await refreshDropboxToken();
-  const dropboxToken = data.access_token;
-  const dbx = new Dropbox({
-    accessToken: dropboxToken,
-  });
+    properties = properties.slice(0, num || properties.length);
+    const data = await refreshDropboxToken();
+    const dropboxToken = data.access_token;
+    const dbx = new Dropbox({
+      accessToken: dropboxToken,
+    });
 
-  const browser = await launchBrowser();
-  const context = await browser.newContext({
-    permissions: ["geolocation"],
-    geolocation: {
-      latitude: 34.8985,
-      longitude: -88.5952,
-    },
-    javaScriptEnabled: true,
-  });
+    browser = await launchBrowser();
+    const context = await browser.newContext({
+      permissions: ["geolocation"],
+      geolocation: {
+        latitude: 34.8985,
+        longitude: -88.5952,
+      },
+      javaScriptEnabled: true,
+    });
 
-  const page = await context.newPage();
+    const page = await context.newPage();
 
-  for (let i = 0; i < properties.length; i++) {
-    console.log(`Processing property #${i + 1} of ${properties.length}`);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      const property = properties[i];
-      const PARNO = property.PARNO || false;
-      let filterObj = { PARNO: PARNO };
+    for (let i = 0; i < properties.length; i++) {
+      console.log(`Processing property #${i + 1} of ${properties.length}`);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        const property = properties[i];
+        const PARNO = property.PARNO || false;
+        let filterObj = { PARNO: PARNO };
 
-      if (!PARNO) {
-        console.warn("Skipping property with missing PARNO:", property);
-        continue;
-      }
-      let output = await fetchMongoDBData(filterObj, "alcornMERGED2subset");
-      let fullPropertyRecords = output.documents;
-      if (!fullPropertyRecords || !fullPropertyRecords.length) {
-        console.log("No properties to process");
-        return;
-      }
-      const fullPropertyRecord = fullPropertyRecords.pop();
-      const geoJSONobj = fullPropertyRecord.geometry;
-      console.log(geoJSONobj);
-      const bufferedGeoJSONURL = await addBuffer(
-        geoJSONobj,
-        100 * 0.000189394,
-        "miles",
-      );
-      console.log(bufferedGeoJSONURL);
-
-      const dt = new Date();
-      let ts = Math.floor(dt.getTime() / 1000);
-      const modifiedPARNO = property.PARNO.replace(/ /g, "-");
-      const roadFile = `${modifiedPARNO}-${ts}-road.png`;
-
-      await page.goto(bufferedGeoJSONURL);
-
-      await page.waitForTimeout(8000);
-
-      await page.screenshot({
-        path: "./screenshots/" + roadFile,
-        fullPage: true,
-      });
-
-      let resultRoadFile = await uploadToDropbox(
-        roadFile,
-        "./screenshots/" + roadFile,
-        dropboxToken,
-      );
-      console.log(resultRoadFile);
-
-      // Ensure uploadData and the returned result files exist before accessing path_lower
-      if (!resultRoadFile) {
-        console.error(
-          "resultRoadFile is null or undefined for property:",
-          property,
+        if (!PARNO) {
+          console.warn("Skipping property with missing PARNO:", property);
+          continue;
+        }
+        let output = await fetchMongoDBData(filterObj, "alcornMERGED2subset");
+        let fullPropertyRecords = output.documents;
+        if (!fullPropertyRecords || !fullPropertyRecords.length) {
+          console.log("No properties to process");
+          return;
+        }
+        const fullPropertyRecord = fullPropertyRecords.pop();
+        const geoJSONobj = fullPropertyRecord.geometry;
+        console.log(geoJSONobj);
+        const bufferedGeoJSONURL = await addBuffer(
+          geoJSONobj,
+          100 * 0.000189394,
+          "miles",
         );
-      } else {
-        let sharedRoadLink =
-          (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
-        property.RoadURL = sharedRoadLink;
-        await upsertOneToBucket(collection, property);
+        console.log(bufferedGeoJSONURL);
+
+        const dt = new Date();
+        let ts = Math.floor(dt.getTime() / 1000);
+        const modifiedPARNO = property.PARNO.replace(/ /g, "-");
+        const roadFile = `${modifiedPARNO}-${ts}-road.png`;
+
+        await page.goto(bufferedGeoJSONURL);
+
+        await page.waitForTimeout(8000);
+
+        await page.screenshot({
+          path: "./screenshots/" + roadFile,
+          fullPage: true,
+        });
+
+        let resultRoadFile = await uploadToDropbox(
+          roadFile,
+          "./screenshots/" + roadFile,
+          dropboxToken,
+        );
+        console.log(resultRoadFile);
+
+        // Ensure uploadData and the returned result files exist before accessing path_lower
+        if (!resultRoadFile) {
+          console.error(
+            "resultRoadFile is null or undefined for property:",
+            property,
+          );
+        } else {
+          let sharedRoadLink =
+            (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
+          property.RoadURL = sharedRoadLink;
+          await upsertOneToBucket(collection, property);
+        }
+      } catch (err) {
+        console.error("Error processing property:", err);
       }
-    } catch (err) {
-      console.error("Error processing property:", err);
+    }
+    console.log("Processing complete");
+  } finally {
+    if (browser) {
+      await browser.close().catch((err) => {
+        console.error("Failed to close browser:", err);
+      });
+    }
+    if (mongoClient) {
+      logMongoClientState(mongoClient, "Closing in takeScreenShots");
+      await mongoClient.close().catch((err) => {
+        console.error("Failed to close Mongo client in takeScreenShots:", err);
+      });
     }
   }
-  await browser.close();
-  console.log("Processing complete");
 }
 
 app.post("/sethProp", (req, res) => {
@@ -226,6 +245,8 @@ async function processSethProp(body) {
   console.time("sethPropProcessing");
   const sethPropStart = Date.now();
   let timerEnded = false;
+  let mongoClient;
+  let browser;
 
   try {
     console.log("body:", body);
@@ -234,6 +255,10 @@ async function processSethProp(body) {
     const num = body.num || 30;
     console.log(filterObj);
 
+    mongoClient = createMongoClient("sethProp");
+    await mongoClient.connect();
+    logMongoClientState(mongoClient, "Connected in processSethProp");
+    const database = mongoClient.db(MONGO_DB_NAME);
     let collection = database.collection("alcornBucket");
 
     let response = await fetchMongoDBData(filterObj, "alcornBucket");
@@ -248,7 +273,7 @@ async function processSethProp(body) {
     const dropboxToken = data.access_token;
     const dbx = new Dropbox({ accessToken: dropboxToken });
 
-    const browser = await launchBrowser();
+    browser = await launchBrowser();
     const context = await browser.newContext({
       permissions: ["geolocation"],
       geolocation: {
@@ -348,7 +373,6 @@ async function processSethProp(body) {
     await loggedInPage.getByRole("button").first().click();
     await loggedInPage.locator("header").getByRole("button").nth(2).click();
     await loggedInPage.getByRole("button", { name: "Sign Out" }).click();
-    await browser.close();
     console.timeEnd("sethPropProcessing");
     timerEnded = true;
     const sethPropDuration = Date.now() - sethPropStart;
@@ -357,6 +381,17 @@ async function processSethProp(body) {
   } catch (err) {
     console.error("Error in processSethProp:", err);
   } finally {
+    if (browser) {
+      await browser.close().catch((err) => {
+        console.error("Failed to close browser:", err);
+      });
+    }
+    if (mongoClient) {
+      logMongoClientState(mongoClient, "Closing in processSethProp");
+      await mongoClient.close().catch((err) => {
+        console.error("Failed to close Mongo client in processSethProp:", err);
+      });
+    }
     if (!timerEnded) {
       console.timeEnd("sethPropProcessing");
       const sethPropDuration = Date.now() - sethPropStart;
