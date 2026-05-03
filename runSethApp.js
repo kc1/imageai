@@ -119,7 +119,7 @@ async function takeScreenShots(body) {
     const database = mongoClient.db(MONGO_DB_NAME);
     let collection = database.collection("alcornGeoJsonBucket");
 
-    let response = await fetchMongoDBData(filterObj, "alcornGeoJsonBucket");
+    let response = await fetchMongoDBData(filterObj, collection);
     let properties = response.documents;
     if (!properties || !properties.length) {
       console.log("No properties to process");
@@ -151,17 +151,20 @@ async function takeScreenShots(body) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
         const property = properties[i];
         const PARNO = property.PARNO || false;
-        let filterObj = { PARNO: PARNO };
-
-        if (!PARNO) {
-          console.warn("Skipping property with missing PARNO:", property);
+        const parcel = property.parcel || false;
+        let libraryFilterObj = { $or: [{ PARNO: PARNO }, { parcel: parcel }] };
+        if (!PARNO && !parcel) {
+          console.warn("Skipping property with missing PARNO or parcel:", property);
           continue;
         }
-        let output = await fetchMongoDBData(filterObj, "alcornMERGED2subset");
+        let output = await fetchMongoDBData(
+          libraryFilterObj,
+          "alcornMERGED2subset",
+        );
         let fullPropertyRecords = output.documents;
         if (!fullPropertyRecords || !fullPropertyRecords.length) {
           console.log("No properties to process");
-          return;
+          continue;
         }
         const fullPropertyRecord = fullPropertyRecords.pop();
         const geoJSONobj = fullPropertyRecord.geometry;
@@ -261,7 +264,7 @@ async function processSethProp(body) {
     const database = mongoClient.db(MONGO_DB_NAME);
     let collection = database.collection("alcornBucket");
 
-    let response = await fetchMongoDBData(filterObj, "alcornBucket");
+    let response = await fetchMongoDBData(filterObj, collection);
     let properties = response.documents;
     if (!properties || !properties.length) {
       console.log("No properties to process");

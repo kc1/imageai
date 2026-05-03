@@ -7,32 +7,46 @@ const MONGO_MAX_POOL_SIZE = Number(process.env.MONGO_MAX_POOL_SIZE || 5);
 /**
  * Fetches data from MongoDB using the native driver
  * @param {Object} filterObj - MongoDB filter object
- * @param {string} coll - Collection name
+ * @param {string|Object} coll - Collection name or Mongo collection object
  * @returns {Promise<Object>} MongoDB response with documents array
  */
 async function fetchMongoDBData(filterObj, coll) {
-  const client = new MongoClient(MONGO_URI, {
-    maxPoolSize: MONGO_MAX_POOL_SIZE,
-    minPoolSize: 0,
-    serverSelectionTimeoutMS: 10000,
-    waitQueueTimeoutMS: 10000,
-  });
+  const isCollectionObject =
+    coll && typeof coll === "object" && typeof coll.find === "function";
+  const isCollectionName = typeof coll === "string" && coll.trim();
+  let client = null;
+  let collection = null;
   
   try {
-    await client.connect();
-    const database = client.db("mydata");
-    const collection = database.collection(coll);
-    
+    if (isCollectionObject) {
+      collection = coll;
+    } else if (isCollectionName) {
+      client = new MongoClient(MONGO_URI, {
+        maxPoolSize: MONGO_MAX_POOL_SIZE,
+        minPoolSize: 0,
+        serverSelectionTimeoutMS: 10000,
+        waitQueueTimeoutMS: 10000,
+      });
+      await client.connect();
+      collection = client.db("mydata").collection(coll);
+    } else {
+      throw new Error(
+        "collection must be a non-empty string or a Mongo collection object",
+      );
+    }
+
     const documents = await collection
       .find(filterObj)
-      .sort({ list_date: -1 })
+      // .sort({ list_date: -1 })
       .toArray();
     
     return { documents };
   } catch (error) {
     throw new Error(`MongoDB error: ${error.message}`);
   } finally {
-    await client.close();
+    if (client) {
+      await client.close();
+    }
   }
 }
 
