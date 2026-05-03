@@ -9,9 +9,28 @@ const dropboxV2Api = require("dropbox-v2-api");
 const { Dropbox } = require("dropbox");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
+const dns = require("dns");
 var murl = process.env.MONGODB_URI;
+// Local stub resolver often SERVFAILs SRV; mongodb+srv needs SRV (see dig vs dig @1.1.1.1).
+if (typeof murl === "string" && murl.startsWith("mongodb+srv://")) {
+  dns.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8"]);
+}
 const client = new MongoClient(murl);
 client.connect();
+// let collection = database.collection("bucket1");
+// Async connection
+/* async function connectToMongo() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  }
+}
+
+connectToMongo();
+ */
 const database = client.db("mydata");
 // let collection = database.collection("alcornms");
 let firstNum = 0;
@@ -30,6 +49,7 @@ const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
 const { closeEngagementPopups, setBasemap } = require("./overlay.js");
+const { addBuffer } = require("./turfUtilities.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
@@ -86,7 +106,7 @@ async function takeScreenShots(body) {
   // const geoJsonIOurl = body.geoJsonIOurl;
   console.log("body:", body);
   // const filterObj = body.filterObj || {};
-  const filterObj = { RoadURL: { $regex: "geojson" } };
+  const filterObj = { RoadURL: "" };
   const num = body.num || 30;
   console.log(filterObj);
 
@@ -122,14 +142,36 @@ async function takeScreenShots(body) {
     console.log(`Processing property #${i + 1} of ${properties.length}`);
     try {
       await new Promise((resolve) => setTimeout(resolve, 5000));
-      let property = properties[i];
+      const property = properties[i];
+      const PARNO = property.PARNO || false;
+      let filterObj = { PARNO: PARNO };
+
+      if (!PARNO) {
+        console.warn("Skipping property with missing PARNO:", property);
+        continue;
+      }
+      let output = await fetchMongoDBData(filterObj, "alcornMERGED2subset");
+      let fullPropertyRecords = output.documents;
+      if (!fullPropertyRecords || !fullPropertyRecords.length) {
+        console.log("No properties to process");
+        return;
+      }
+      const fullPropertyRecord = fullPropertyRecords.pop();
+      const geoJSONobj = fullPropertyRecord.geometry;
+      console.log(geoJSONobj);
+      const bufferedGeoJSONURL = await addBuffer(
+        geoJSONobj,
+        100 * 0.000189394,
+        "miles",
+      );
+      console.log(bufferedGeoJSONURL);
 
       const dt = new Date();
       let ts = Math.floor(dt.getTime() / 1000);
       const modifiedPARNO = property.PARNO.replace(/ /g, "-");
       const roadFile = `${modifiedPARNO}-${ts}-road.png`;
 
-      await page.goto(property.RoadURL);
+      await page.goto(bufferedGeoJSONURL);
 
       await page.waitForTimeout(8000);
 

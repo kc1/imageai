@@ -5,38 +5,13 @@ const buffer = require("@turf/buffer").default; // Note: may need .default depen
 
 async function addBuffer(geojsonObj, distance, units) {
   
-  // Parse the request body as an object
-  const myObjArray = JSON.parse(event.body);
-  // const myObjArray = requestData.data; // The array of objects
-  // const collectionName = requestData.collectionName; // The collection name
-  // let collection = database.collection(collectionName);
-
-  console.log("Received data:", myObjArray);
-  // console.log("Received collection name:", collectionName);
-  
-
-  // // Logger.log(geojson_data);
-  var buffered = turf.buffer(geojson_data, 100 * 0.000189394, "miles");
-  // var buffered = turf.buffer(geojson_data, 100, {units: 'feet'});
+  var buffered = buffer(geojsonObj, distance, { units });
   const geoJsonObj = buffered.geometry;
-  // const newGeoJsonObj = normalizeGeoJSONForGeojsonIO(geoJsonObj);
-  // const newGeojsonString = JSON.stringify(newGeoJsonObj)
-  // Logger.log(newGeojsonString);
-
-  // const encoded = encodeURIComponent(newGeojsonString);
-  // const encoded = encodeURIComponent(newGeoJson);
   const encoded = encodeURIComponent(JSON.stringify(geoJsonObj));
-  // Logger.log(encoded);
 
-  const longUrl = `http://geojson.io/#data=data:application/json,${encoded}`;
+  return `http://geojson.io/#data=data:application/json,${encoded}`;
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: longUrl,
-    }),
-  };
-};
+ };
 
 module.exports = {
   addBuffer
