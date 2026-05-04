@@ -154,7 +154,10 @@ async function takeScreenShots(body) {
         const parcel = property.parcel || false;
         let libraryFilterObj = { $or: [{ PARNO: PARNO }, { parcel: parcel }] };
         if (!PARNO && !parcel) {
-          console.warn("Skipping property with missing PARNO or parcel:", property);
+          console.warn(
+            "Skipping property with missing PARNO or parcel:",
+            property,
+          );
           continue;
         }
         let output = await fetchMongoDBData(
@@ -184,9 +187,18 @@ async function takeScreenShots(body) {
         await page.goto(bufferedGeoJSONURL);
 
         await page.waitForTimeout(7000);
-        await page.waitForSelector('i.sidebar-handle-icon.fa-solid.fa-caret-right', { visible: true });
-        await page.click('i.sidebar-handle-icon.fa-solid.fa-caret-right');
-
+        try {
+          await page.waitForSelector(
+            "i.sidebar-handle-icon.fa-solid.fa-caret-right",
+            { visible: true },
+          );
+          await page.click("i.sidebar-handle-icon.fa-solid.fa-caret-right");
+        } catch (err) {
+          console.error(
+            "Error navigating to buffered GeoJSON URL or interacting with sidebar:",
+            err,
+          );
+        }
         await page.waitForTimeout(2000);
         await page.screenshot({
           path: "./screenshots/" + roadFile,
