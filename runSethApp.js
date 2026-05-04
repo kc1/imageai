@@ -183,8 +183,11 @@ async function takeScreenShots(body) {
 
         await page.goto(bufferedGeoJSONURL);
 
-        await page.waitForTimeout(8000);
+        await page.waitForTimeout(7000);
+        await page.waitForSelector('i.sidebar-handle-icon.fa-solid.fa-caret-right', { visible: true });
+        await page.click('i.sidebar-handle-icon.fa-solid.fa-caret-right');
 
+        await page.waitForTimeout(2000);
         await page.screenshot({
           path: "./screenshots/" + roadFile,
           fullPage: true,
