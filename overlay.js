@@ -1,17 +1,19 @@
 async function neutralizeEngagementOverlay(page) {
-  await page.evaluate(() => {
-    const selectors = [
-      ".engagement-nudge-modal",
-      ".amplitude-engagement-modal-container",
-      ".rc-dialog-wrap",
-      "#engagement-wrapper",
-    ];
-    for (const selector of selectors) {
-      document.querySelectorAll(selector).forEach((el) => {
-        el.remove();
-      });
-    }
-  }).catch(() => {});
+  await page
+    .evaluate(() => {
+      const selectors = [
+        ".engagement-nudge-modal",
+        ".amplitude-engagement-modal-container",
+        ".rc-dialog-wrap",
+        "#engagement-wrapper",
+      ];
+      for (const selector of selectors) {
+        document.querySelectorAll(selector).forEach((el) => {
+          el.remove();
+        });
+      }
+    })
+    .catch(() => {});
 }
 
 async function closeLocationAccessModalIfPresent(page) {
@@ -19,7 +21,10 @@ async function closeLocationAccessModalIfPresent(page) {
   if (!(await locationAccessText.isVisible().catch(() => false))) return;
 
   await locationAccessText.click({ button: "right" }).catch(() => {});
-  await page.getByLabel("Modal").click().catch(() => {});
+  await page
+    .getByLabel("Modal")
+    .click()
+    .catch(() => {});
   await locationAccessText.click({ button: "right" }).catch(() => {});
 }
 
@@ -49,7 +54,12 @@ async function setBasemap(page) {
     try {
       let clicked = false;
       for (const buttonLocator of layersButtonCandidates) {
-        if (await buttonLocator.first().isVisible().catch(() => false)) {
+        if (
+          await buttonLocator
+            .first()
+            .isVisible()
+            .catch(() => false)
+        ) {
           await buttonLocator.first().click({ timeout: 10000 });
           clicked = true;
           break;
@@ -62,10 +72,12 @@ async function setBasemap(page) {
     } catch (error) {
       // A late engagement modal can still mount and intercept pointer events.
       if (attempt === 2) {
-        await page.screenshot({
-          path: debugScreenshotPath,
-          fullPage: true,
-        }).catch(() => {});
+        await page
+          .screenshot({
+            path: debugScreenshotPath,
+            fullPage: true,
+          })
+          .catch(() => {});
         console.error(
           `setBasemap debug screenshot saved: ${debugScreenshotPath}`,
         );
@@ -79,7 +91,12 @@ async function setBasemap(page) {
     }
   }
 
-  if (await engagementModal.first().isVisible().catch(() => false)) {
+  if (
+    await engagementModal
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
     await closeEngagementPopups(page).catch(() => {});
     await closeLocationAccessModalIfPresent(page).catch(() => {});
     await page.keyboard.press("Escape").catch(() => {});
@@ -179,7 +196,9 @@ async function fillEngagementSurveyOtherIfPresent(page, options = {}) {
       '[data-testid^="engagement-popover"]',
     ].join(", "),
   );
-  const other = surveyPopover.getByRole("checkbox", { name: /^other$/i }).first();
+  const other = surveyPopover
+    .getByRole("checkbox", { name: /^other$/i })
+    .first();
   if (waitMs > 0) {
     await other.waitFor({ state: "visible", timeout: waitMs }).catch(() => {});
   }
@@ -190,7 +209,9 @@ async function fillEngagementSurveyOtherIfPresent(page, options = {}) {
   if (await submit.isVisible().catch(() => false)) {
     await submit.click({ timeout: 3000 }).catch(() => {});
   }
-  console.log("✅ Engagement survey step: selected Other (and Submit if present)");
+  console.log(
+    "✅ Engagement survey step: selected Other (and Submit if present)",
+  );
   await page.waitForTimeout(300).catch(() => {});
 }
 
@@ -228,7 +249,7 @@ async function closeEngagementPopups(page) {
     [
       '#engagement-wrapper .amplitude-engagement-actions-bar-container button[aria-label*="close" i]',
       '#engagement-wrapper .amplitude-engagement-actions-bar-container button:has-text("Close")',
-      '#engagement-wrapper .amplitude-engagement-actions-bar-container > div > div:nth-child(2) > button',
+      "#engagement-wrapper .amplitude-engagement-actions-bar-container > div > div:nth-child(2) > button",
       "#engagement-wrapper .rc-dialog-root .rc-dialog-wrap .amplitude-engagement-actions-bar-container > div > div:nth-child(2) > button",
     ].join(", "),
   );
@@ -267,7 +288,9 @@ async function closeEngagementPopups(page) {
       .first()
       .click({ timeout: 3000 })
       .catch(() => {});
-    console.log("✅ Engagement nudge popup closed (#engagement-wrapper selector)");
+    console.log(
+      "✅ Engagement nudge popup closed (#engagement-wrapper selector)",
+    );
   }
 
   await closeOverlays(page);
@@ -277,9 +300,74 @@ async function closeOverlays2(page) {
   await closeEngagementPopups(page);
 }
 
+/* (async function closeSidebars() {
+  const { chromium } = require("playwright");
+ */
+  // (async () => {
+/*   const browser = await chromium.launch({ headless: false });
+  const page = await browser.newPage();
+
+  await page.goto("https://geojson.io/next/");
+
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(4000); // Give the new React app time to render
+  // Add this before the evaluate block
+  await page
+    .locator("button")
+    .filter({ hasText: /collapse|close|editor/i })
+    .click()
+    .catch(() => {});
+  await page
+    .locator('[aria-expanded="true"]')
+    .click()
+    .catch(() => {});
+  await page.evaluate(() => {
+    // 1. Hide all side panels aggressively
+    document
+      .querySelectorAll(
+        'div[class*="sidebar"], div[class*="panel"], div[class*="editor"], .geojsonio-scrollbar, [data-keybinding-scope]',
+      )
+      .forEach((panel) => {
+        panel.style.display = "none";
+        panel.style.width = "0";
+        panel.style.minWidth = "0";
+        panel.style.maxWidth = "0";
+        panel.style.flex = "0 0 0";
+        panel.style.overflow = "hidden";
+        panel.style.visibility = "hidden";
+        panel.style.padding = "0";
+        panel.style.margin = "0";
+      });
+
+    // 2. Force the map container to take full width
+    document.querySelectorAll('div[class*="flex"]').forEach((container) => {
+      if (
+        container.style.display?.includes("flex") ||
+        container.classList.toString().includes("flex")
+      ) {
+        container.style.gap = "0";
+        Array.from(container.children).forEach((child) => {
+          if (
+            child.style.display !== "none" &&
+            !child.classList.toString().includes("hidden")
+          ) {
+            child.style.flex = "1 1 100%";
+            child.style.width = "100%";
+          }
+        });
+      }
+    });
+
+    console.log("Hide script executed on /next/");
+  });
+
+  console.log("✅ Attempted to collapse both panels on geojson.io/next");
+})();
+ */
 module.exports = {
   closeOverlays,
   closeOverlays2,
   closeEngagementPopups,
   setBasemap,
+  // closeSidebars
 };
