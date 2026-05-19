@@ -365,14 +365,14 @@ async function takeScreenShots(body) {
         await buildingPage.waitForTimeout(4000);
 
         try {
-          const layerSwitchButton = await buildingPage.waitForSelector(
-            "#map > div.layer-switch.absolute.left-0.bottom-0.mb-9.text-xs.z-10 > button.pad0x.active",
+          const outdoorsButton = await buildingPage.waitForSelector(
+            'div.layer-switch button.pad0x:has-text("Outdoors")',
             { visible: true, timeout: 5000 },
           );
-          await layerSwitchButton.click();
-          console.log("Clicked layer switch active button.");
+          await outdoorsButton.click();
+          console.log("Selected Outdoors layer for building screenshot.");
         } catch (err) {
-          console.error("Error clicking layer switch button:", err);
+          console.error("Error selecting Outdoors layer:", err);
         }
 
         try {
