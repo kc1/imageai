@@ -305,6 +305,18 @@ async function takeScreenShots(body) {
             err,
           );
         }
+
+        try {
+          const standardButton = await page.waitForSelector(
+            'div.layer-switch button.pad0x:has-text("Standard")',
+            { visible: true, timeout: 5000 },
+          );
+          await standardButton.click();
+          console.log("Selected Standard layer for road screenshot.");
+        } catch (err) {
+          console.error("Error selecting Standard layer:", err);
+        }
+
         await page.waitForTimeout(2000);
         await page.screenshot({
           path: "./screenshots/" + roadFile,
