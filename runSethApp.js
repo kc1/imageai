@@ -268,7 +268,7 @@ async function takeScreenShots(body) {
         console.log(originalGeoJSON);
         const bufferedGeoJSON = await addBuffer(
           originalGeoJSON,
-          200 * 0.000189394,
+          25 * 0.000189394,
           "miles",
         );
         console.log(bufferedGeoJSON);
