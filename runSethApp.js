@@ -317,7 +317,7 @@ async function takeScreenShots(body) {
           console.error("Error selecting Standard layer:", err);
         }
 
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(4000);
         await page.screenshot({
           path: "./screenshots/" + roadFile,
           fullPage: true,
