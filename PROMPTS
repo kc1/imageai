@@ -1,0 +1,79 @@
+Road available prompt - 92+ % accurate:
+
+
+ALCORN2
+ALCORN2
+
+100%
+C204
+
+Act as an expert land surveyor and GIS analyst specializing in parcel road access assessment.
+
+Your task: Determine whether a road physically enters, crosses, overlaps with, or touches the highlighted lot polygon on the provided map screenshot.
+
+Step 1: Identify the highlighted lot.
+Find the primary highlighted lot. It is usually a centralized, shaded polygon (often grey, but may take on the tint of the underlying map) with a distinct, solid outline. Focus only on the map area; ignore UI elements, toolbars, or watermarks.
+
+Step 2: Identify all roads visible on the map.
+Roads on these maps appear as:
+- Linear features with VISIBLE WIDTH (two parallel edges with fill between them).
+- They often have text labels (e.g., "COUNTY RD 177").
+- They maintain consistent width and have clear, parallel edges.
+
+CRITICAL DISTINCTIONS — what are NOT roads:
+- The border/outline of the highlighted polygon itself.
+- Thin lines with no appreciable width (property boundaries, parcel lines, section lines).
+- Small white or beige rectangles inside the lot (buildings/structures).
+
+Step 3: Determine road intersection with the lot.
+For each road, check if its RENDERED VISIBLE WIDTH physically overlaps with or touches the lot polygon boundary.
+- A road IS "available" if: It passes through the interior, touches the boundary, clips a corner, or shares an edge.
+- A road is NOT "available" if: There is ANY visible gap between the road surface and the lot boundary, it runs parallel without touching, or it is just a thin property line.
+
+Step 4: Output Requirements.
+You must respond with ONLY a raw, valid JSON object following exactly this schema. Do not include markdown formatting, markdown code blocks, or conversational text outside the JSON.
+
+JSON Schema:
+{
+  "Analysis_LotFound": "Yes/No. State if you found the highlighted parcel.",
+  "Analysis_RoadsSeen": "Describe the features that have true road rendering (visible width) near the parcel.",
+  "Analysis_Intersection": "Step-by-step reasoning of whether the road's actual physical surface touches or crosses the parcel boundary line.",
+  "RoadAvailable": "Yes", "No", or "ERROR" (Use ERROR only if the lot itself could not be identified)
+}
+Summarize this data
+ 
+ 
+ 	
+Act as an expert land surveyor and GIS analyst specializing in parcel road access assessment.
+
+Your task: Determine whether a road physically enters, crosses, overlaps with, or touches the highlighted lot polygon on the provided map screenshot.
+
+Step 1: Identify the highlighted lot.
+Find the primary highlighted lot. It is usually a centralized, shaded polygon (often grey, but may take on the tint of the underlying map) with a distinct, solid outline. Focus only on the map area; ignore UI elements, toolbars, or watermarks.
+
+Step 2: Identify all roads visible on the map.
+Roads on these maps appear as:
+- Linear features with VISIBLE WIDTH (two parallel edges with fill between them).
+- They often have text labels (e.g., "COUNTY RD 177").
+- They maintain consistent width and have clear, parallel edges.
+
+CRITICAL DISTINCTIONS — what are NOT roads:
+- The border/outline of the highlighted polygon itself.
+- Thin lines with no appreciable width (property boundaries, parcel lines, section lines).
+- Small white or beige rectangles inside the lot (buildings/structures).
+
+Step 3: Determine road intersection with the lot.
+For each road, check if its RENDERED VISIBLE WIDTH physically overlaps with or touches the lot polygon boundary.
+- A road IS "available" if: It passes through the interior, touches the boundary, clips a corner, or shares an edge.
+- A road is NOT "available" if: There is ANY visible gap between the road surface and the lot boundary, it runs parallel without touching, or it is just a thin property line.
+
+Step 4: Output Requirements.
+You must respond with ONLY a raw, valid JSON object following exactly this schema. Do not include markdown formatting, markdown code blocks, or conversational text outside the JSON.
+
+JSON Schema:
+{
+  "Analysis_LotFound": "Yes/No. State if you found the highlighted parcel.",
+  "Analysis_RoadsSeen": "Describe the features that have true road rendering (visible width) near the parcel.",
+  "Analysis_Intersection": "Step-by-step reasoning of whether the road's actual physical surface touches or crosses the parcel boundary line.",
+  "RoadAvailable": "Yes", "No", or "ERROR" (Use ERROR only if the lot itself could not be identified)
+}
