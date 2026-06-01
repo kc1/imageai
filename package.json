@@ -8,6 +8,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@esri/arcgis-rest-feature-service": "^4.10.2",
+    "@esri/arcgis-rest-request": "^4.10.2",
     "@turf/area": "^7.3.4",
     "@turf/buffer": "^7.3.5",
     "@turf/helpers": "^7.3.4",
@@ -22,6 +24,9 @@
     "patchright": "^1.58.2",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sharp": "^0.33.5"
+  },
+  "overrides": {
+    "pbf": "3.3.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.1",
