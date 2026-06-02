@@ -408,6 +408,7 @@ async function takeScreenShots(body) {
           );
         }
         await buildingPage.waitForTimeout(2000);
+        await page.waitForTimeout(4000);
         await buildingPage.screenshot({
           path: "./screenshots/" + buildingFile,
           fullPage: true,
