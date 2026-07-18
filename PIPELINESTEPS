@@ -1,0 +1,18 @@
+
+
+we have 3500 records in alcornMERGED2subset - started with about 22000
+but filtered by acreage>4 (to allow for splits) and improvementsValue = **NA**
+
+Have to run pipeline through 3 filter steps:
+1) Roadavailable within 50 feet = Yes/No
+2) StructuresPresent = Yes/No
+3) Buildable (a - less than 50% , b- water away from road)
+
+1+2) are handled by gscriptsethclasp: 
+
+the collection is: alcornGeoJsonBucket
+
+{ name: '1A) Push Road and Building Rows to collection (alcornGeoJsonBucket) -- 30', functionName: 'alcornGeoJsonPush' },
+{ name: '1B) Run buildScreenshotsFromLink (runSethApp) with IMAGEAI to generate screenshots ', functionName: 'postToBuildScreenshotsFromLink' },
+{ name: '1C) Update PUSHED rows with Road Screenshot Links from collection (alcornGeoJsonBucket)-- wait 30 min', functionName: 'updateWithRoadandBuildingScreenshotPaths' },
+{ name: '1D)  Y/N on Available Road using WaterURL with LLM  -- works in parallel', functionName: 'roadAvailableUsingLLM' },

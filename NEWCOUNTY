@@ -1,0 +1,79 @@
+https://revolutionarygis.wordpress.com/
+
+based on this - mississippi
+
+https://maris.mississippi.edu/HTML/DATA/data_Cadastral/CadastralFramework.html#gsc.tab=0
+
+1) I downloaded the single county data for alcorn county mississippi.
+
+2) After moving zip file contents to SHAPEFILES/ , 
+a) extract it if in zip
+b) import it into a coll using 
+shpToJSON.js.
+c) run: $ node shpToJSON.js monroe ./SHAPEFILES/MDEQ_MONROE_PARCELS
+
+3) Then you can look at data.
+4) you may want to move properties into record root.
+ you can use mongo shell and:
+
+db.yourCollection.updateMany(
+  {},
+  [
+    {
+      $replaceRoot: {
+        newRoot: {
+          $mergeObjects: ["$$ROOT", "$properties"]
+        }
+      }
+    },
+    {
+      $unset: ["properties"]
+    }
+  ]
+) 
+
+5)  next use: {
+ filter: {
+  GISACRES: {
+   $gte: 4
+  },
+  IMPVAL1: 0,
+  IMPVAL2: 0
+ }
+} export to new collection - MonroeFiltered.json
+
+upload to atlas MonroeFiltered
+
+then export a csv without geodata and open in a google sheet
+
+6. I then want to set up a new sheet and push the seth clasp repo to it:
+
+1975  git clone https://github.com/kc1/gscriptSETHclasp.git monroe
+ 1976  ls -la
+ 1977  npm install
+ 1978  clasp login
+ 1979  sudo apt install clasp
+ 1980  ls -la
+ 1981  clasp login
+ 1982  npx clasp login
+ 1983  npx clasp logout
+ 1984  npx clasp npx clasp create-script --title "Monroe" --type sheets --parentID 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
+ 1985  npx clasp create-script --title "Monroe" --type sheets --parentID 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
+ 1986  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
+ 1987  npx clasp login
+ 1988  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
+ 1989  npx clasp push
+ 1990  npx clasp pull
+ 1991  npx clasp push
+ 1992  npx clasp push --force
+ 1993  npx clasp push
+ 1995  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
+
+
+7. I'd like to set things up to have a mongo unique id using a point{
+  _id: [lon, lat],
+  // other fields...
+} lets call it GEOID, alongside myId, you can then add a geoindex:
+/*  db.yourCollection.createIndex({ geoId: "2dsphere" }) as well as a unique
+
+5) send Seth a sample of data as a csv 
