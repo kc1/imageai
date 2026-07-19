@@ -1,0 +1,14 @@
+1) you will test node RunSethApp with:
+
+ curl --location 'http://localhost:3000/buildScreenshotsFromLink' \
+--header 'Content-Type: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+  "num": 10,
+  "filterObj": { "RoadURL": "" }
+}
+'
+
+2) keep in mind you also need ro run geojson.io in a seperate terminal:
+
+(base) ubuntu@penguin:~/node/geojsonio$ npm start
