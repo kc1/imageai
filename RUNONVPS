@@ -1,6 +1,6 @@
 1) You have to install nginx as a reverse proxy to recieve requests and proxy to the directory where you are tunning the node app
 
-2) I'm running "node runlocalapp" in the root/imageai directory
+2) as of July 2026 - running a systemctl sethapp service:
 
 3) using remmina app to connect to vps - pw = Keyring1!
 

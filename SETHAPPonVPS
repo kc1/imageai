@@ -1,3 +1,6 @@
+
+as of July 2026 - running a systemctl sethapp service:
+
 add .env:
 
 MONGODB_URI="mongodb+srv://realoption11:RZR5KLeX7s6BFWte@cluster0.cqtemdq.mongodb.net/?retryWrites=true&w=majority"
@@ -10,3 +13,318 @@ npx patchright install
 also make sure to restart: kc@image1:~/imageai$ sudo systemctl restart sethapp
 
 after each git pull to update the codebase.
+
+
+Unit]
+Description=SethApp Node.js Express
+After=network.target
+
+[Service]
+User=kc
+Group=kc
+WorkingDirectory=/home/kc/imageai
+ExecStart=/usr/bin/node /home/kc/imageai/runSethApp.js
+Environment=NODE_ENV=production
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sethapp
+
+[Install]
+WantedBy=multi-user.target
+544  git pull origin main
+  545  sudo systemctl restart sethapp
+  546  sudo systemctl status sethapp
+  547  sudo journalctl -u sethapp -f
+  548  chromium-browser
+  549  chromium
+  550  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome"
+  551  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  552  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome"
+  553  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  554  git pull origin main
+  555  cd imageai/
+  556  git pull origin main
+  557  sudo systemctl restart sethapp
+  558  sudo systemctl status sethapp
+  559  sudo systemctl stop sethapp
+  560  sudo systemctl start sethapp
+  561  sudo systemctl status sethapp
+  562  sudo journalctl -u sethapp -f
+  563  sudo systemctl stop sethapp
+  564  sudo systemctl status sethapp
+  565  sudo systemctl start sethapp
+  566  sudo systemctl status sethapp
+  567  sudo journalctl -u sethapp -f
+  568  sudo systemctl stop sethapp
+  569  sudo systemctl start sethapp
+  570  sudo systemctl status sethapp
+  571  git pull origin main
+  572  cd imageai/
+  573  git pull origin main
+  574  sudo systemctl stop sethapp
+  575  sudo systemctl start sethapp
+  576  sudo systemctl status sethapp
+  577  clear
+  578  sudo systemctl status sethapp
+  579  clear
+  580  sudo journalctl -u sethapp -f
+  581  cd imageai/
+  582  git pull origin main
+  583  sudo systemctl restart sethapp
+  584  sudo journalctl -u sethapp -f
+  585  logout
+  586  sudo journalctl -u sethapp -f
+  587  sudo systemctl stop sethapp
+  588  cd imageai/
+  589  git pull origin main
+  590  sudo systemctl stop sethapp
+  591  sudo systemctl start sethapp
+  592  sudo systemctl status sethapp
+  593  sudo journalctl -u sethapp -f
+  594  cd imageai/
+  595  git pull origin main
+  596  sudo systemctl stop sethapp
+  597  sudo systemctl status sethapp
+  598  sudo systemctl stop sethapp
+  599  sudo systemctl start sethapp
+  600  sudo systemctl status sethapp
+  601  sudo journalctl -u sethapp -f
+  602  cd imageai/
+  603  git pull origin main
+  604  sudo systemctl stop sethapp
+  605  sudo systemctl start sethapp
+  606  git pull origin main
+  607  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome"
+  608  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  609  "$CHROMIUM_EXECUTABLE_PATH"
+  610  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  611  git pull origin main
+  612  cd imageai/
+  613  git pull origin main
+  614  sudo systemctl stop sethapp
+  615  sudo systemctl start sethapp
+  616  sudo journalctl -u sethapp -f
+  617  cd imageai/
+  618  git pull origin main
+  619  sudo systemctl stop sethapp
+  620  sudo systemctl start sethapp
+  621  sudo journalctl -u sethapp -f
+  622  sudo systemctl stop sethapp
+  623  git pull origin main
+  624  sudo systemctl start sethapp
+  625  sudo journalctl -u sethapp -f
+  626  sudo systemctl start sethapp
+  627  sudo journalctl -u sethapp -f
+  628  sudo systemctl stop sethapp
+  629  cd imageai/
+  630  git pull origin main
+  631  sudo systemctl stop sethapp
+  632  sudo systemctl start sethapp
+  633  sudo journalctl -u sethapp -f
+  634  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome"
+  635  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  636  exit
+  637  sudo journalctl -u sethapp -f
+  638  cd imageai/
+  639  sudo systemctl stop sethapp
+  640  git pull origin main
+  641  sudo systemctl stop sethapp
+  642  sudo systemctl start sethapp
+  643  sudo journalctl -u sethapp -f
+  644  export CHROMIUM_EXECUTABLE_PATH="/home/kc/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome"
+  645  sudo systemctl stop sethapp
+  646  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  646  "$CHROMIUM_EXECUTABLE_PATH" --no-sandbox
+  647  sudo systemctl start sethapp
+  648  sudo journalctl -u sethapp -f
+  649  git pull origin main
+  650  cd imageai/
+  651  git pull origin main
+  652  sudo systemctl stop sethapp
+  653  sudo systemctl start sethapp
+  654  sudo journalctl -u sethapp -f
+  655  sudo systemctl stop sethapp
+  656  git pull origin main
+  657  sudo systemctl stop sethapp
+  658  sudo systemctl start sethapp
+  659  sudo journalctl -u sethapp -f
+  660  ls -la
+  661  cd screenshots/
+  662  ls
+  663  cd ..
+  664  sudo systemctl stop sethapp
+  665  git pull origin main
+  666  sudo systemctl stop sethapp
+  667  sudo systemctl start sethapp
+  668  sudo journalctl -u sethapp -f
+  669  ls
+  670  ls screenshots/
+  671  vim SCREENSHOT 
+  672  pwd
+  673  cd screenshots/
+  674  ls
+  675  pwd
+  676  cd ..
+  677  sudo systemctl stop sethapp
+  678  git pull origin main
+  679  sudo systemctl stop sethapp
+  680  sudo systemctl start sethapp
+  681  sudo journalctl -u sethapp -f
+  682  sudo systemctl stop sethapp
+  683  git pull origin main
+  684  cd imageai/
+  685  git pull origin main
+  686  sudo systemctl stop sethapp
+  687  sudo systemctl start sethapp
+  688  sudo journalctl -u sethapp -f
+  689  sudo systemctl stop sethapp
+  690  cd imageai/
+  691  git pull origin main
+  692  sudo systemctl start sethapp
+  693  sudo journalctl -u sethapp -f
+  694  sudo systemctl stop sethapp
+  695  git pull origin main
+  696  cd imageai/
+  697  git pull origin main
+  698  sudo systemctl start sethapp
+  699  sudo journalctl -u sethapp -f
+  700  sudo systemctl stop sethapp
+  701  npm install @turf/buffer
+  702  sudo systemctl start sethapp
+  703  sudo journalctl -u sethapp -f
+  704  lsb_release -a
+  705  curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+  706  echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.2.list
+  707  sudo apt update
+  708  sudo apt install -y mongodb-org
+  709  mongod --version
+  710  sudo systemctl start mongod
+  711  sudo systemctl status mongod
+  712  sudo systemctl enable mongod
+  713  systemctl is-enabled mongod
+  714  mongosh --eval "db.runCommand({ connectionStatus: 1 })"
+  715  sudo systemctl status mongod
+  716  sudo reboot
+  717  sudo systemctl status mongod
+  718  sudo systemctl stop sethapp
+  719  cd imageai/
+  720  git pull origin main
+  721  sudo systemctl start sethapp
+  722  sudo journalctl -u sethapp -f
+  723  sudo systemctl stop sethapp
+  724  sudo systemctl start sethapp
+  725  sudo systemctl stop sethapp
+  726  cd imageai/
+  727  git pull origin main
+  728  sudo systemctl start sethapp
+  729  sudo journalctl -u sethapp -f
+  730  sudo systemctl stop sethapp
+  731  cd imageai/
+  732  git pull origin main
+  733  sudo systemctl start sethapp
+  734  sudo journalctl -u sethapp -f
+  735  cd imageai/
+  736  sudo systemctl status sethapp
+  737  sudo journalctl -u sethapp -f
+  738  cd imageai/
+  739  sudo systemctl stop sethapp
+  740  git pull origin main
+  741  sudo systemctl start sethapp
+  742  cd ..
+  743  git clone https://github.com/kc1/geojsonio.git
+  744  ls
+  745  cd geojsonio/
+  746  ls
+  747  npm start
+  748  npm install
+  749  npm start
+  750  npm run build
+  751  ls /etc/systemd/system/geojsonio.service
+  752  ls /etc/systemd/system/
+  753  vim /etc/systemd/system/
+  754  sudo vim /etc/systemd/system/geojsonio.service
+  755  cd /etc/systemd/system/
+  756  ls
+  757  cp sethapp.service geojsinio.service
+  758  sudo cp sethapp.service geojsinio.service
+  759  ls
+  760  mv geojsinio.service geojsonio.service 
+  761  sudo mv geojsinio.service geojsonio.service 
+  762  ls
+  763  vim geojsonio.service 
+  764  ls -la
+  765  vim geojsonio.service 
+  766  sudo vim /etc/systemd/system/geojsonio.service
+  767  sudo systemctl daemon-reload
+  768  sudo systemctl enable --now geojsonio.service
+  769  sudo systemctl status geojsonio.service
+  770  ls /home/kc/geojsonio/dist
+  771  cd geojsonio/
+  772  sudo journalctl -u sethapp -f
+  773  sudo journalctl -u geojsonio -f
+  774  sudo journalctl -u sethapp -f
+  775  sudo certbot renew
+  776  sudo nginx -t && sudo systemctl reload nginx
+  777  cd ..
+  778  sudo apt update
+  779  sudo apt install python3-certbot-nginx
+  780  sudo certbot renew
+  781  sudo nginx -t && sudo systemctl reload nginx
+  782  sudo journalctl -u sethapp -f
+  783  cg imageai/
+  784  cd imageai/
+  785  sudo systemctl stop sethapp
+  786  git pull origin main
+  787  sudo systemctl start sethapp
+  788  sudo systemctl status sethapp
+  789  cd imageai/
+  790  sudo systemctl stop sethapp
+  791  git pull origin main
+  792  sudo systemctl start sethapp
+  793  sudo systemctl status sethapp
+  794  cd imageai/
+  795  sudo systemctl stop sethapp
+  796  git pull origin main
+  797  sudo systemctl start sethapp
+  798  cd imageai/
+  799  sudo systemctl stop sethapp
+  800  git pull origin main
+  801  sudo systemctl start sethapp
+  802  sudo systemctl stop sethapp
+  803  cd imageai/
+  804  git pull origin main
+  805  sudo systemctl start sethapp
+  806  sudo journalctl -u sethapp -f
+  807  cd imageai/
+  808  sudo systemctl stop sethapp
+  809  git pull origin main
+  810  sudo systemctl start sethapp
+  811  sudo journalctl -u sethapp -f
+  812  sudo systemctl start sethapp
+  813  sudo systemctl stop sethapp
+  814  sudo systemctl start sethapp
+  815  sudo systemctl status sethapp
+  816  sudo journalctl -u sethapp -f
+  817  ls
+  818  cd imageai/
+  819  ls
+  820  less /etc/nginx/sites-available/ 
+  821  less /etc/nginx/sites-available 
+  822  ls /etc/nginx/sites-available 
+  823  ls /etc/nginx/sites-enabled/
+  824  vim /etc/nginx/sites-enabled/
+  825  ls
+  826  cd ..
+  827  ls
+  828  vim /etc/nginx/sites-enabled/default 
+  829  vim /etc/nginx/sites-enabled/
+  830  sudo systemctl help
+  831  sudo systemctl --help
+  832  sudo systemctl list-unit-files 
+  833  vim /etc/systemd/system/sethapp.service
+  834  history 100
+  835  history 200
+  836  history 300
+
