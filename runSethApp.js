@@ -184,12 +184,10 @@ app.post("/buildScreenshotsFromLink", (req, res) => {
   const body = req.body;
   res.send("Processing started");
   // return;
-  takeScreenShots(body).catch((err) =>
+  takeScreenShots2(body).catch((err) =>
     console.error("Unhandled error in /sethProp async processing:", err),
   );
 });
-
-
 
 async function takeScreenShots2(body) {
   let mongoClient;
@@ -198,24 +196,23 @@ async function takeScreenShots2(body) {
   try {
     const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
-    const filterObj = { RoadURL: "" };
-    const num = body.num || 30;
+    const filterObj = { status: "PENDING" };
+    const num = body.num || 10;
     console.log(filterObj);
 
     mongoClient = createMongoClient("buildScreenshotsFromLink");
     await mongoClient.connect();
     logMongoClientState(mongoClient, "Connected in takeScreenShots");
     const database = mongoClient.db(MONGO_DB_NAME);
-    let collection = database.collection("alcornGeoJsonBucket");
+    let TasksCollection = database.collection("Tasks");
 
-    let response = await fetchMongoDBData(filterObj, collection);
-    let properties = response.documents;
-    if (!properties || !properties.length) {
-      console.log("No properties to process");
+    let tasks = await TasksCollection.find(filterObj).limit(num).toArray();
+    if (!tasks || !tasks.length) {
+      console.log("No tasks to process");
       return;
     }
 
-    properties = properties.slice(0, num || properties.length);
+    tasks = tasks.slice(0, num || tasks.length);
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
     const dbx = new Dropbox({
@@ -232,8 +229,8 @@ async function takeScreenShots2(body) {
       javaScriptEnabled: true,
     });
 
-    for (let i = 0; i < properties.length; i++) {
-      console.log(`Processing property #${i + 1} of ${properties.length}`);
+    for (let i = 0; i < tasks.length; i++) {
+      console.log(`Processing task #${i + 1} of ${tasks.length}`);
       try {
         const pagesToClose = context.pages().slice(-2);
         for (const stalePage of pagesToClose) {
@@ -242,202 +239,195 @@ async function takeScreenShots2(body) {
           });
         }
         let page = await context.newPage();
-
+/*         let task = {
+          _id: {
+            $oid: "6a5cfdf26025496d2072f080",
+          },
+          ID: 2,
+          PARNO: "0170-35-000-002.00",
+          link: "",
+          sheetName: "Sheet1",
+          sourceCollection: "MonroeFiltered",
+          spreadsheetName: "Monroe",
+          status: "PENDING",
+          type: "RoadURL",
+        }; */
         await new Promise((resolve) => setTimeout(resolve, 5000));
-        const property = properties[i];
-        const PARNO = property.PARNO || false;
-        const parcel = property.parcel || false;
-        let libraryFilterObj = { $or: [{ PARNO: PARNO }, { parcel: parcel }] };
-        if (!PARNO && !parcel) {
-          console.warn(
-            "Skipping property with missing PARNO or parcel:",
-            property,
-          );
-          continue;
-        }
-        let output = await fetchMongoDBData(
-          libraryFilterObj,
-          "alcornMERGED2subset",
-        );
+        const task = tasks[i];
+        const PARNO = task.PARNO || false;
+        const sourceCollection = task.sourceCollection;
+        let sourceFilterObj = { PARNO: PARNO };
+
+        let output = await fetchMongoDBData(sourceFilterObj, sourceCollection);
         let fullPropertyRecords = output.documents;
         if (!fullPropertyRecords || !fullPropertyRecords.length) {
           console.log("Can't process");
           continue;
         }
         const fullPropertyRecord = fullPropertyRecords.pop();
-        console.log("Property:", property.PARNO)
         const originalGeoJSON = fullPropertyRecord.geometry;
         console.log(originalGeoJSON);
-        const bufferedGeoJSON = await addBuffer(
-          originalGeoJSON,
-          50 * 0.000189394,
-          "miles",
-        );
-        console.log(bufferedGeoJSON);
-        const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
 
-        const dt = new Date();
-        let ts = Math.floor(dt.getTime() / 1000);
-        const modifiedPARNO = property.PARNO.replace(/ /g, "-");
-        const roadFile = `${modifiedPARNO}-${ts}-road.png`;
-
-        console.log("");
-        // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
-        await page.goto(bufferedGeoJSONURL);
-
-        await page.waitForTimeout(4000);
-
-        try {
-          const leftHandle = await page.$(
-            "i.sidebar-handle-icon.fa-solid.fa-caret-left",
+        if (task.type === "RoadURL") {
+          const bufferedGeoJSON = await addBuffer(
+            originalGeoJSON,
+            50 * 0.000189394,
+            "miles",
           );
-          if (leftHandle) {
-            console.log("Sidebar already hidden; map is maximized.");
-          } else {
-            const rightHandle = await page.waitForSelector(
-              "i.sidebar-handle-icon.fa-solid.fa-caret-right",
+          console.log(bufferedGeoJSON);
+          const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
+
+          const dt = new Date();
+          let ts = Math.floor(dt.getTime() / 1000);
+          const modifiedPARNO = fullPropertyRecord.PARNO.replace(/ /g, "-");
+          const roadFile = `${modifiedPARNO}-${ts}-road.png`;
+
+          console.log("");
+          // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
+          await page.goto(bufferedGeoJSONURL);
+
+          await page.waitForTimeout(4000);
+
+          try {
+            const leftHandle = await page.$(
+              "i.sidebar-handle-icon.fa-solid.fa-caret-left",
+            );
+            if (leftHandle) {
+              console.log("Sidebar already hidden; map is maximized.");
+            } else {
+              const rightHandle = await page.waitForSelector(
+                "i.sidebar-handle-icon.fa-solid.fa-caret-right",
+                { visible: true, timeout: 5000 },
+              );
+              await rightHandle.click();
+              console.log("Clicked sidebar right caret to maximize map.");
+            }
+          } catch (err) {
+            console.error(
+              "Error maximizing map/sidebar after navigating to buffered GeoJSON URL:",
+              err,
+            );
+          }
+
+          try {
+            const standardButton = await page.waitForSelector(
+              'div.layer-switch button.pad0x:has-text("Standard")',
               { visible: true, timeout: 5000 },
             );
-            await rightHandle.click();
-            console.log("Clicked sidebar right caret to maximize map.");
+            await standardButton.click();
+            console.log("Selected Standard layer for road screenshot.");
+          } catch (err) {
+            console.error("Error selecting Standard layer:", err);
           }
-        } catch (err) {
-          console.error(
-            "Error maximizing map/sidebar after navigating to buffered GeoJSON URL:",
-            err,
+
+          await page.waitForTimeout(4000);
+          await page.screenshot({
+            path: "./screenshots/" + roadFile,
+            fullPage: true,
+          });
+
+          let resultRoadFile = await uploadToDropbox(
+            roadFile,
+            "./screenshots/" + roadFile,
+            dropboxToken,
           );
-        }
+          console.log(resultRoadFile);
 
-        try {
-          const standardButton = await page.waitForSelector(
-            'div.layer-switch button.pad0x:has-text("Standard")',
-            { visible: true, timeout: 5000 },
-          );
-          await standardButton.click();
-          console.log("Selected Standard layer for road screenshot.");
-        } catch (err) {
-          console.error("Error selecting Standard layer:", err);
-        }
-
-        await page.waitForTimeout(4000);
-        await page.screenshot({
-          path: "./screenshots/" + roadFile,
-          fullPage: true,
-        });
-
-        let resultRoadFile = await uploadToDropbox(
-          roadFile,
-          "./screenshots/" + roadFile,
-          dropboxToken,
-        );
-        console.log(resultRoadFile);
-
-        // Ensure uploadData and the returned result files exist before accessing path_lower
-        if (!resultRoadFile) {
-          console.error(
-            "resultRoadFile is null or undefined for property:",
-            property,
-          );
-        } else {
-          let sharedRoadLink =
-            (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
-          property.RoadURL = sharedRoadLink;
-          await upsertOneToBucket(collection, property);
-        }
-
-        // click the "New" button in geojson.io toolbar
-        /* try {
-          const newButton = await page.waitForSelector(
-            'div.file-bar.hidden.md\\:block div.item:has-text("New") a.parent',
-            { visible: true, timeout: 10000 },
-          );
-          await newButton.click();
-        } catch (err) {
-          console.error("Error clicking the New button:", err);
-        } */
-
-        // next: add building footprint screenshots using same GeoJSONobj and same process as above, but with different file name and property field (BuildingURL)
-        
-        const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
-
-        await page.waitForTimeout(3000);
-        console.log(originalGeoJSON);
-        const originalGeoJSONurl = await buildGEOJSONIOurl(originalGeoJSON);
-
-
-        const buildingPage = await context.newPage();
-        try {
-          await buildingPage.goto(originalGeoJSONurl);
-          // await loadGeoJSONInGeojsonIO(buildingPage, originalGeoJSON);
-          console.log("Loaded original GeoJSON into local geojson.io");
-        } catch (err) {
-          console.error(
-            "Error loading original GeoJSON into local geojson.io:",
-            err,
-          );
-        }
-        await buildingPage.waitForTimeout(4000);
-
-        try {
-          const outdoorsButton = await buildingPage.waitForSelector(
-            'div.layer-switch button.pad0x:has-text("Outdoors")',
-            { visible: true, timeout: 5000 },
-          );
-          await outdoorsButton.click();
-          console.log("Selected Outdoors layer for building screenshot.");
-        } catch (err) {
-          console.error("Error selecting Outdoors layer:", err);
-        }
-
-        try {
-          const leftHandle = await buildingPage.$(
-            "i.sidebar-handle-icon.fa-solid.fa-caret-left",
-          );
-          if (leftHandle) {
-            console.log("Sidebar already hidden; map is maximized.");
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!resultRoadFile) {
+            console.error(
+              "resultRoadFile is null or undefined forfullPropertyRecord:",
+              fullPropertyRecord,
+            );
           } else {
-            const rightHandle = await buildingPage.waitForSelector(
-              "i.sidebar-handle-icon.fa-solid.fa-caret-right",
+            let sharedRoadLink =
+              (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
+            task.link = sharedRoadLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
+          }
+        } else if (task.type === "BuildingURL") {
+          const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
+
+          await page.waitForTimeout(3000);
+          console.log(originalGeoJSON);
+          const originalGeoJSONurl = await buildGEOJSONIOurl(originalGeoJSON);
+
+          const buildingPage = await context.newPage();
+          try {
+            await buildingPage.goto(originalGeoJSONurl);
+            // await loadGeoJSONInGeojsonIO(buildingPage, originalGeoJSON);
+            console.log("Loaded original GeoJSON into local geojson.io");
+          } catch (err) {
+            console.error(
+              "Error loading original GeoJSON into local geojson.io:",
+              err,
+            );
+          }
+          await buildingPage.waitForTimeout(4000);
+
+          try {
+            const outdoorsButton = await buildingPage.waitForSelector(
+              'div.layer-switch button.pad0x:has-text("Outdoors")',
               { visible: true, timeout: 5000 },
             );
-            await rightHandle.click();
-            console.log("Clicked sidebar right caret to maximize map.");
+            await outdoorsButton.click();
+            console.log("Selected Outdoors layer for building screenshot.");
+          } catch (err) {
+            console.error("Error selecting Outdoors layer:", err);
           }
-        } catch (err) {
-          console.error(
-            "Error maximizing map/sidebar after navigating to buffered GeoJSON URL:",
-            err,
-          );
-        }
-        await buildingPage.waitForTimeout(2000);
-        await page.waitForTimeout(4000);
-        await buildingPage.screenshot({
-          path: "./screenshots/" + buildingFile,
-          fullPage: true,
-        });
-        await buildingPage.close();
 
-        let resultBuildingFile = await uploadToDropbox(
-          buildingFile,
-          "./screenshots/" + buildingFile,
-          dropboxToken,
-        );
-        console.log(resultBuildingFile);
+          try {
+            const leftHandle = await buildingPage.$(
+              "i.sidebar-handle-icon.fa-solid.fa-caret-left",
+            );
+            if (leftHandle) {
+              console.log("Sidebar already hidden; map is maximized.");
+            } else {
+              const rightHandle = await buildingPage.waitForSelector(
+                "i.sidebar-handle-icon.fa-solid.fa-caret-right",
+                { visible: true, timeout: 5000 },
+              );
+              await rightHandle.click();
+              console.log("Clicked sidebar right caret to maximize map.");
+            }
+          } catch (err) {
+            console.error(
+              "Error maximizing map/sidebar after navigating to buffered GeoJSON URL:",
+              err,
+            );
+          }
+          await buildingPage.waitForTimeout(2000);
+          await page.waitForTimeout(4000);
+          await buildingPage.screenshot({
+            path: "./screenshots/" + buildingFile,
+            fullPage: true,
+          });
+          await buildingPage.close();
 
-        // Ensure uploadData and the returned result files exist before accessing path_lower
-        if (!resultBuildingFile) {
-          console.error(
-            "resultBuildingFile is null or undefined for property:",
-            property,
+          let resultBuildingFile = await uploadToDropbox(
+            buildingFile,
+            "./screenshots/" + buildingFile,
+            dropboxToken,
           );
-        } else {
-          let sharedBuildingLink =
-            (await getSharedLink(dbx, resultBuildingFile.path_lower)) || "";
-          property.BuildingURL = sharedBuildingLink;
-          await upsertOneToBucket(collection, property);
+          console.log(resultBuildingFile);
+
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!resultBuildingFile) {
+            console.error(
+              "resultBuildingFile is null or undefined for fullPropertyRecord:",
+              fullPropertyRecord,
+            );
+          } else {
+            let sharedBuildingLink =
+              (await getSharedLink(dbx, resultBuildingFile.path_lower)) || "";
+            task.link = sharedBuildingLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
+          }
         }
       } catch (err) {
-        console.error("Error processing property:", err);
+        console.error("Error processing fullPropertyRecord:", err);
       }
     }
     console.log("Processing complete");
@@ -705,7 +695,7 @@ async function takeScreenShots(body) {
           continue;
         }
         const fullPropertyRecord = fullPropertyRecords.pop();
-        console.log("Property:", property.PARNO)
+        console.log("Property:", property.PARNO);
         const originalGeoJSON = fullPropertyRecord.geometry;
         console.log(originalGeoJSON);
         const bufferedGeoJSON = await addBuffer(
@@ -797,13 +787,12 @@ async function takeScreenShots(body) {
         } */
 
         // next: add building footprint screenshots using same GeoJSONobj and same process as above, but with different file name and property field (BuildingURL)
-        
+
         const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
 
         await page.waitForTimeout(3000);
         console.log(originalGeoJSON);
         const originalGeoJSONurl = await buildGEOJSONIOurl(originalGeoJSON);
-
 
         const buildingPage = await context.newPage();
         try {
