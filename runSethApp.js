@@ -257,6 +257,7 @@ async function takeScreenShots2(body) {
         const PARNO = task.PARNO || false;
         const sourceCollection = task.sourceCollection;
         let sourceFilterObj = { PARNO: PARNO };
+        console.log("sourceCollection:", sourceCollection);
 
         let output = await fetchMongoDBData(sourceFilterObj, sourceCollection);
         let fullPropertyRecords = output.documents;
