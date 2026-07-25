@@ -11,4 +11,6 @@
 
 2) keep in mind you also need ro run geojson.io in a seperate terminal:
 
-(base) ubuntu@penguin:~/node/geojsonio$ npm start
+(base) ubuntu@penguin:~/node/geojsonio$ 
+
+npm start

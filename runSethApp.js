@@ -211,7 +211,8 @@ async function takeScreenShots2(body) {
       console.log("No tasks to process");
       return;
     }
-
+    // sort tasks by ID in ascending order
+    tasks.sort((a, b) => a.ID - b.ID);
     tasks = tasks.slice(0, num || tasks.length);
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
@@ -239,7 +240,7 @@ async function takeScreenShots2(body) {
           });
         }
         let page = await context.newPage();
-/*         let task = {
+        /*         let task = {
           _id: {
             $oid: "6a5cfdf26025496d2072f080",
           },
@@ -268,6 +269,9 @@ async function takeScreenShots2(body) {
         const fullPropertyRecord = fullPropertyRecords.pop();
         const originalGeoJSON = fullPropertyRecord.geometry;
         console.log(originalGeoJSON);
+        const dt = new Date();
+        let ts = Math.floor(dt.getTime() / 1000);
+        const modifiedPARNO = fullPropertyRecord.PARNO.replace(/ /g, "-");
 
         if (task.type === "RoadURL") {
           const bufferedGeoJSON = await addBuffer(
@@ -277,10 +281,6 @@ async function takeScreenShots2(body) {
           );
           console.log(bufferedGeoJSON);
           const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
-
-          const dt = new Date();
-          let ts = Math.floor(dt.getTime() / 1000);
-          const modifiedPARNO = fullPropertyRecord.PARNO.replace(/ /g, "-");
           const roadFile = `${modifiedPARNO}-${ts}-road.png`;
 
           console.log("");
