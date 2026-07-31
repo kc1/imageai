@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Property Map with Parcels & Wetlands</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Esri Leaflet Plugin for easy ArcGIS querying -->
+  <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+  <style>
+    #map { height: 100vh; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    // Initialize map focused on a specific property location
+    const map = L.map('map').setView([28.5383, -81.3792], 16); // Example: Orange County, FL
+
+    // 1. Satellite Base Layer
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri'
+    }).addTo(map);
+
+    // 2. Wetlands Overlay
+    L.tileLayer.wms('https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/export', {
+      layers: 'show:0',
+      format: 'png32',
+      transparent: true,
+      bboxSR: 4326,
+      imageSR: 4326,
+      f: 'image',
+      opacity: 0.6
+    }).addTo(map);
+
+    // 3. Parcel Boundaries Layer (Example using Orange County, FL public GIS)
+    // Replace URL with the target county/state parcel MapServer or FeatureServer URL
+    const parcelUrl = 'https://ocgis.ocfl.net/arcgis/rest/services/InfoMap/Property_Info/MapServer/0';
+
+    const parcelLayer = L.esri.featureLayer({
+      url: parcelUrl,
+      style: function () {
+        return {
+          color: '#FFFF00', // Yellow outline for property lines
+          weight: 2,
+          fillOpacity: 0.1,
+          fillColor: '#FFFF00'
+        };
+      }
+    }).addTo(map);
+
+    // Bind clickable popup showing parcel details
+    parcelLayer.bindPopup(function (layer) {
+      const props = layer.feature.properties;
+      return `
+        <strong>Parcel ID:</strong> ${props.PARCEL_ID || props.PIN || 'N/A'}<br/>
+        <strong>Owner:</strong> ${props.OWNER_NAME || props.OWNER || 'N/A'}<br/>
+        <strong>Address:</strong> ${props.SITE_ADDRESS || 'N/A'}
+      `;
+    });
+  </script>
+</body>
+</html>

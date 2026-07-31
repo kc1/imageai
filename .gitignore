@@ -13,3 +13,9 @@ screenshot*.*
 
 # Playwright
 /playwright/.auth/
+
+# Geopackage data
+*.gpkg
+
+# Archive files
+*.zip

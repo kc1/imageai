@@ -5,6 +5,14 @@ const port = process.env.PORT || 3000;
 // Add JSON middleware
 app.use(express.json());
 
+const {
+  calculateCenterCoordinates,
+  getBBoxForZoom,
+  generateCombinedMap,
+} = require("./buildImageWithCanvas.js");
+const extractPropertyWetlands =
+  require("./buildWetlandsLayer.js").extractPropertyWetlands;
+const createPropertyMap = require("./sharp.js").createPropertyMap;
 const dropboxV2Api = require("dropbox-v2-api");
 const { Dropbox } = require("dropbox");
 require("dotenv").config();
@@ -56,14 +64,15 @@ const { addBuffer, buildGEOJSONIOurl } = require("./turfUtilities.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
-const fs = require("fs").promises;
+const fs = require("fs");
+const fsPromises = fs.promises;
 const path = require("path");
 const { getSharedLink } = require("./getSharedLink.js");
 
 async function deletePngFiles(folderPath) {
   try {
     // Read the contents of the folder
-    const files = await fs.readdir(folderPath);
+    const files = await fsPromises.readdir(folderPath);
     // Filter out files that have a .png extension
     const pngFiles = files.filter(
       (file) => path.extname(file).toLowerCase() === ".png",
@@ -71,7 +80,7 @@ async function deletePngFiles(folderPath) {
 
     // Loop through the filtered files and delete each one
     for (const file of pngFiles) {
-      await fs.unlink(path.join(folderPath, file));
+      await fsPromises.unlink(path.join(folderPath, file));
       console.log(`Deleted ${file}`);
     }
 
@@ -196,7 +205,11 @@ async function takeScreenShots2(body) {
   try {
     const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
-    const filterObj = { status: "PENDING" };
+
+    // const filterObj = { status: "PENDING" };
+    const filterObj = { status: "PENDING", type: "WaterURL" };
+    // const filterObj = { status: "PENDING", type: "BuildingURL" };
+
     const num = body.num || 10;
     console.log(filterObj);
 
@@ -266,7 +279,7 @@ async function takeScreenShots2(body) {
           console.log("Can't process");
           continue;
         }
-        const fullPropertyRecord = fullPropertyRecords.pop();
+        let fullPropertyRecord = fullPropertyRecords.pop();
         const originalGeoJSON = fullPropertyRecord.geometry;
         console.log(originalGeoJSON);
         const dt = new Date();
@@ -426,6 +439,244 @@ async function takeScreenShots2(body) {
             task.status = "COMPLETED";
             await upsertOneToBucket(TasksCollection, task);
           }
+        } else if (task.type === "WaterURL") {
+          // we have a task and fullPropertyRecord, now we can process the WaterURL type
+
+          const waterFileName = `${modifiedPARNO}-${ts}-water.png`;
+          const bb = fullPropertyRecord?.geometry?.bbox;
+          const [xmin, ymin, xmax, ymax] =
+            Array.isArray(bb) && bb.length >= 4 ? bb : [null, null, null, null];
+          console.log("Bounding box:", { xmin, ymin, xmax, ymax });
+          const centerCoords = calculateCenterCoordinates([
+            xmin,
+            ymin,
+            xmax,
+            ymax,
+          ]);
+          const { centerLat, centerLng } = centerCoords;
+          console.log("Center coordinates:", centerCoords);
+          const zoom = 16; // Zoom level for parcel boundaries
+          const updatedBboxStr = getBBoxForZoom(
+            centerLat,
+            centerLng,
+            zoom,
+            1200,
+            800,
+          );
+          console.log("Bounding box string:", updatedBboxStr);
+          // const [updatedXmin, updatedYmin, updatedXmax, updatedYmax]
+          const base64Data = await generateCombinedMap(
+            updatedBboxStr,
+            1200,
+            800,
+          );
+
+          await page.waitForTimeout(4000);
+          // Convert base64 dataURL to raw binary buffer
+          // const dataUrl = canvas.toDataURL("image/png");
+          // const base64Data = wetlandsImageUrl.replace(/^data:image\/png;base64,/, "");
+
+          // Define exact local directory path
+          const outputFolder = path.join(__dirname, "screenshots");
+          const filePath = path.join(outputFolder, waterFileName);
+          
+          // Ensure the directory exists
+          if (!fs.existsSync(outputFolder)) {
+            fs.mkdirSync(outputFolder, { recursive: true });
+          }
+
+          // Write file directly to disk
+          fs.writeFileSync(filePath, base64Data, "base64");
+          console.log(`Saved screenshot to: ${filePath}`);
+
+          let resultWaterFile = await uploadToDropbox(
+            waterFileName,
+            "./screenshots/" + waterFileName,
+            dropboxToken,
+          );
+          console.log(resultWaterFile);
+
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!resultWaterFile) {
+            console.error(
+              "resultWaterFile is null or undefined for fullPropertyRecord:",
+              fullPropertyRecord,
+            );
+          } else {
+            let sharedWaterLink =
+              (await getSharedLink(dbx, resultWaterFile.path_lower)) || "";
+            task.link = sharedWaterLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
+          }
+        } else if (task.type === "DUMMYVALUE") {
+          // we have a task and fullPropertyRecord, now we can process the WaterURL type
+
+          console.log("body:", body);
+          // const filterObj = body.filterObj || {};
+          /* const filterObj = { $or: [{ WaterURL: "" }, { ContourURL: "" }] };
+            const num = body.num || 30;
+            console.log(filterObj);
+
+            mongoClient = createMongoClient("sethProp");
+            await mongoClient.connect();
+            logMongoClientState(mongoClient, "Connected in processSethProp");
+            const database = mongoClient.db(MONGO_DB_NAME);
+            let collection = database.collection("alcornBucket");
+
+            let response = await fetchMongoDBData(filterObj, collection);
+            let properties = response.documents;
+            if (!properties || !properties.length) {
+              console.log("No properties to process");
+              return;
+            }
+
+            properties = properties.slice(0, num || properties.length);
+            const data = await refreshDropboxToken();
+            const dropboxToken = data.access_token;
+            const dbx = new Dropbox({ accessToken: dropboxToken });
+
+            browser = await launchBrowser();
+            const context = await browser.newContext({
+              permissions: ["geolocation"],
+              geolocation: {
+                latitude: 34.8985,
+                longitude: -88.5952,
+              },
+              javaScriptEnabled: true,
+            });
+ */
+          const page = await context.newPage();
+          const loggedInPage = await login(page);
+          await new Promise((resolve) => setTimeout(resolve, 15000));
+          // At the beginning of your script, right after page load
+
+          await closeEngagementPopups(loggedInPage);
+          await loggedInPage.screenshot({
+            path: "./screenshots/screenshot-debug.png",
+          });
+          await loggedInPage.keyboard.press("Escape");
+          await setBasemap(loggedInPage);
+
+          console.log("Processing task", task);
+          // can I insert fullPropertyRecord as Property?
+          console.log("fullPropertyRecord:", fullPropertyRecord);
+          // .fill(property.LAT.toString() + "," + property.LON.toString());
+          const bbox = fullPropertyRecord?.geometry?.bbox;
+          const [minLon, minLat, maxLon, maxLat] =
+            Array.isArray(bbox) && bbox.length >= 4
+              ? bbox
+              : [null, null, null, null];
+
+          const LAT =
+            minLat != null && maxLat != null ? (minLat + maxLat) / 2 : null;
+          const LON =
+            minLon != null && maxLon != null ? (minLon + maxLon) / 2 : null;
+          const property = { LAT, LON };
+          fullPropertyRecord.LAT = LAT;
+          fullPropertyRecord.LON = LON;
+
+          try {
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            // let property = properties[i];
+            uploadData = await performTestLatLon(
+              loggedInPage,
+              fullPropertyRecord,
+              dropboxToken,
+              closeEngagementPopups,
+            );
+
+            // Ensure uploadData and the returned result files exist before accessing path_lower
+            if (!uploadData) {
+              console.error(
+                "uploadData is null or undefined for property:",
+                fullPropertyRecord,
+              );
+              // skip this property and continue with the next one
+              continue;
+            }
+
+            // Ensure uploadData and the returned result files exist before accessing path_lower
+            if (!resultBuildingFile) {
+              console.error(
+                "resultBuildingFile is null or undefined for fullPropertyRecord:",
+                fullPropertyRecord,
+              );
+            } else {
+              let sharedBuildingLink =
+                (await getSharedLink(dbx, resultBuildingFile.path_lower)) || "";
+              task.link = sharedBuildingLink;
+              task.status = "COMPLETED";
+              await upsertOneToBucket(TasksCollection, task);
+            }
+
+            let sharedWaterLink = "";
+            let sharedContourLink = "";
+
+            if (
+              uploadData.resultWaterFile &&
+              uploadData.resultWaterFile.path_lower
+            ) {
+              sharedWaterLink =
+                (await getSharedLink(
+                  dbx,
+                  uploadData.resultWaterFile.path_lower,
+                )) || "";
+            } else {
+              console.warn(
+                "No resultWaterFile.path_lower for property, skipping water link:",
+                fullPropertyRecord,
+              );
+            }
+
+            if (
+              uploadData.resultContourFile &&
+              uploadData.resultContourFile.path_lower
+            ) {
+              sharedContourLink =
+                (await getSharedLink(
+                  dbx,
+                  uploadData.resultContourFile.path_lower,
+                )) || "";
+            } else {
+              console.warn(
+                "No resultContourFile.path_lower for property, skipping contour link:",
+                fullPropertyRecord,
+              );
+            }
+
+            fullPropertyRecord.WaterURL = sharedWaterLink;
+            fullPropertyRecord.ContourURL = sharedContourLink;
+
+            // property.ContourURL = uploadData.resultContourFile.path_lower;
+            // property.WaterURL = uploadData.resultWaterFile.path_lower;
+            // console.log("Property:", property);
+            await upsertOneToBucket(collection, task);
+          } catch (err) {
+            const errorTs = new Date().toISOString().replace(/[:.]/g, "-");
+            const errorScreenshotPath = `./screenshots/ERROR-${errorTs}.png`;
+            await loggedInPage
+              .screenshot({
+                path: errorScreenshotPath,
+                fullPage: true,
+              })
+              .catch(() => {});
+            console.error(`Saved error screenshot: ${errorScreenshotPath}`);
+            console.error("Error processing property:", err);
+          }
+
+          await loggedInPage.getByRole("button").first().click();
+          await loggedInPage
+            .locator("header")
+            .getByRole("button")
+            .nth(2)
+            .click();
+          await loggedInPage.getByRole("button", { name: "Sign Out" }).click();
+          console.timeEnd("sethPropProcessing");
+          timerEnded = true;
+          const sethPropDuration = Date.now() - sethPropStart;
+          console.log(`sethProp processing duration: ${sethPropDuration}ms`);
+          console.log("Processing complete");
         }
       } catch (err) {
         console.error("Error processing fullPropertyRecord:", err);

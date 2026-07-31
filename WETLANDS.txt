@@ -1,0 +1,47 @@
+Install GDAL:
+
+sudo apt install gdal-bin
+
+1) Download zipped geopackage from https://www.fws.gov/program/national-wetlands-inventory/download-state-wetlands-data
+
+2) ogrinfo MS_geopackage_wetlands.gpkg 
+INFO: Open of `MS_geopackage_wetlands.gpkg'
+      using driver `GPKG' successful.
+1: Mississippi (Multi Polygon)
+2: MS_Wetlands_Historic_Map_Info (Multi Polygon)
+3: MS_Wetlands_Project_Metadata (Multi Polygon)
+4: MS_Wetlands (Multi Polygon)
+
+3) layer 4 is the one we want - you can export it as below:
+
+
+4) # Summary info about the wetlands layer only
+ogrinfo -so MS_geopackage_wetlands.gpkg MS_Wetlands
+
+# Export just the wetlands to GeoJSON
+ogr2ogr -f GeoJSON mississippi_wetlands.geojson MS_geopackage_wetlands.gpkg MS_Wetlands
+
+# Export + clip to a bounding box around a property (example)
+ogr2ogr -f GeoJSON property_wetlands.geojson \
+  MS_geopackage_wetlands.gpkg MS_Wetlands \
+  -spat -90.25 32.25 -90.15 32.35
+
+5) I am now trying sharp.js as a possible way to add different layers
+
+
+How to Find Parcel Endpoints for Your Target Area
+Because there is no single free nationwide public parcel API provided by the US federal government, you have two options depending on your scope:
+
+Free Public County ArcGIS Endpoint (Single State or County focus):
+
+Search Google for: "[County Name] [State] GIS parcel MapServer rest services"
+
+Example: "Wake County NC GIS parcel MapServer rest services"
+
+Look for a URL ending in /MapServer/0 or /FeatureServer/0 that contains layers named Parcels, Tax Lots, or Property Lines.
+
+Nationwide Commercial APIs (Multi-state / Production applications):
+
+Regrid API: The industry standard for US parcel data. Provides nationwide API endpoints for GeoJSON boundaries and parcel attributes.
+
+Geocodio: Provides parcel boundary geometries alongside reverse geocoding for US addresses
