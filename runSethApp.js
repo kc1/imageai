@@ -455,7 +455,8 @@ async function takeScreenShots2(body) {
           ]);
           const { centerLat, centerLng } = centerCoords;
           console.log("Center coordinates:", centerCoords);
-          const zoom = 16; // Zoom level for parcel boundaries
+          // const zoom = 16; // Zoom level for parcel boundaries
+          const zoom = 17; // Zoom level for parcel boundaries
           const updatedBboxStr = getBBoxForZoom(
             centerLat,
             centerLng,
@@ -465,10 +466,17 @@ async function takeScreenShots2(body) {
           );
           console.log("Bounding box string:", updatedBboxStr);
           // const [updatedXmin, updatedYmin, updatedXmax, updatedYmax]
+         /*  const base64Data = await generateCombinedMap(
+            updatedBboxStr,
+            1200,
+            800,
+          ); */
+
           const base64Data = await generateCombinedMap(
             updatedBboxStr,
             1200,
             800,
+            fullPropertyRecord
           );
 
           await page.waitForTimeout(4000);
@@ -489,13 +497,14 @@ async function takeScreenShots2(body) {
           fs.writeFileSync(filePath, base64Data, "base64");
           console.log(`Saved screenshot to: ${filePath}`);
 
-          let resultWaterFile = await uploadToDropbox(
+          let resultWaterFile = null;
+/*           let resultWaterFile = await uploadToDropbox(
             waterFileName,
             "./screenshots/" + waterFileName,
             dropboxToken,
           );
           console.log(resultWaterFile);
-
+ */
           // Ensure uploadData and the returned result files exist before accessing path_lower
           if (!resultWaterFile) {
             console.error(
@@ -510,6 +519,7 @@ async function takeScreenShots2(body) {
             await upsertOneToBucket(TasksCollection, task);
           }
         } else if (task.type === "DUMMYVALUE") {
+
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
           console.log("body:", body);
