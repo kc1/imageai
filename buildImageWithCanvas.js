@@ -164,12 +164,12 @@ async function generateCombinedMap(bboxStr, width, height, fullPropertyRecord) {
     ctx.beginPath();
     pathGenerator(fullPropertyRecord.geometry);
 
-    // Style the property overlay (Red outline & yellow-ish transparent fill)
-    ctx.fillStyle = "rgba(255, 255, 0, 0.4)";
-    ctx.fill();
+    // Style the property overlay (Blue outline & transparent fill)
+    // ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+    // ctx.fill();
 
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 6;
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 8;
     ctx.stroke();
 
     return canvas.toBuffer("image/png");

@@ -45,3 +45,35 @@ Nationwide Commercial APIs (Multi-state / Production applications):
 Regrid API: The industry standard for US parcel data. Provides nationwide API endpoints for GeoJSON boundaries and parcel attributes.
 
 Geocodio: Provides parcel boundary geometries alongside reverse geocoding for US addresses
+
+
+  
+const wetlandsUrl = `https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=4326&size=${width},${height}&format=png32&transparent=true&f=image`;
+
+Based on the URL you provided, the water overlays come from the U.S. Fish and Wildlife Service (USFWS) National Wetlands Inventory (NWI) Mapper.
+
+Here is the standard legend mapping the colors to their specific wetland classifications, according to the official USFWS Wetlands Mapper:
+
+Freshwater Forested/Shrub Wetland (Dark Green): rgb(0, 136, 55) - Forested swamps or shrub bogs.
+
+Freshwater Emergent Wetland (Light/Lime Green): rgb(127, 195, 28) - Herbaceous marshes, fens, swales, or wet meadows.
+
+Freshwater Pond (Light Blue): rgb(104, 140, 192) - Ponds or aquatic beds.
+
+Estuarine and Marine Wetland (Teal/Sea Green): rgb(102, 194, 165) - Saltwater/brackish marshes, shrubs, beaches, shoals, or flats.
+
+Riverine (Medium Blue): rgb(1, 144, 191) - River or stream channels.
+
+Lakes (Dark Blue): rgb(19, 0, 124) - Lake or reservoir basins.
+
+Estuarine and Marine Deepwater (Dark Teal): rgb(0, 124, 136) - Open water estuaries, bays, sounds, or open oceans.
+
+Other Freshwater Wetland (Brown): rgb(178, 134, 83) - Farmed wetlands, saline seeps, and other miscellaneous wetlands.
+
+Looking at your screenshot (image_5e7786.jpg), it appears to contain:
+
+Freshwater Ponds (the light blue pools at the bottom right and center).
+
+Freshwater Forested/Shrub Wetlands (the dark green patches).
+
+Freshwater Emergent Wetlands (the lighter green patches).
