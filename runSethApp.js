@@ -443,51 +443,18 @@ async function takeScreenShots2(body) {
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
           const waterFileName = `${modifiedPARNO}-${ts}-water.png`;
-          const bb = fullPropertyRecord?.geometry?.bbox;
-          const [xmin, ymin, xmax, ymax] =
-            Array.isArray(bb) && bb.length >= 4 ? bb : [null, null, null, null];
-          console.log("Bounding box:", { xmin, ymin, xmax, ymax });
-          const centerCoords = calculateCenterCoordinates([
-            xmin,
-            ymin,
-            xmax,
-            ymax,
-          ]);
-          const { centerLat, centerLng } = centerCoords;
-          console.log("Center coordinates:", centerCoords);
-          // const zoom = 16; // Zoom level for parcel boundaries
-          const zoom = 17; // Zoom level for parcel boundaries
-          const updatedBboxStr = getBBoxForZoom(
-            centerLat,
-            centerLng,
-            zoom,
-            1200,
-            800,
-          );
-          console.log("Bounding box string:", updatedBboxStr);
-          // const [updatedXmin, updatedYmin, updatedXmax, updatedYmax]
-         /*  const base64Data = await generateCombinedMap(
-            updatedBboxStr,
-            1200,
-            800,
-          ); */
-
           const base64Data = await generateCombinedMap(
-            updatedBboxStr,
+            fullPropertyRecord,
             1200,
             800,
-            fullPropertyRecord
           );
+          console.log("base64Data:", base64Data);
 
-          await page.waitForTimeout(4000);
-          // Convert base64 dataURL to raw binary buffer
-          // const dataUrl = canvas.toDataURL("image/png");
-          // const base64Data = wetlandsImageUrl.replace(/^data:image\/png;base64,/, "");
-
-          // Define exact local directory path
+          await page.waitForTimeout(1000);
+                    // Define exact local directory path
           const outputFolder = path.join(__dirname, "screenshots");
           const filePath = path.join(outputFolder, waterFileName);
-          
+
           // Ensure the directory exists
           if (!fs.existsSync(outputFolder)) {
             fs.mkdirSync(outputFolder, { recursive: true });
@@ -498,13 +465,13 @@ async function takeScreenShots2(body) {
           console.log(`Saved screenshot to: ${filePath}`);
 
           let resultWaterFile = null;
-/*           let resultWaterFile = await uploadToDropbox(
+          resultWaterFile = await uploadToDropbox(
             waterFileName,
             "./screenshots/" + waterFileName,
             dropboxToken,
           );
           console.log(resultWaterFile);
- */
+
           // Ensure uploadData and the returned result files exist before accessing path_lower
           if (!resultWaterFile) {
             console.error(
@@ -519,7 +486,6 @@ async function takeScreenShots2(body) {
             await upsertOneToBucket(TasksCollection, task);
           }
         } else if (task.type === "DUMMYVALUE") {
-
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
           console.log("body:", body);

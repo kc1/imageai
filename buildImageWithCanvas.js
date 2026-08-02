@@ -8,13 +8,6 @@ function getMetersPerPixel(latitude, zoom) {
   return (earthCircumference * Math.cos(latRad)) / (256 * Math.pow(2, zoom));
 }
 
-function calculateCenterCoordinates(bbox) {
-  const [minLng, minLat, maxLng, maxLat] = bbox;
-  const centerLat = (minLat + maxLat) / 2;
-  const centerLng = (minLng + maxLng) / 2;
-  return { centerLat, centerLng };
-}
-
 // Calculate total ground distance across a canvas/image width
 function getMapDistanceWidth(latitude, zoom, imageWidthPx) {
   const mPerPx = getMetersPerPixel(latitude, zoom);
@@ -36,44 +29,67 @@ function getMapDistanceWidth(latitude, zoom, imageWidthPx) {
 // 1. The Numerator: earthCircumference * Math.cos(latRad)Goal: Calculate the true real-world circumference of the Earth at your specific latitude in meters.earthCircumference: At the Equator, the Earth is roughly $40,075,016.68\text{ meters}$ (~24,901 miles) around.Math.cos(latRad): Web Mercator maps flatten the spherical Earth onto a flat square grid. Because the Earth gets smaller around as you move from the Equator toward the North or South Pole, a line of latitude at $34^\circ\text{ N}$ (like Mississippi) is much shorter than the Equator.At Equator ($0^\circ$): $\cos(0) = 1$ $\rightarrow$ Full circumference ($40,075\text{ km}$).At Mississippi ($34^\circ\text{ N}$): $\cos(34^\circ) \approx 0.829$ $\rightarrow$ Circumference at that ring is smaller ($\approx 33,223\text{ km}$).
 // 2. The Denominator: 256 * Math.pow(2, zoom)Goal: Calculate how many total horizontal pixels make up the entire world map at that zoom level.Web Mercator maps use square image tiles that are 256 pixels wide:Math.pow(2, zoom) ($2^{\text{zoom}}$): Calculates how many tiles wide the whole world map is at a given zoom level:Zoom 0: $2^0 = 1$ tile wide ($1 \times 256 = \mathbf{256\text{ total pixels}}$ across the whole world).Zoom 1: $2^1 = 2$ tiles wide ($2 \times 256 = \mathbf{512\text{ total pixels}}$).Zoom 16: $2^{16} = 65,536$ tiles wide ($65,536 \times 256 = \mathbf{16,777,216\text{ total pixels}}$ across the world).
 
-function getBBoxForZoom(centerLat, centerLng, zoom, widthPx, heightPx) {
-  // Earth circumference in meters
-  const earthCircumference = 40075016.68;
-  const latRad = (centerLat * Math.PI) / 180;
 
-  // Meters per pixel at this zoom level and latitude
-  const metersPerPixel =
-    (earthCircumference * Math.cos(latRad)) / (256 * Math.pow(2, zoom));
+/**
+ * Calculates a padded bounding box and GeoJSON bounds feature from a property record.
+ * 
+ * @param {Object} propertyRecord - GeoJSON Feature or object with geometry.
+ * @param {number} [paddingRatio=0.15] - Percentage buffer to add (0.15 = 15%).
+ * @returns {Object} Object containing bboxStr, numeric bounds, and mapBoundsGeoJSON feature.
+ */
+function getPropertyBounds(propertyRecord, paddingRatio = 0.15) {
+  if (!propertyRecord) {
+    throw new Error("getPropertyBounds: No property record provided.");
+  }
 
-  // Total span in meters across the image width and height
-  const halfWidthMeters = (widthPx * metersPerPixel) / 2;
-  const halfHeightMeters = (heightPx * metersPerPixel) / 2;
+  const geometry = propertyRecord.geometry || propertyRecord;
 
-  // Convert meters offset back into degrees (approximate for local bbox)
-  const metersPerDegreeLat = 111320;
-  const metersPerDegreeLng = 111320 * Math.cos(latRad);
+  // 1. Get tight bounding box from geometry array, or fallback to d3.geoBounds
+  let minLng, minLat, maxLng, maxLat;
+  const existingBbox = geometry.bbox || propertyRecord.bbox;
 
-  const minLat = centerLat - halfHeightMeters / metersPerDegreeLat;
-  const maxLat = centerLat + halfHeightMeters / metersPerDegreeLat;
-  const minLng = centerLng - halfWidthMeters / metersPerDegreeLng;
-  const maxLng = centerLng + halfWidthMeters / metersPerDegreeLng;
+  if (Array.isArray(existingBbox) && existingBbox.length >= 4) {
+    [minLng, minLat, maxLng, maxLat] = existingBbox;
+  } else {
+    // d3.geoBounds returns [[minLng, minLat], [maxLng, maxLat]]
+    const [[d3MinLng, d3MinLat], [d3MaxLng, d3MaxLat]] = d3.geoBounds(geometry);
+    minLng = d3MinLng;
+    minLat = d3MinLat;
+    maxLng = d3MaxLng;
+    maxLat = d3MaxLat;
+  }
 
-  return `${minLng},${minLat},${maxLng},${maxLat}`;
+  // 2. Calculate percentage buffer with fallback for point features / zero area
+  const lngBuffer = (maxLng - minLng) * paddingRatio || 0.001;
+  const latBuffer = (maxLat - minLat) * paddingRatio || 0.001;
+
+  const paddedMinLng = minLng - lngBuffer;
+  const paddedMaxLng = maxLng + lngBuffer;
+  const paddedMinLat = minLat - latBuffer;
+  const paddedMaxLat = maxLat + latBuffer;
+
+  // 3. Format string for Mapbox and ArcGIS REST parameters
+  const bboxStr = `${paddedMinLng},${paddedMinLat},${paddedMaxLng},${paddedMaxLat}`;
+
+  // 4. Build MultiPoint GeoJSON target for d3.geoMercator().fitSize()
+  const mapBoundsGeoJSON = {
+    type: "Feature",
+    geometry: {
+      type: "MultiPoint",
+      coordinates: [
+        [paddedMinLng, paddedMinLat],
+        [paddedMaxLng, paddedMaxLat],
+      ],
+    },
+  };
+
+  return {
+    bboxStr,
+    bounds: [paddedMinLng, paddedMinLat, paddedMaxLng, paddedMaxLat],
+    mapBoundsGeoJSON,
+  };
 }
 
-// Generate the bounding box string for Zoom 16:
-// const bboxStr = getBBoxForZoom(centerLat, centerLng, targetZoom, width, height);
-
-// const parcelUrl = `https://gis.mississippi.edu/server/rest/services/MS_East_Parcels/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=4326&size=${width},${height}&format=png32&transparent=true&f=image`;
-
-// const fs = require('fs');
-// const path = require('path');
-
-// const { createCanvas, loadImage } = require('canvas');
-
-// const { createCanvas, loadImage } = require('canvas');
-
-// Helper to add padding (e.g., 20%) around the property's tight bbox for the view window
 function getPaddedBboxStr(propertyGeojson, paddingFactor = 0.2) {
   const [minLng, minLat, maxLng, maxLat] = propertyGeojson.geometry.bbox;
 
@@ -91,98 +107,55 @@ function getPaddedBboxStr(propertyGeojson, paddingFactor = 0.2) {
 
 const d3 = require("d3-geo");
 
-async function generateCombinedMap(bboxStr, width, height, fullPropertyRecord) {
+async function generateCombinedMap(fullPropertyRecord, width = 1200, height = 800) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
+  // Get padded bounds and D3 map feature in one line
+  const { bboxStr, mapBoundsGeoJSON } = getPropertyBounds(fullPropertyRecord, 0.15);
+
   const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 
-  // 1. Mapbox Basemap & Overlay URLs using your calculated zoom bounding box
+  // Layer URLs (All pulling imageSR=3857 for Web Mercator alignment)
   const basemapUrl = `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/[${bboxStr}]/${width}x${height}?access_token=${MAPBOX_TOKEN}`;
-  const parcelUrl = `https://gis.mississippi.edu/server/rest/services/MS_East_Parcels/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=4326&size=${width},${height}&format=png32&transparent=true&f=image`;
-  const wetlandsUrl = `https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=4326&size=${width},${height}&format=png32&transparent=true&f=image`;
+  const parcelUrl = `https://gis.mississippi.edu/server/rest/services/MS_East_Parcels/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=3857&size=${width},${height}&format=png32&transparent=true&f=image`;
+  const wetlandsUrl = `https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=3857&size=${width},${height}&format=png32&transparent=true&f=image`;
+  const floodUrl = `https://hazards.fema.gov/gis/nfhl/rest/services/public/NFHL/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=3857&size=${width},${height}&format=png32&transparent=true&layers=show:28&f=image`;
 
-  try {
-    // 2. Fetch all background layers in parallel
-    const [basemapResult, parcelResult, wetlandsResult] =
-      await Promise.allSettled([
-        loadImage(basemapUrl),
-        loadImage(parcelUrl),
-        loadImage(wetlandsUrl),
-      ]);
+  // Fetch images in parallel
+  const [basemapResult, parcelResult, wetlandsResult, floodResult] =
+    await Promise.allSettled([
+      loadImage(basemapUrl),
+      loadImage(parcelUrl),
+      loadImage(wetlandsUrl),
+      loadImage(floodUrl),
+    ]);
 
-    const basemapImg =
-      basemapResult.status === "fulfilled" ? basemapResult.value : null;
-    const parcelImg =
-      parcelResult.status === "fulfilled" ? parcelResult.value : null;
-    const wetlandsImg =
-      wetlandsResult.status === "fulfilled" ? wetlandsResult.value : null;
-
-    // 3. Draw background layers onto the canvas
-    if (basemapImg) {
-      ctx.drawImage(basemapImg, 0, 0, width, height);
+  // Draw background rasters
+  [basemapResult, parcelResult, wetlandsResult, floodResult].forEach((res) => {
+    if (res.status === "fulfilled" && res.value) {
+      ctx.drawImage(res.value, 0, 0, width, height);
     }
-    if (parcelImg) {
-      ctx.drawImage(parcelImg, 0, 0, width, height);
-    }
-    if (wetlandsImg) {
-      ctx.drawImage(wetlandsImg, 0, 0, width, height);
-    }
+  });
 
-   /*  // 4. Set up D3 projection matching your exact zoom bounding box string
-    const [minLng, minLat, maxLng, maxLat] = bboxStr.split(",").map(Number);
-    const viewportFeature = {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [minLng, minLat],
-            [maxLng, minLat],
-            [maxLng, maxLat],
-            [minLng, maxLat],
-            [minLng, minLat],
-          ],
-        ],
-      },
-    };
- */
-    // 4. Set up D3 projection matched DIRECTLY to the property geometry itself.
-    // This forces D3 to center and scale the property right in the middle of the canvas,
-    // completely independent of any bbox string discrepancies!
-    const projection = d3.geoMercator().fitExtent(
-      [
-        [50, 50], // Leaves a 50px padding border around the edges of your 1200x800 canvas
-        [width - 50, height - 50],
-      ],
-      fullPropertyRecord.geometry
-    );
+  // Projection setup using the generated mapBoundsGeoJSON
+  const projection = d3
+    .geoMercator()
+    .fitSize([width, height], mapBoundsGeoJSON);
 
-    const pathGenerator = d3.geoPath().projection(projection).context(ctx);
+  const pathGenerator = d3.geoPath().projection(projection).context(ctx);
 
-    // 5. Draw the MultiPolygon property boundary cleanly
-    ctx.beginPath();
-    pathGenerator(fullPropertyRecord.geometry);
+  // Stroke the property boundary
+  ctx.beginPath();
+  pathGenerator(fullPropertyRecord.geometry);
+  ctx.strokeStyle = "blue";
+  ctx.lineWidth = 6;
+  ctx.stroke();
 
-    // Style the property overlay (Blue outline & transparent fill)
-    // ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
-    // ctx.fill();
-
-    ctx.strokeStyle = "blue";
-    ctx.lineWidth = 8;
-    ctx.stroke();
-
-    return canvas.toBuffer("image/png");
-  } catch (err) {
-    console.error("Failed to generate property map:", err);
-    throw err;
-  }
+  return canvas.toBuffer("image/png");
 }
 
 module.exports = {
   getMetersPerPixel,
-  getMapDistanceWidth,
-  getBBoxForZoom,
   generateCombinedMap,
-  calculateCenterCoordinates,
 };
