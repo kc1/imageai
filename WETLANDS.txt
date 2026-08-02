@@ -77,3 +77,27 @@ Freshwater Ponds (the light blue pools at the bottom right and center).
 Freshwater Forested/Shrub Wetlands (the dark green patches).
 
 Freshwater Emergent Wetlands (the lighter green patches).
+
+---------------------------------------------------------
+
+After trying different things, I am going with buildImagewithcanvas.js
+
+keep in mind an HTML CANVAS element is weird, with origin in left upper
+corner. To get around the weird x,y calculations I'm using the D3-geo js package
+to draw on it.
+
+you can add data like:
+
+const wetlandsUrl = `https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/export?bbox=${bboxStr}&bboxSR=4326&imageSR=3857&size=${width},${height}&format=png32&transparent=true&f=image`;
+
+bboxSR=4326&imageSR=3857 - this is important:
+
+spatial reference
+
+There are entirely different but named in an annoyingly similar way.
+
+In layman terms WGS84 (EPSG 4326) is a geographic coordinate sistem (decimal degrees) 
+while the WGS84 auxiliary sphere (EPSG 3857 ) is the pseudo mercator one, 
+(in meters) that is used in 99% of the web map apis / aplications, therefore commonly called web mercator.
+
+3857 is therefore a distance projection of the degrees of WGS84 (which is a gis)
