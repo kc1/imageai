@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NWI Wetland Legend</title>
+    <style>
+        /* Basic page styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        /* Table styling */
+        .nwi-legend-table {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .nwi-legend-table th,
+        .nwi-legend-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nwi-legend-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .nwi-legend-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* The specific styling for the color sample cell */
+        .color-swatch-cell {
+            width: 60px; /* Fixed width for consistency */
+            text-align: center;
+        }
+
+        /* The actual colored box */
+        .color-swatch {
+            display: inline-block;
+            width: 40px;   /* Adjust width */
+            height: 25px;  /* Adjust height */
+            border: 1px solid #444; /* Dark border for contrast */
+            border-radius: 4px; /* Slightly rounded corners */
+            vertical-align: middle;
+        }
+
+        .rgb-text {
+            font-family: monospace; /* For easier reading of codes */
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>National Wetlands Inventory (NWI) Legend</h1>
+
+    <h2>Map Observations for image_5e7786.jpg</h2>
+
+    <table class="nwi-legend-table">
+        <thead>
+            <tr>
+                <th>Visual Sample</th>
+                <th>Classification</th>
+                <th>RGB Value</th>
+                <th>Description (from USFWS)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(0, 136, 55);"></div></td>
+                <td><strong>Freshwater Forested/Shrub Wetland</strong></td>
+                <td><span class="rgb-text">rgb(0, 136, 55)</span></td>
+                <td>Forested swamps or shrub bogs.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(127, 195, 28);"></div></td>
+                <td><strong>Freshwater Emergent Wetland</strong></td>
+                <td><span class="rgb-text">rgb(127, 195, 28)</span></td>
+                <td>Herbaceous marshes, fens, swales, or wet meadows.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(104, 140, 192);"></div></td>
+                <td><strong>Freshwater Pond</strong></td>
+                <td><span class="rgb-text">rgb(104, 140, 192)</span></td>
+                <td>Ponds or aquatic beds.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Full NWI Standard Legend (Reference)</h2>
+
+    <table class="nwi-legend-table">
+        <thead>
+            <tr>
+                <th>Visual Sample</th>
+                <th>Classification</th>
+                <th>RGB Value</th>
+                <th>Description (from USFWS)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(0, 136, 55);"></div></td>
+                <td><strong>Freshwater Forested/Shrub Wetland</strong></td>
+                <td><span class="rgb-text">rgb(0, 136, 55)</span></td>
+                <td>Forested swamps or shrub bogs.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(127, 195, 28);"></div></td>
+                <td><strong>Freshwater Emergent Wetland</strong></td>
+                <td><span class="rgb-text">rgb(127, 195, 28)</span></td>
+                <td>Herbaceous marshes, fens, swales, or wet meadows.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(104, 140, 192);"></div></td>
+                <td><strong>Freshwater Pond</strong></td>
+                <td><span class="rgb-text">rgb(104, 140, 192)</span></td>
+                <td>Ponds or aquatic beds.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(102, 194, 165);"></div></td>
+                <td><strong>Estuarine and Marine Wetland</strong></td>
+                <td><span class="rgb-text">rgb(102, 194, 165)</span></td>
+                <td>Saltwater/brackish marshes, shrubs, beaches, shoals, or flats.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(1, 144, 191);"></div></td>
+                <td><strong>Riverine</strong></td>
+                <td><span class="rgb-text">rgb(1, 144, 191)</span></td>
+                <td>River or stream channels.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(19, 0, 124);"></div></td>
+                <td><strong>Lakes</strong></td>
+                <td><span class="rgb-text">rgb(19, 0, 124)</span></td>
+                <td>Lake or reservoir basins.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(0, 124, 136);"></div></td>
+                <td><strong>Estuarine and Marine Deepwater</strong></td>
+                <td><span class="rgb-text">rgb(0, 124, 136)</span></td>
+                <td>Open water estuaries, bays, sounds, or open oceans.</td>
+            </tr>
+            <tr>
+                <td class="color-swatch-cell"><div class="color-swatch" style="background-color: rgb(178, 134, 83);"></div></td>
+                <td><strong>Other Freshwater Wetland</strong></td>
+                <td><span class="rgb-text">rgb(178, 134, 83)</span></td>
+                <td>Farmed wetlands, saline seeps, and other miscellaneous wetlands.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

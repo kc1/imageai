@@ -213,7 +213,7 @@ async function takeScreenShots2(body) {
 
     // const filterObj = { status: "PENDING", type: "BuildingURL" };
 
-    const num = body.num || 10;
+    const num = body.num || 30;
     console.log(filterObj);
 
     mongoClient = createMongoClient("buildScreenshotsFromLink");
