@@ -207,8 +207,8 @@ async function takeScreenShots2(body) {
     console.log("body:", body);
 
     // const filterObj = { status: "PENDING" };
-    const filterObj = {sourceCollection: "alcornMERGED2subset", status: "PENDING", type: "WaterURL" };
-    // const filterObj = { status: "PENDING", type: "WaterURL" };
+    // const filterObj = {sourceCollection: "alcornMERGED2subset", status: "PENDING", type: "WaterURL" };
+    const filterObj = { status: "PENDING", type: "WaterURL" };
     // alcornMERGED2subset
 
     // const filterObj = { status: "PENDING", type: "BuildingURL" };
