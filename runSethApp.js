@@ -206,9 +206,9 @@ async function takeScreenShots2(body) {
     const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
 
-    // const filterObj = { status: "PENDING" };
+    const filterObj = { status: "PENDING" };
     // const filterObj = {sourceCollection: "alcornMERGED2subset", status: "PENDING", type: "WaterURL" };
-    const filterObj = { status: "PENDING", type: "WaterURL" };
+    // const filterObj = { status: "PENDING", type: "WaterURL" };
     // alcornMERGED2subset
 
     // const filterObj = { status: "PENDING", type: "BuildingURL" };
