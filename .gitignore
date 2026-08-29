@@ -6,6 +6,7 @@ node_modules/
 package-lock.json
 *.png
 *.env
+.env.dropbox
 screenshot*.*
 
 # Local Netlify folder

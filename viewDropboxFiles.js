@@ -13,13 +13,19 @@ const { refreshDropboxToken } = require("./refreshToken");
 
     // List files in the root folder
     const folderContent = await dbx.filesListFolder({ path: "" });
+    const entries = folderContent.result.entries;
 
-
-    console.log("Files in folder:", folderContent.entries);
+    console.log("Files in folder:", entries.map((entry) => entry.path_display));
 
     // Download specific file
     const filePath = "/Wisconsin-Ashland-18012340000-01-07-2025-contours.png";
-    const response = await dbx.filesDownload({ path: filePath });
+    const file = entries.find((entry) => entry.path_display === filePath);
+    if (!file) {
+      throw new Error(
+        `Dropbox file not found: ${filePath}. Check the listed paths above.`
+      );
+    }
+    const response = await dbx.filesDownload({ path: file.path_lower });
 
     // Save the file locally
     fs.writeFileSync(
@@ -29,6 +35,9 @@ const { refreshDropboxToken } = require("./refreshToken");
     );
     console.log(`File downloaded: ${response.result.name}`);
   } catch (error) {
-    console.error("Error:", error);
+    console.error(
+      "Error:",
+      error?.error?.error_summary || error.message || error
+    );
   }
 })();

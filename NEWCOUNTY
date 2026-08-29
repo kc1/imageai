@@ -44,7 +44,7 @@ db.yourCollection.updateMany(
 
 upload to atlas MonroeFiltered
 
-then export a csv without geodata and open in a google sheet
+then export a csv without geodata and import in a google sheet
 
 6. I then want to set up a new sheet and push the seth clasp repo to it:
 
