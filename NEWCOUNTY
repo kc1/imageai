@@ -4,12 +4,18 @@ based on this - mississippi
 
 https://maris.mississippi.edu/HTML/DATA/data_Cadastral/CadastralFramework.html#gsc.tab=0
 
+for the individual counties:
+
+https://maris.mississippi.edu/MARISdata/Parcels/County_Parcels_by_Year/MS_County_Parcels_2024/
+
 1) I downloaded the single county data for alcorn county mississippi.
+
+Switch to geoData 
 
 2) After moving zip file contents to SHAPEFILES/ , 
 a) extract it if in zip
 b) import it into a coll using 
-shpToJSON.js.
+shpToJSON.js. Note : replace xxx with collection name:
 c) run: $ node shpToJSON.js monroe ./SHAPEFILES/MDEQ_MONROE_PARCELS
 
 3) Then you can look at data.
@@ -32,21 +38,22 @@ db.yourCollection.updateMany(
   ]
 ) 
 
-5)  next use: {
- filter: {
-  GISACRES: {
-   $gte: 4
-  },
-  IMPVAL1: 0,
-  IMPVAL2: 0
- }
-} export to new collection - MonroeFiltered.json
+5)  next use:  
 
-upload to atlas MonroeFiltered
+{ GISACRES: {$gte: 4}, IMPVAL1: 0, IMPVAL2: 0 }
 
-then export a csv without geodata and import in a google sheet
+export as JSON to new collection - MonroeFiltered.json
 
-6. I then want to set up a new sheet and push the seth clasp repo to it:
+upload to ATLAS MonroeFiltered
+
+then export as a CSV without geometry field and import in a google sheet
+
+6) Fix up sheet adding:
+
+ID	RoadURL	RoadAvailable	NealNotes	BuildingURL	StructuresPresent	NealNotes2	WaterURL	Buildable	ContourURL	ContourResponse	POINTS	LON	LAT
+
+
+7. I then want to set up a new sheet and push the seth clasp repo to it:
 
 1975  git clone https://github.com/kc1/gscriptSETHclasp.git monroe
  1976  ls -la
