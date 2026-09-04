@@ -16,6 +16,7 @@ const createPropertyMap = require("./sharp.js").createPropertyMap;
 const dropboxV2Api = require("dropbox-v2-api");
 const { Dropbox } = require("dropbox");
 require("dotenv").config();
+require("dotenv").config({ path: ".env.dropbox" });
 const { MongoClient } = require("mongodb");
 const dns = require("dns");
 var murl = process.env.MONGODB_URI;
@@ -55,7 +56,28 @@ const { launchBrowser } = require("./patchright2.js");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
 const { performTestAPN, performTestLatLon } = require("./tests/SETH2.spec.js");
-const { refreshDropboxToken } = require("./refreshToken.js");
+async function refreshDropboxToken() {
+  const params = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: process.env.SOURCE_DROPBOX_REFRESH_TOKEN,
+    client_id: process.env.SOURCE_DROPBOX_APP_KEY,
+    client_secret: process.env.SOURCE_DROPBOX_APP_SECRET,
+  });
+
+  const response = await fetch("https://api.dropbox.com/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Dropbox token refresh failed: ${response.status} ${await response.text()}`,
+    );
+  }
+
+  return response.json();
+}
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
@@ -203,7 +225,7 @@ async function takeScreenShots2(body) {
   let browser;
 
   try {
-    const { uploadToDropbox } = require("./uploadToDropbox.js");
+    // const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
 
     const filterObj = { status: "PENDING" };
