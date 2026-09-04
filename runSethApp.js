@@ -275,6 +275,7 @@ async function takeScreenShots2(body) {
         const sourceCollection = task.sourceCollection;
         let sourceFilterObj = { PARNO: PARNO };
         console.log("sourceCollection:", sourceCollection);
+        const spreadsheetName = task.spreadsheetName || "Unknown";
 
         let output = await fetchMongoDBData(sourceFilterObj, sourceCollection);
         let fullPropertyRecords = output.documents;
@@ -297,7 +298,7 @@ async function takeScreenShots2(body) {
           );
           console.log(bufferedGeoJSON);
           const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
-          const roadFile = `${modifiedPARNO}-${ts}-road.png`;
+          const roadFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
 
           console.log("");
           // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
@@ -364,7 +365,7 @@ async function takeScreenShots2(body) {
             await upsertOneToBucket(TasksCollection, task);
           }
         } else if (task.type === "BuildingURL") {
-          const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
+          const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
 
           await page.waitForTimeout(3000);
           console.log(originalGeoJSON);
@@ -445,7 +446,7 @@ async function takeScreenShots2(body) {
         } else if (task.type === "WaterURL") {
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
-          const waterFileName = `${modifiedPARNO}-${ts}-water.png`;
+          const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
           const base64Data = await generateCombinedMap(
             fullPropertyRecord,
             1200,
