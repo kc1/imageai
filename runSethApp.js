@@ -56,6 +56,7 @@ const { launchBrowser } = require("./patchright2.js");
 // const { launchBrowser } = require("./stealthPlaywright");
 const { performTest, login } = require("./tests/test-5.spec.ts");
 const { performTestAPN, performTestLatLon } = require("./tests/SETH2.spec.js");
+
 async function refreshDropboxToken() {
   const params = new URLSearchParams({
     grant_type: "refresh_token",
@@ -83,6 +84,7 @@ const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 const { upsertOneToBucket } = require("./updateBucket.js");
 const { closeEngagementPopups, setBasemap } = require("./overlay.js");
 const { addBuffer, buildGEOJSONIOurl } = require("./turfUtilities.js");
+const { uploadToDropbox } = require("./uploadToDropbox.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
 
