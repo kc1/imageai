@@ -25,6 +25,7 @@
     "node-fetch": "^2.7.0",
     "node-fetch2": "^1.6.3",
     "ogr2ogr": "^7.0.0",
+    "p-limit": "^2.3.0",
     "patchright": "^1.58.2",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sharp": "^0.33.5"
