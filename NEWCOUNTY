@@ -48,6 +48,14 @@ upload to ATLAS MonroeFiltered
 
 then export as a CSV without geometry field and import in a google sheet
 
+Note: 
+
+PARNO should be imported as a string because it can look like:
+
+'0101000010001 , which if imported as a number is interpreted as
+101000010001 by sheets. this lead to a mismatch when the task record
+info is used to look up a CountyFiltered record
+
 6) Fix up sheet adding:
 
 ID	RoadURL	RoadAvailable	NealNotes	BuildingURL	StructuresPresent	NealNotes2	WaterURL	Buildable	ContourURL	ContourResponse	POINTS	LON	LAT

@@ -60,13 +60,9 @@ const { performTestAPN, performTestLatLon } = require("./tests/SETH2.spec.js");
 async function refreshDropboxToken() {
   const params = new URLSearchParams({
     grant_type: "refresh_token",
-    /*  refresh_token: process.env.SOURCE_DROPBOX_REFRESH_TOKEN,
+    refresh_token: process.env.SOURCE_DROPBOX_REFRESH_TOKEN,
     client_id: process.env.SOURCE_DROPBOX_APP_KEY,
     client_secret: process.env.SOURCE_DROPBOX_APP_SECRET,
-     */
-    refresh_token: process.env.DEST_DROPBOX_REFRESH_TOKEN,
-    client_id: process.env.DEST_DROPBOX_APP_KEY,
-    client_secret: process.env.DEST_DROPBOX_APP_SECRET,
   });
 
   const response = await fetch("https://api.dropbox.com/oauth2/token", {
@@ -96,7 +92,6 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 const { getSharedLink } = require("./getSharedLink.js");
-const { type } = require("os");
 
 async function deletePngFiles(folderPath) {
   try {
@@ -235,11 +230,7 @@ async function takeScreenShots2(body) {
     // const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
 
-    // const filterObj = { status: "PENDING" };
-    const filterObj = {
-      sourceCollection: "CalhounFiltered",
-      status: "PENDING",
-    };
+    const filterObj = { status: "PENDING" };
     // const filterObj = {sourceCollection: "alcornMERGED2subset", status: "PENDING", type: "WaterURL" };
     // const filterObj = { status: "PENDING", type: "WaterURL" };
     // alcornMERGED2subset
@@ -263,7 +254,6 @@ async function takeScreenShots2(body) {
     // sort tasks by ID in ascending order
     tasks.sort((a, b) => a.ID - b.ID);
     tasks = tasks.slice(0, num || tasks.length);
-
     const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
     const dbx = new Dropbox({
@@ -305,12 +295,10 @@ async function takeScreenShots2(body) {
         }; */
         await new Promise((resolve) => setTimeout(resolve, 5000));
         const task = tasks[i];
-        const myPARNO = task.PARNO || false;
-        console.log("type of PARNO", typeof myPARNO);
+        const PARNO = task.PARNO || false;
         const sourceCollection = task.sourceCollection;
-        let sourceFilterObj = { PARNO: myPARNO };
+        let sourceFilterObj = { PARNO: PARNO };
         console.log("sourceCollection:", sourceCollection);
-        console.log("sourceFilterObj:", sourceFilterObj);
         const spreadsheetName = task.spreadsheetName || "Unknown";
 
         let output = await fetchMongoDBData(sourceFilterObj, sourceCollection);
@@ -327,7 +315,6 @@ async function takeScreenShots2(body) {
         const modifiedPARNO = fullPropertyRecord.PARNO.replace(/ /g, "-");
 
         if (task.type === "RoadURL") {
-
           const bufferedGeoJSON = await addBuffer(
             originalGeoJSON,
             50 * 0.000189394,
@@ -374,8 +361,8 @@ async function takeScreenShots2(body) {
           } catch (err) {
             console.error("Error selecting Standard layer:", err);
           }
-          await page.waitForTimeout(4000);
 
+          await page.waitForTimeout(4000);
           await page.screenshot({
             path: "./screenshots/" + roadFile,
             fullPage: true,
@@ -391,7 +378,7 @@ async function takeScreenShots2(body) {
           // Ensure uploadData and the returned result files exist before accessing path_lower
           if (!resultRoadFile) {
             console.error(
-              "resultRoadFile is null or undefined for fullPropertyRecord:",
+              "resultRoadFile is null or undefined forfullPropertyRecord:",
               fullPropertyRecord,
             );
           } else {
@@ -401,7 +388,6 @@ async function takeScreenShots2(body) {
             task.status = "COMPLETED";
             await upsertOneToBucket(TasksCollection, task);
           }
-
         } else if (task.type === "BuildingURL") {
           const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
 
@@ -493,7 +479,7 @@ async function takeScreenShots2(body) {
           console.log("base64Data:", base64Data);
 
           await page.waitForTimeout(1000);
-          // Define exact local directory path
+                    // Define exact local directory path
           const outputFolder = path.join(__dirname, "screenshots");
           const filePath = path.join(outputFolder, waterFileName);
 
