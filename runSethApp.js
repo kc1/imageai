@@ -335,7 +335,7 @@ async function takeScreenShots2(body) {
           );
           console.log(bufferedGeoJSON);
           const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
-          const roadFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
+          const roadFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
 
           console.log("");
           // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
@@ -377,13 +377,13 @@ async function takeScreenShots2(body) {
           await page.waitForTimeout(4000);
 
           await page.screenshot({
-            path: "./screenshots/" + roadFile,
+            path: "./screenshots/" + roadFileName,
             fullPage: true,
           });
 
           let resultRoadFile = await uploadToDropbox(
-            roadFile,
-            "./screenshots/" + roadFile,
+            roadFileName,
+            "./screenshots/" + roadFileName,
             dropboxToken,
           );
           console.log(resultRoadFile);
