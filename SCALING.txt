@@ -1,0 +1,9 @@
+When running multiple counties, If you cant figure out what holdup is:
+
+1) Make sure OPENROUTER key is topped up
+
+2) Is there enouph room in storage? - may need to switch to MEGA account.
+
+3) If nescesary delete entire TASKS collection, create a new blank TASKS
+
+4) Then delete all PUSHED in each sheet being processed. 
