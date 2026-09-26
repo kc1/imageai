@@ -46,7 +46,35 @@ export as JSON to new collection - MonroeFiltered.json
 
 upload to ATLAS MonroeFiltered
 
-then export as a CSV without geometry field and import in a google sheet
+6. I then want to set up a new sheet using MULTICLASP:
+
+First, create a new folder for NEWCOUNTY
+
+(base) ubuntu@penguin:~/node/multiClasp$ cp -r alcorn/ choctaw/
+
+7. Next Login as optionhomes:
+
+  npx clasp login
+  
+  WE ARE CREATING NEW SHEET at Command Line:
+  
+  move into new folder, remove .clasp.json and appsscript.json, then:
+
+cd ~/node/multiClasp/choctaw/build
+npx clasp create-script --title "Choctaw" --type sheets
+npx clasp push
+
+THIS creates sheet and pushes app script to New Sheet
+
+Other commands:
+
+ 1982  npx clasp login
+ 1983  npx clasp logout
+ 1990  npx clasp pull
+
+
+
+8. Now back to ATLAS MonroeFiltered:  export as a CSV without geometry field and import into created sheet
 
 Note: 
 
@@ -61,34 +89,9 @@ info is used to look up a CountyFiltered record
 ID	RoadURL	RoadAvailable	NealNotes	BuildingURL	StructuresPresent	NealNotes2	WaterURL	Buildable	ContourURL	ContourResponse	POINTS	LON	LAT
 
 
-7. I then want to set up a new sheet and push the seth clasp repo to it:
 
-1975  git clone https://github.com/kc1/gscriptSETHclasp.git monroe
- 1976  ls -la
- 1977  npm install
- 1978  clasp login
- 1979  sudo apt install clasp
- 1980  ls -la
- 1981  clasp login
- 1982  npx clasp login
- 1983  npx clasp logout
- 1984  npx clasp npx clasp create-script --title "Monroe" --type sheets --parentID 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
- 1985  npx clasp create-script --title "Monroe" --type sheets --parentID 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
- 1986  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
- 1987  npx clasp login
- 1988  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
- 1989  npx clasp push
- 1990  npx clasp pull
- 1991  npx clasp push
- 1992  npx clasp push --force
- 1993  npx clasp push
- 1995  npx clasp create-script --title "Monroe" --type sheets --parentId 1syPd_P9ahiLOofnG2e01hFREuhT3ZOQfhiTkhLHQ4oI
-
-
-7. I'd like to set things up to have a mongo unique id using a point{
+9. I'd like to set things up to have a mongo unique id using a point{
   _id: [lon, lat],
   // other fields...
 } lets call it GEOID, alongside myId, you can then add a geoindex:
 /*  db.yourCollection.createIndex({ geoId: "2dsphere" }) as well as a unique
-
-5) send Seth a sample of data as a csv 

@@ -2,12 +2,21 @@ const { Storage } = require('megajs')
 
 // Node doesn't support top-level await when using CJS
 async function megaLogin() {
-  const storage = await new Storage({
-    email: 'realoption11@gmail.com',
-    password: 'MegaMega1$'
-  }).ready;
-  return storage;
+  console.log('Logging into MEGA...');
+  try {
+    const storage = await new Storage({
+      email: 'realoption11@gmail.com',
+      password: 'MegaMega1$'
+    }).ready;
+    console.log('Successfully logged into MEGA.');
+    return storage;
+  } catch (error) {
+    console.error('Error logging into MEGA:', error);
+    process.exit(1);
+  }
 }
+
+
 
   /* const file = await storage.upload('./toMove.txt', 'Hello world!').complete
   console.log('The file was uploaded!', file) */

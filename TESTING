@@ -9,7 +9,7 @@
 }
 '
 
-2) keep in mind you also need ro run geojson.io in a seperate terminal:
+2) keep in mind you also need to run geojson.io in a seperate terminal:
 
 (base) ubuntu@penguin:~/node/geojsonio$ 
 
