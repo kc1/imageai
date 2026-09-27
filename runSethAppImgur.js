@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
+const path = require("path");
 
 // Add JSON middleware
 app.use(express.json());
@@ -65,10 +66,10 @@ const { addBuffer, buildGEOJSONIOurl } = require("./turfUtilities.js");
 const { uploadToDropbox } = require("./uploadToDropbox.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
-const megaStorage = require("./uploadToMEGA.js").megaLogin;
+const imgurStorage = require("./uploadToIMGUR.js");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const path = require("path");
+const myPath = require("path");
 const { getSharedLink } = require("./getSharedLink.js");
 const { type } = require("os");
 
@@ -78,7 +79,7 @@ async function deletePngFiles(folderPath) {
     const files = await fsPromises.readdir(folderPath);
     // Filter out files that have a .png extension
     const pngFiles = files.filter(
-      (file) => path.extname(file).toLowerCase() === ".png",
+      (file) => myPath.extname(file).toLowerCase() === ".png",
     );
 
     // Loop through the filtered files and delete each one
@@ -256,7 +257,7 @@ async function takeScreenShots2(body) {
     });
 
     for (let i = 0; i < 1; i++) {
-    // for (let i = 0; i < tasks.length; i++) {
+      // for (let i = 0; i < tasks.length; i++) {
       console.log(`Processing task #${i + 1} of ${tasks.length}`);
       try {
         const pagesToClose = context.pages().slice(-2);
@@ -351,11 +352,19 @@ async function takeScreenShots2(body) {
           }
           await page.waitForTimeout(4000);
 
-          /*           await page.screenshot({
-            path: "./screenshots/" + roadFileName,
+          const roadScreenshotPath = myPath.resolve(
+            __dirname,
+            "screenshots",
+            roadFileName,
+          );
+          await page.screenshot({
+            path: roadScreenshotPath,
             fullPage: true,
           });
- */
+
+          const sharedRoadLink =
+            await imgurStorage.uploadImageToImgBB(roadScreenshotPath);
+
           /*           let resultRoadFile = await uploadToDropbox(
             roadFileName,
             "./screenshots/" + roadFileName,
@@ -363,20 +372,20 @@ async function takeScreenShots2(body) {
           );
           console.log(resultRoadFile);
   */
-          const buffer = await page.screenshot({
+          /* const buffer = await page.screenshot({
             type: "png",
             fullPage: true,
           });
+ */
+          // console.log(Buffer.isBuffer(buffer)); // true
 
-          console.log(Buffer.isBuffer(buffer)); // true
-
-          const megaStorageClient = await megaStorage();
-          const roadUpload = await megaStorageClient.upload(
+          // const megaStorageClient = await megaStorage();
+          /* const roadUpload = await megaStorageClient.upload(
             { name: roadFileName, size: buffer.length },
             buffer,
           ).complete;
           const sharedRoadLink = await roadUpload.link();
-
+ */
           // Ensure uploadData and the returned result files exist before accessing path_lower
           if (!sharedRoadLink) {
             console.error(
@@ -447,20 +456,24 @@ async function takeScreenShots2(body) {
           });
           await buildingPage.close();
 
-          const buffer = await page.screenshot({
+          /* const buffer = await page.screenshot({
             type: "png",
             fullPage: true,
           });
+ */
+          // console.log(Buffer.isBuffer(buffer)); // true
 
-          console.log(Buffer.isBuffer(buffer)); // true
+          const sharedBuildingLink = await imgurStorage.uploadImageToImgBB(
+            "./screenshots/" + buildingFile,
+          );
 
-          const megaStorageClient = await megaStorage();
+          /*           const megaStorageClient = await megaStorage();
           const resultBuildingUpload = await megaStorageClient.upload(
             { name: buildingFile, size: buffer.length },
             buffer,
           ).complete;
           const sharedBuildingLink = await resultBuildingUpload.link();
-
+ */
           // Ensure uploadData and the returned result files exist before accessing path_lower
           if (!sharedBuildingLink) {
             console.error(
@@ -501,12 +514,7 @@ async function takeScreenShots2(body) {
           fs.writeFileSync(filePath, waterUploadBuffer);
           console.log(`Saved custom water map to: ${filePath}`);
 
-          const megaStorageClient = await megaStorage();
-          const resultWaterUpload = await megaStorageClient.upload(
-            { name: waterFileName, size: waterUploadBuffer.length },
-            waterUploadBuffer,
-          ).complete;
-          const sharedWaterLink = await resultWaterUpload.link();
+          const sharedWaterLink = await imgurStorage.uploadImageToImgBB(filePath);
 
           if (!sharedWaterLink) {
             console.error(

@@ -84,13 +84,18 @@ PARNO should be imported as a string because it can look like:
 101000010001 by sheets. this lead to a mismatch when the task record
 info is used to look up a CountyFiltered record
 
-6) Fix up sheet adding:
+9) Fix up sheet adding:
 
 ID	RoadURL	RoadAvailable	NealNotes	BuildingURL	StructuresPresent	NealNotes2	WaterURL	Buildable	ContourURL	ContourResponse	POINTS	LON	LAT
 
+10. Fix Script:
+
+const dataSourceCollection = "ChoctawFiltered"; // Specify the collection name
+const ssId = "1KCKatrqT1tDGyXbeJkiI"; //Spreadsheet ID
+const ss = SpreadsheetApp.openById(ssId);
 
 
-9. I'd like to set things up to have a mongo unique id using a point{
+11. I'd like to set things up to have a mongo unique id using a point{
   _id: [lon, lat],
   // other fields...
 } lets call it GEOID, alongside myId, you can then add a geoindex:
