@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-const path = require("path");
 
 // Add JSON middleware
 app.use(express.json());
@@ -58,6 +57,32 @@ const { launchBrowser } = require("./patchright2.js");
 const { performTest, login } = require("./tests/test-5.spec.ts");
 const { performTestAPN, performTestLatLon } = require("./tests/SETH2.spec.js");
 
+async function refreshDropboxToken() {
+  const params = new URLSearchParams({
+    grant_type: "refresh_token",
+    /*  refresh_token: process.env.SOURCE_DROPBOX_REFRESH_TOKEN,
+    client_id: process.env.SOURCE_DROPBOX_APP_KEY,
+    client_secret: process.env.SOURCE_DROPBOX_APP_SECRET,
+     */
+    refresh_token: process.env.DEST_DROPBOX_REFRESH_TOKEN,
+    client_id: process.env.DEST_DROPBOX_APP_KEY,
+    client_secret: process.env.DEST_DROPBOX_APP_SECRET,
+  });
+
+  const response = await fetch("https://api.dropbox.com/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Dropbox token refresh failed: ${response.status} ${await response.text()}`,
+    );
+  }
+
+  return response.json();
+}
 const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 // const { getDaysAgoString } = require("./getMongoData");
 const { upsertOneToBucket } = require("./updateBucket.js");
@@ -66,10 +91,10 @@ const { addBuffer, buildGEOJSONIOurl } = require("./turfUtilities.js");
 const { uploadToDropbox } = require("./uploadToDropbox.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
-const imgurStorage = require("./uploadToIMGUR.js");
+const megaStorage = require("./uploadToMEGA.js").megaLogin;
 const fs = require("fs");
 const fsPromises = fs.promises;
-const myPath = require("path");
+const path = require("path");
 const { getSharedLink } = require("./getSharedLink.js");
 const { type } = require("os");
 
@@ -79,7 +104,7 @@ async function deletePngFiles(folderPath) {
     const files = await fsPromises.readdir(folderPath);
     // Filter out files that have a .png extension
     const pngFiles = files.filter(
-      (file) => myPath.extname(file).toLowerCase() === ".png",
+      (file) => path.extname(file).toLowerCase() === ".png",
     );
 
     // Loop through the filtered files and delete each one
@@ -210,13 +235,12 @@ async function takeScreenShots2(body) {
     // const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
 
-    // const filterObj = { status: "PENDING" };
-
-    const filterObj = {
-      sourceCollection: "ChoctawFiltered",
+    const filterObj = { status: "PENDING" };
+    /* const filterObj = {
+      sourceCollection: "PrentissFiltered",
       status: "PENDING",
-    };
-
+    }; */
+    // const filterObj = {sourceCollection: "alcornMERGED2subset", status: "PENDING", type: "WaterURL" };
     // const filterObj = { status: "PENDING", type: "WaterURL" };
     // alcornMERGED2subset
 
@@ -240,12 +264,12 @@ async function takeScreenShots2(body) {
     tasks.sort((a, b) => a.ID - b.ID);
     tasks = tasks.slice(0, num || tasks.length);
 
-    /*     const data = await refreshDropboxToken();
+    const data = await refreshDropboxToken();
     const dropboxToken = data.access_token;
     const dbx = new Dropbox({
       accessToken: dropboxToken,
     });
- */
+
     browser = await launchBrowser();
     const context = await browser.newContext({
       permissions: ["geolocation"],
@@ -256,8 +280,7 @@ async function takeScreenShots2(body) {
       javaScriptEnabled: true,
     });
 
-    for (let i = 0; i < 1; i++) {
-      // for (let i = 0; i < tasks.length; i++) {
+    for (let i = 0; i < tasks.length; i++) {
       console.log(`Processing task #${i + 1} of ${tasks.length}`);
       try {
         const pagesToClose = context.pages().slice(-2);
@@ -304,6 +327,7 @@ async function takeScreenShots2(body) {
         const modifiedPARNO = fullPropertyRecord.PARNO.replace(/ /g, "-");
 
         if (task.type === "RoadURL") {
+
           const bufferedGeoJSON = await addBuffer(
             originalGeoJSON,
             50 * 0.000189394,
@@ -313,7 +337,7 @@ async function takeScreenShots2(body) {
           const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
           const roadFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
 
-          console.log(roadFileName);
+          console.log("");
           // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
           await page.goto(bufferedGeoJSONURL);
 
@@ -352,51 +376,32 @@ async function takeScreenShots2(body) {
           }
           await page.waitForTimeout(4000);
 
-          const roadScreenshotPath = myPath.resolve(
-            __dirname,
-            "screenshots",
-            roadFileName,
-          );
           await page.screenshot({
-            path: roadScreenshotPath,
+            path: "./screenshots/" + roadFileName,
             fullPage: true,
           });
 
-          const sharedRoadLink =
-            await imgurStorage.uploadImageToImgBB(roadScreenshotPath);
-
-          /*           let resultRoadFile = await uploadToDropbox(
+          let resultRoadFile = await uploadToDropbox(
             roadFileName,
             "./screenshots/" + roadFileName,
             dropboxToken,
           );
           console.log(resultRoadFile);
-  */
-          /* const buffer = await page.screenshot({
-            type: "png",
-            fullPage: true,
-          });
- */
-          // console.log(Buffer.isBuffer(buffer)); // true
 
-          // const megaStorageClient = await megaStorage();
-          /* const roadUpload = await megaStorageClient.upload(
-            { name: roadFileName, size: buffer.length },
-            buffer,
-          ).complete;
-          const sharedRoadLink = await roadUpload.link();
- */
           // Ensure uploadData and the returned result files exist before accessing path_lower
-          if (!sharedRoadLink) {
+          if (!resultRoadFile) {
             console.error(
-              "sharedRoadLink is null or undefined for fullPropertyRecord:",
+              "resultRoadFile is null or undefined for fullPropertyRecord:",
               fullPropertyRecord,
             );
           } else {
+            let sharedRoadLink =
+              (await getSharedLink(dbx, resultRoadFile.path_lower)) || "";
             task.link = sharedRoadLink;
             task.status = "COMPLETED";
             await upsertOneToBucket(TasksCollection, task);
           }
+
         } else if (task.type === "BuildingURL") {
           const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
 
@@ -456,31 +461,22 @@ async function takeScreenShots2(body) {
           });
           await buildingPage.close();
 
-          /* const buffer = await page.screenshot({
-            type: "png",
-            fullPage: true,
-          });
- */
-          // console.log(Buffer.isBuffer(buffer)); // true
-
-          const sharedBuildingLink = await imgurStorage.uploadImageToImgBB(
+          let resultBuildingFile = await uploadToDropbox(
+            buildingFile,
             "./screenshots/" + buildingFile,
+            dropboxToken,
           );
+          console.log(resultBuildingFile);
 
-          /*           const megaStorageClient = await megaStorage();
-          const resultBuildingUpload = await megaStorageClient.upload(
-            { name: buildingFile, size: buffer.length },
-            buffer,
-          ).complete;
-          const sharedBuildingLink = await resultBuildingUpload.link();
- */
           // Ensure uploadData and the returned result files exist before accessing path_lower
-          if (!sharedBuildingLink) {
+          if (!resultBuildingFile) {
             console.error(
-              "sharedBuildingLink is null or undefined for fullPropertyRecord:",
+              "resultBuildingFile is null or undefined for fullPropertyRecord:",
               fullPropertyRecord,
             );
           } else {
+            let sharedBuildingLink =
+              (await getSharedLink(dbx, resultBuildingFile.path_lower)) || "";
             task.link = sharedBuildingLink;
             task.status = "COMPLETED";
             await upsertOneToBucket(TasksCollection, task);
@@ -489,39 +485,44 @@ async function takeScreenShots2(body) {
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
           const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
-          const customWaterImageBuffer = await generateCombinedMap(
+          const base64Data = await generateCombinedMap(
             fullPropertyRecord,
             1200,
             800,
           );
-          const waterUploadBuffer = Buffer.isBuffer(customWaterImageBuffer)
-            ? customWaterImageBuffer
-            : Buffer.from(customWaterImageBuffer, "base64");
-
-          console.log(
-            "waterUploadBuffer isBuffer:",
-            Buffer.isBuffer(waterUploadBuffer),
-          );
+          console.log("base64Data:", base64Data);
 
           await page.waitForTimeout(1000);
+          // Define exact local directory path
           const outputFolder = path.join(__dirname, "screenshots");
           const filePath = path.join(outputFolder, waterFileName);
 
+          // Ensure the directory exists
           if (!fs.existsSync(outputFolder)) {
             fs.mkdirSync(outputFolder, { recursive: true });
           }
 
-          fs.writeFileSync(filePath, waterUploadBuffer);
-          console.log(`Saved custom water map to: ${filePath}`);
+          // Write file directly to disk
+          fs.writeFileSync(filePath, base64Data, "base64");
+          console.log(`Saved screenshot to: ${filePath}`);
 
-          const sharedWaterLink = await imgurStorage.uploadImageToImgBB(filePath);
+          let resultWaterFile = null;
+          resultWaterFile = await uploadToDropbox(
+            waterFileName,
+            "./screenshots/" + waterFileName,
+            dropboxToken,
+          );
+          console.log(resultWaterFile);
 
-          if (!sharedWaterLink) {
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!resultWaterFile) {
             console.error(
-              "sharedWaterLink is null or undefined for fullPropertyRecord:",
+              "resultWaterFile is null or undefined for fullPropertyRecord:",
               fullPropertyRecord,
             );
           } else {
+            let sharedWaterLink =
+              (await getSharedLink(dbx, resultWaterFile.path_lower)) || "";
             task.link = sharedWaterLink;
             task.status = "COMPLETED";
             await upsertOneToBucket(TasksCollection, task);
