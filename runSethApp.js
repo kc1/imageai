@@ -317,7 +317,7 @@ async function takeScreenShots2(body) {
           // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
           await page.goto(bufferedGeoJSONURL);
 
-          await page.waitForTimeout(4000);
+          await page.waitForTimeout(5000);
 
           try {
             const leftHandle = await page.$(
@@ -350,7 +350,7 @@ async function takeScreenShots2(body) {
           } catch (err) {
             console.error("Error selecting Standard layer:", err);
           }
-          await page.waitForTimeout(4000);
+          await page.waitForTimeout(5000);
 
           const roadScreenshotPath = myPath.resolve(
             __dirname,
@@ -448,8 +448,8 @@ async function takeScreenShots2(body) {
               err,
             );
           }
-          await buildingPage.waitForTimeout(2000);
-          await page.waitForTimeout(4000);
+          await buildingPage.waitForTimeout(5000);
+          await page.waitForTimeout(5000);
           await buildingPage.screenshot({
             path: "./screenshots/" + buildingFile,
             fullPage: true,
@@ -503,7 +503,7 @@ async function takeScreenShots2(body) {
             Buffer.isBuffer(waterUploadBuffer),
           );
 
-          await page.waitForTimeout(1000);
+          await page.waitForTimeout(5000);
           const outputFolder = path.join(__dirname, "screenshots");
           const filePath = path.join(outputFolder, waterFileName);
 
