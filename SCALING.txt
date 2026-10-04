@@ -7,3 +7,7 @@ When running multiple counties, If you cant figure out what holdup is:
 3) If nescesary delete entire TASKS collection, create a new blank TASKS
 
 4) Then delete all PUSHED in each sheet being processed. 
+
+5) Make sure in imageai screenshot2: 
+
+    const filterObj = { status: "PENDING" };

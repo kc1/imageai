@@ -210,13 +210,13 @@ async function takeScreenShots2(body) {
     // const { uploadToDropbox } = require("./uploadToDropbox.js");
     console.log("body:", body);
 
-    // const filterObj = { status: "PENDING" };
+    const filterObj = { status: "PENDING" };
 
-    const filterObj = {
+    /* const filterObj = {
       sourceCollection: "ChoctawFiltered",
       status: "PENDING",
     };
-
+ */
     // const filterObj = { status: "PENDING", type: "WaterURL" };
     // alcornMERGED2subset
 
