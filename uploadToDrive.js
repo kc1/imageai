@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const { google } = require('googleapis');
 
-const credentialsPath =
+/* const credentialsPath =
     process.env.GOOGLE_APPLICATION_CREDENTIALS ||
     path.join(__dirname, '.env.google');
 const apikeys = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
-
+ */
 // Define the scope for Google Drive API
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const DRIVE_FOLDER_ID = '';
