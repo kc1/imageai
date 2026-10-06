@@ -9,7 +9,7 @@ const apikeys = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
 // Define the scope for Google Drive API
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const DRIVE_FOLDER_ID = '1V8fCFSKOvZB0CdR5y0vbch0MBqwJbx5T';
+const DRIVE_FOLDER_ID = '';
 
 // Function to authorize and get access to Google Drive API
 async function authorize() {
