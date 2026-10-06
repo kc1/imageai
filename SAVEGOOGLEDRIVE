@@ -1,0 +1,17 @@
+https://dev.to/mearjuntripathi/upload-files-on-drive-with-nodejs-15j2
+
+{"web":{"client_id":"783471517684-anpib1l5j54soqljh7g32tfmne50fjv0.apps.googleusercontent.com","project_id":"gifted-harmony-510716-c0","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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"}}
+
+{
+  "type": "service_account",
+  "project_id": "gifted-harmony-510716-c0",
+  "private_key_id": "1b783c3ea1c8651468a96ebf347ad72b13cc0cdc",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDS+CbdmttXMCDo\nT/q2QuPT++0SQvBg8Bckw3vY6cJ7MQGbuv1m7gJ+Ks/Awiw99jzc2AYoz5gVz/vb\nNvC/R0lnzkuMWEsaMHopgcVmZ3vQ7GYDg7dAHhInPSiaITekyc0ReYpcosjYypXo\nKAVVxG36rya8wb7vIipcwmVdhVnUDLnNv0FksztxBJjrsm+cK/mwaW3tqIurqHgD\n+BL1Y8rG/MUuZrjfk2BKxkAszlj0Hn5CRUYvPaW9pM6Y+jvi2yihrtDlda0HPMZa\ntBQzXGWec0+hP8S7ybae4wwGv0qJsVWRRYuaUGW6q92ZKxQvKrOhgnZ0Ma6PH5uB\na3el6qr1AgMBAAECggEAAZQTuQgQk2LBIZvU6gouvtudVsv4v8ZBa2f/BDdzhLfF\nevnM2DlNps4BMesB/mYE5zjCiwmf6gHdW4gvXZmrRe3i3iZG9ueH8nQ4cDS0AMh+\nrDtkYplsVK4oy0Zrrn2dXX/FoOh4N48Ed3Eyi7AQNpZFjuylgLqGYJ1KZDG8OKbq\n5nB8qsEz77N2K5cF9qzNW+zW2gWLNkdk2jhxHpV4IksQj/g6sr3p7aWRMdgD1LgC\nqfgAcVH0ru/p/Hqo5HcfWKtqGXRrjgyPy9B+oclZpWKkXbkqkai7b/Qa09XossbH\nCSPbqkFLnpOP+9KufYE6Xsc+CtJJ5czT4sCd/A7GXQKBgQD8E/6xyA846lRYC12M\nAR1r+2vH8fka1Vv3ilmh6wIDgLv0IcgtEfe6DTCIewrtt98xfAhniCilUDpEMqx7\n9wSBlKY98UxosdDeRLxCGQlbNYc1SAZN5XWMh5qBucNCYJAkvpBnOvhjjWo2fqmM\nMdbIzmQUuracJJb8JnBlMWdM/wKBgQDWQGyfUpI+9xQ27fqgPTPHR5h6jEXbFrja\n0xdjzP1V7hbzUMY5gF3dz9xIcqeR1dNf7b5O6KhngoKY0CAiLwG8kLnbxGEgPP8L\nN8CYAOzVHs7+1boYQV/yvTM/rCSmhPGarViowEzDEgM7LU1VEzqS74OWbDZNXcx8\nEn7G69mkCwKBgA+hrcmYflkpLtHG4qYr64cmsChV+PyQ/oL7MVO5HwbYlM8uyRsC\nYjpHVxsfhi33mP+YkWzaJKsbroFMIyYMy1q9vRFaRUK4xBsEaCgxJUNirl+/d6Sc\n9g0g25Pv0QvssQOWTZ4ZKg4CVvPKJvlqnccWBV7DtU85daNtPssHpUBBAoGAQBa9\nZ1s3zAX00gmV8uDb4DyWa/IR41uEqFCEqqHjFhVGYDpFUWYIrhVDe5hwb7tao1Nm\nngwSdAQiNLvtIMyW5GUWc5rmwtH8KMrgnZeJQKcanDgqlp7XqLDX57ACtp0F+JLp\n9nCvhZqZxNXkUBKUbueeoRx1kecBCAwwSCi8zckCgYAvGEuPchk8GT9+ArmVq6EI\nJqUwlRmiwpdUR7p/H7HmKIM3WuzBXNFxXOmixz5SoDaiuQGx90AFjzaeo5ECNxUV\n9VP/dLMV0qVUZQ4XTooYzbOjJyNUq3dsGNun7qE9aCeVf0VLsUMvmG+1ovmsOrYz\n/+pDX3Pb10K9+eEz2utasQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "service1@gifted-harmony-510716-c0.iam.gserviceaccount.com",
+  "client_id": "108328063608521993988",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service1%40gifted-harmony-510716-c0.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -9,7 +9,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/runSethAppImgur.js"
+      "program": "${workspaceFolder}/runSethApp.js"
     }
   ]
 }

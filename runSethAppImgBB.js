@@ -14,8 +14,8 @@ const {
 const extractPropertyWetlands =
   require("./buildWetlandsLayer.js").extractPropertyWetlands;
 const createPropertyMap = require("./sharp.js").createPropertyMap;
-// const dropboxV2Api = require("dropbox-v2-api");
-// const { Dropbox } = require("dropbox");
+const dropboxV2Api = require("dropbox-v2-api");
+const { Dropbox } = require("dropbox");
 require("dotenv").config();
 require("dotenv").config({ path: ".env.dropbox" });
 const { MongoClient } = require("mongodb");
@@ -63,17 +63,15 @@ const { fetchMongoDBData, getDaysAgoString } = require("./getMongoData.js");
 const { upsertOneToBucket } = require("./updateBucket.js");
 const { closeEngagementPopups, setBasemap } = require("./overlay.js");
 const { addBuffer, buildGEOJSONIOurl } = require("./turfUtilities.js");
-// const { uploadToDropbox } = require("./uploadToDropbox.js");
+const { uploadToDropbox } = require("./uploadToDropbox.js");
 // const { login } = require("./tests/test-5.spec.ts");
 // const { log } = require("console");
-// const imgurStorage = require("./uploadToIMGUR.js");
-const gdriveStorage = require("./uploadToDrive.js");
+const imgurStorage = require("./uploadToIMGUR.js");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const myPath = require("path");
-// const { getSharedLink } = require("./getSharedLink.js");
+const { getSharedLink } = require("./getSharedLink.js");
 const { type } = require("os");
-const { env } = require("process");
 
 async function deletePngFiles(folderPath) {
   try {
@@ -227,9 +225,6 @@ async function takeScreenShots2(body) {
     const num = body.num || 30;
     console.log(filterObj);
 
-    const storage = process.env.storage || "./screenshots/";
-    const storageWebSite = process.env.storageWebSite || "https://image1.space";
-
     mongoClient = createMongoClient("buildScreenshotsFromLink");
     await mongoClient.connect();
     logMongoClientState(mongoClient, "Connected in takeScreenShots");
@@ -245,6 +240,12 @@ async function takeScreenShots2(body) {
     tasks.sort((a, b) => a.ID - b.ID);
     tasks = tasks.slice(0, num || tasks.length);
 
+    /*     const data = await refreshDropboxToken();
+    const dropboxToken = data.access_token;
+    const dbx = new Dropbox({
+      accessToken: dropboxToken,
+    });
+ */
     browser = await launchBrowser();
     const context = await browser.newContext({
       permissions: ["geolocation"],
@@ -310,6 +311,9 @@ async function takeScreenShots2(body) {
           );
           console.log(bufferedGeoJSON);
           const bufferedGeoJSONURL = await buildGEOJSONIOurl(bufferedGeoJSON);
+          const roadFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
+
+          console.log(roadFileName);
           // await loadGeoJSONInGeojsonIO(page, bufferedGeoJSON);
           await page.goto(bufferedGeoJSONURL);
 
@@ -346,38 +350,56 @@ async function takeScreenShots2(body) {
           } catch (err) {
             console.error("Error selecting Standard layer:", err);
           }
-
-          const roadFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-road.png`;
-          console.log(roadFileName);
           await page.waitForTimeout(5000);
-          const storedScreenshotPath = path.join(storage, roadFileName);
 
+          const roadScreenshotPath = myPath.resolve(
+            __dirname,
+            "screenshots",
+            roadFileName,
+          );
           await page.screenshot({
-            path: storedScreenshotPath,
+            path: roadScreenshotPath,
             fullPage: true,
           });
 
-          const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
-          if (screenshotInfo.size === 0) {
-            throw new Error(`Screenshot is empty: ${storedScreenshotPath}`);
-          }
-          console.log(
-            `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
-          );
-          sharedableRoadLink = storageWebSite + "/" + "storage/" + roadFileName;
-          console.log("sharedableRoadLink:", sharedableRoadLink);
-          task.link = sharedableRoadLink;
-          task.status = "COMPLETED";
+          const sharedRoadLink =
+            await imgurStorage.uploadImageToImgBB(roadScreenshotPath);
 
-          if (process.env.storage) {
-            await upsertOneToBucket(collection, property);
-          } else {
-            console.log(
-              "Skipping upsertOneToBucket because storage is not set",
+          /*           let resultRoadFile = await uploadToDropbox(
+            roadFileName,
+            "./screenshots/" + roadFileName,
+            dropboxToken,
+          );
+          console.log(resultRoadFile);
+  */
+          /* const buffer = await page.screenshot({
+            type: "png",
+            fullPage: true,
+          });
+ */
+          // console.log(Buffer.isBuffer(buffer)); // true
+
+          // const megaStorageClient = await megaStorage();
+          /* const roadUpload = await megaStorageClient.upload(
+            { name: roadFileName, size: buffer.length },
+            buffer,
+          ).complete;
+          const sharedRoadLink = await roadUpload.link();
+ */
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!sharedRoadLink) {
+            console.error(
+              "sharedRoadLink is null or undefined for fullPropertyRecord:",
+              fullPropertyRecord,
             );
+          } else {
+            task.link = sharedRoadLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
           }
-          // next: add building footprint screenshots using same GeoJSONobj and same process as above, but with different file name and property field (BuildingURL)
         } else if (task.type === "BuildingURL") {
+          const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
+
           await page.waitForTimeout(3000);
           console.log(originalGeoJSON);
           const originalGeoJSONurl = await buildGEOJSONIOurl(originalGeoJSON);
@@ -426,42 +448,47 @@ async function takeScreenShots2(body) {
               err,
             );
           }
-
-          await buildingPage.waitForTimeout(2000);
-          await page.waitForTimeout(4000);
-          const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
-          console.log(buildingFile);
+          await buildingPage.waitForTimeout(5000);
           await page.waitForTimeout(5000);
-          const storedScreenshotPath = path.join(storage, buildingFile);
-
-          await page.screenshot({
-            path: storedScreenshotPath,
+          await buildingPage.screenshot({
+            path: "./screenshots/" + buildingFile,
             fullPage: true,
           });
+          await buildingPage.close();
 
-          const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
-          if (screenshotInfo.size === 0) {
-            throw new Error(`Screenshot is empty: ${storedScreenshotPath}`);
-          }
-          console.log(
-            `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
+          /* const buffer = await page.screenshot({
+            type: "png",
+            fullPage: true,
+          });
+ */
+          // console.log(Buffer.isBuffer(buffer)); // true
+
+          const sharedBuildingLink = await imgurStorage.uploadImageToImgBB(
+            "./screenshots/" + buildingFile,
           );
-          sharedableBuildingLink =
-            storageWebSite + "/" + "storage/" + buildingFile;
-          console.log("sharedableBuildingLink:", sharedableBuildingLink);
-          task.link = sharedableBuildingLink;
-          task.status = "COMPLETED";
 
-          if (process.env.storage) {
-            await upsertOneToBucket(collection, property);
-          } else {
-            console.log(
-              "Skipping upsertOneToBucket because storage is not set",
+          /*           const megaStorageClient = await megaStorage();
+          const resultBuildingUpload = await megaStorageClient.upload(
+            { name: buildingFile, size: buffer.length },
+            buffer,
+          ).complete;
+          const sharedBuildingLink = await resultBuildingUpload.link();
+ */
+          // Ensure uploadData and the returned result files exist before accessing path_lower
+          if (!sharedBuildingLink) {
+            console.error(
+              "sharedBuildingLink is null or undefined for fullPropertyRecord:",
+              fullPropertyRecord,
             );
+          } else {
+            task.link = sharedBuildingLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
           }
         } else if (task.type === "WaterURL") {
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
 
+          const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
           const customWaterImageBuffer = await generateCombinedMap(
             fullPropertyRecord,
             1200,
@@ -476,56 +503,29 @@ async function takeScreenShots2(body) {
             Buffer.isBuffer(waterUploadBuffer),
           );
 
-
-          const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
           await page.waitForTimeout(5000);
-          const outputFolder = path.join(__dirname, storage);
-          const filePath = path.resolve(storage, waterFileName);
+          const outputFolder = path.join(__dirname, "screenshots");
+          const filePath = path.join(outputFolder, waterFileName);
 
           if (!fs.existsSync(outputFolder)) {
             fs.mkdirSync(outputFolder, { recursive: true });
           }
 
-          await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
-          await fsPromises.writeFile(filePath, waterUploadBuffer);
+          fs.writeFileSync(filePath, waterUploadBuffer);
+          console.log(`Saved custom water map to: ${filePath}`);
 
-          const waterInfo = await fsPromises.stat(filePath);
-          if (waterInfo.size === 0) {
-            throw new Error(`Water image is empty: ${filePath}`);
-          }
-          console.log(
-            `Water image saved (${waterInfo.size} bytes): ${filePath}`,
-          );
+          const sharedWaterLink =
+            await imgurStorage.uploadImageToImgBB(filePath);
 
-          await page.waitForTimeout(4000);
-          console.log(waterFileName);
-          await page.waitForTimeout(5000);
-          const storedScreenshotPath = path.join(storage, waterFileName);
-
-          await page.screenshot({
-            path: storedScreenshotPath,
-            fullPage: true,
-          });
-
-          const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
-          if (screenshotInfo.size === 0) {
-            throw new Error(`Screenshot is empty: ${storedScreenshotPath}`);
-          }
-          console.log(
-            `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
-          );
-          sharedableWaterLink =
-            storageWebSite + "/" + "storage/" + waterFileName;
-          console.log("sharedableWaterLink:", sharedableWaterLink);
-          task.link = sharedableWaterLink;
-          task.status = "COMPLETED";
-
-          if (process.env.storage) {
-            await upsertOneToBucket(collection, property);
-          } else {
-            console.log(
-              "Skipping upsertOneToBucket because storage is not set",
+          if (!sharedWaterLink) {
+            console.error(
+              "sharedWaterLink is null or undefined for fullPropertyRecord:",
+              fullPropertyRecord,
             );
+          } else {
+            task.link = sharedWaterLink;
+            task.status = "COMPLETED";
+            await upsertOneToBucket(TasksCollection, task);
           }
         } else if (task.type === "DUMMYVALUE") {
           // we have a task and fullPropertyRecord, now we can process the WaterURL type
@@ -571,7 +571,7 @@ async function takeScreenShots2(body) {
 
           await closeEngagementPopups(loggedInPage);
           await loggedInPage.screenshot({
-            path: storage + "screenshot-debug.png",
+            path: "./screenshots/screenshot-debug.png",
           });
           await loggedInPage.keyboard.press("Escape");
           await setBasemap(loggedInPage);
@@ -672,7 +672,7 @@ async function takeScreenShots2(body) {
             await upsertOneToBucket(collection, task);
           } catch (err) {
             const errorTs = new Date().toISOString().replace(/[:.]/g, "-");
-            const errorScreenshotPath = `${storage}ERROR-${errorTs}.png`;
+            const errorScreenshotPath = `./screenshots/ERROR-${errorTs}.png`;
             await loggedInPage
               .screenshot({
                 path: errorScreenshotPath,
@@ -780,7 +780,7 @@ async function processSethProp(body) {
 
     await closeEngagementPopups(loggedInPage);
     await loggedInPage.screenshot({
-      path: storage + "screenshot-debug.png",
+      path: "./screenshots/screenshot-debug.png",
     });
     await loggedInPage.keyboard.press("Escape");
     await setBasemap(loggedInPage);
@@ -849,7 +849,7 @@ async function processSethProp(body) {
         await upsertOneToBucket(collection, property);
       } catch (err) {
         const errorTs = new Date().toISOString().replace(/[:.]/g, "-");
-        const errorScreenshotPath = `${storage}ERROR-${errorTs}.png`;
+        const errorScreenshotPath = `./screenshots/ERROR-${errorTs}.png`;
         await loggedInPage
           .screenshot({
             path: errorScreenshotPath,
@@ -1111,14 +1111,14 @@ async function takeScreenShots(body) {
         await buildingPage.waitForTimeout(2000);
         await page.waitForTimeout(4000);
         await buildingPage.screenshot({
-          path: buildingScreenshotPath,
+          path: "./screenshots/" + buildingFile,
           fullPage: true,
         });
         await buildingPage.close();
 
         let resultBuildingFile = await uploadToDropbox(
           buildingFile,
-          buildingScreenshotPath,
+          "./screenshots/" + buildingFile,
           dropboxToken,
         );
         console.log(resultBuildingFile);
