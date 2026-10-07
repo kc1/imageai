@@ -370,7 +370,7 @@ async function takeScreenShots2(body) {
           task.status = "COMPLETED";
 
           if (process.env.storage) {
-            await upsertOneToBucket(TasksCollection, property);
+            await upsertOneToBucket(TasksCollection, task);
           } else {
             console.log(
               "Skipping upsertOneToBucket because storage is not set",
@@ -454,7 +454,7 @@ async function takeScreenShots2(body) {
           task.status = "COMPLETED";
 
           if (process.env.storage) {
-            await upsertOneToBucket(TasksCollection, property);
+            await upsertOneToBucket(TasksCollection, task);
           } else {
             console.log(
               "Skipping upsertOneToBucket because storage is not set",
