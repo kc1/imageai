@@ -219,7 +219,7 @@ async function takeScreenShots2(body) {
       status: "PENDING",
     };
  */
-    // const filterObj = { status: "PENDING", type: "WaterURL" };
+    // const filterObj = { status: "PENDING", type: "RoadURL" };
     // alcornMERGED2subset
 
     // const filterObj = { status: "PENDING", type: "BuildingURL" };
@@ -427,16 +427,15 @@ async function takeScreenShots2(body) {
             );
           }
 
-          await buildingPage.waitForTimeout(2000);
-          await page.waitForTimeout(4000);
+          await buildingPage.waitForTimeout(4000);
           
-          const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
+          const buildingFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
           
-          console.log(buildingFile);
-          await page.waitForTimeout(5000);
-          const storedScreenshotPath = path.join(storage, buildingFile);
+          console.log(buildingFileName);
+          await buildingPage.waitForTimeout(5000);
+          const storedScreenshotPath = path.join(storage, buildingFileName);
 
-          await page.screenshot({
+          await buildingPage.screenshot({
             path: storedScreenshotPath,
             fullPage: true,
           });
@@ -449,7 +448,7 @@ async function takeScreenShots2(body) {
             `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
           );
           sharedableBuildingLink =
-            storageWebSite + "/" + "storage/" + buildingFile;
+            storageWebSite + "/" + "storage/" + buildingFileName;
           console.log("sharedableBuildingLink:", sharedableBuildingLink);
           task.link = sharedableBuildingLink;
           task.status = "COMPLETED";
@@ -480,7 +479,7 @@ async function takeScreenShots2(body) {
 
 
           const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
-          await page.waitForTimeout(5000);
+          // await waterPage.waitForTimeout(5000);
           const outputFolder = path.join(__dirname, storage);
           const filePath = path.resolve(storage, waterFileName);
 
@@ -499,23 +498,24 @@ async function takeScreenShots2(body) {
             `Water image saved (${waterInfo.size} bytes): ${filePath}`,
           );
 
-          await page.waitForTimeout(4000);
+/*           await waterPage.waitForTimeout(4000);
           console.log(waterFileName);
-          await page.waitForTimeout(5000);
+          await waterPage.waitForTimeout(5000);
           const storedScreenshotPath = path.join(storage, waterFileName);
 
-          await page.screenshot({
+          await waterPage.screenshot({
             path: storedScreenshotPath,
             fullPage: true,
           });
-
-          const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
+ */
+/*           const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
           if (screenshotInfo.size === 0) {
             throw new Error(`Screenshot is empty: ${storedScreenshotPath}`);
           }
           console.log(
             `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
           );
+  */         
           sharedableWaterLink =
             storageWebSite + "/" + "storage/" + waterFileName;
           console.log("sharedableWaterLink:", sharedableWaterLink);
@@ -674,7 +674,7 @@ async function takeScreenShots2(body) {
             await upsertOneToBucket(collection, task);
           } catch (err) {
             const errorTs = new Date().toISOString().replace(/[:.]/g, "-");
-            const errorScreenshotPath = `${storage}ERROR-${errorTs}.png`;
+            const errorScreenshotPath = `${storage}-ERROR-${errorTs}.png`;
             await loggedInPage
               .screenshot({
                 path: errorScreenshotPath,
