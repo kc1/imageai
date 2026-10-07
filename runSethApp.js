@@ -429,7 +429,9 @@ async function takeScreenShots2(body) {
 
           await buildingPage.waitForTimeout(2000);
           await page.waitForTimeout(4000);
-          const buildingFile = `${modifiedPARNO}-${ts}-building.png`;
+          
+          const buildingFile = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
+          
           console.log(buildingFile);
           await page.waitForTimeout(5000);
           const storedScreenshotPath = path.join(storage, buildingFile);
