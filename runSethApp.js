@@ -428,9 +428,9 @@ async function takeScreenShots2(body) {
           }
 
           await buildingPage.waitForTimeout(4000);
-          
+
           const buildingFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-building.png`;
-          
+
           console.log(buildingFileName);
           await buildingPage.waitForTimeout(5000);
           const storedScreenshotPath = path.join(storage, buildingFileName);
@@ -477,7 +477,6 @@ async function takeScreenShots2(body) {
             Buffer.isBuffer(waterUploadBuffer),
           );
 
-
           const waterFileName = `${modifiedPARNO}-${ts}-${spreadsheetName}-water.png`;
           // await waterPage.waitForTimeout(5000);
           const outputFolder = path.join(__dirname, storage);
@@ -498,24 +497,6 @@ async function takeScreenShots2(body) {
             `Water image saved (${waterInfo.size} bytes): ${filePath}`,
           );
 
-/*           await waterPage.waitForTimeout(4000);
-          console.log(waterFileName);
-          await waterPage.waitForTimeout(5000);
-          const storedScreenshotPath = path.join(storage, waterFileName);
-
-          await waterPage.screenshot({
-            path: storedScreenshotPath,
-            fullPage: true,
-          });
- */
-/*           const screenshotInfo = await fsPromises.stat(storedScreenshotPath);
-          if (screenshotInfo.size === 0) {
-            throw new Error(`Screenshot is empty: ${storedScreenshotPath}`);
-          }
-          console.log(
-            `Screenshot saved (${screenshotInfo.size} bytes): ${storedScreenshotPath}`,
-          );
-  */         
           sharedableWaterLink =
             storageWebSite + "/" + "storage/" + waterFileName;
           console.log("sharedableWaterLink:", sharedableWaterLink);

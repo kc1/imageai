@@ -200,7 +200,7 @@ async function generateCombinedMap(fullPropertyRecord, width = 1200, height = 80
   ctx.beginPath();
   pathGenerator(fullPropertyRecord.geometry);
   ctx.strokeStyle = "red"; // Changed to red so it stands out against blue wetlands!
-  ctx.lineWidth = 8;
+  ctx.lineWidth = 4;
   ctx.stroke();
 
   return canvas.toBuffer("image/png");
